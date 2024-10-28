@@ -17,12 +17,8 @@ import {
   AuthEmbedConfig,
   upsertAuthEmbed,
 } from "../outseta";
-import { CopyButton, EmbedModeListControls } from "../common";
-import {
-  useEmbedMode,
-  useSingleOutsetaEmbedSelection,
-  useSingleSupportsLinkSelection,
-} from "../app-state";
+import { EmbedModeListControls, PopupLinkFormSection } from "../common";
+import { useEmbedMode, useSingleOutsetaEmbedSelection } from "../app-state";
 import { useConfiguration } from "../custom-code";
 import { Alert } from "../common/Alert";
 
@@ -39,7 +35,6 @@ function AuthRegisterPage() {
     enabled: !!domain && !isInvalid,
   });
 
-  const singleSupportsLink = useSingleSupportsLinkSelection();
   const singleOutsetaEmbed = useSingleOutsetaEmbedSelection();
   const embedControls = singleOutsetaEmbed?.controls;
 
@@ -100,16 +95,6 @@ function AuthRegisterPage() {
     mutationFn: () => upsertAuthEmbed(config, singleOutsetaEmbed),
   });
 
-  const popupMutation = useMutation({
-    mutationFn: () => {
-      if (!singleSupportsLink) return Promise.resolve(null);
-      return singleSupportsLink.setAttributes({
-        link: registerAuthPopupUrl(config, domain),
-        linkOpenInNewTab: false,
-      });
-    },
-  });
-
   const planFamilyItems =
     planFamilies?.map((family) => ({
       value: family.Uid,
@@ -164,10 +149,6 @@ function AuthRegisterPage() {
         switch (embedMode) {
           case "embed":
             embedMutation.mutate();
-            break;
-          case "popup":
-            popupMutation.mutate();
-
             break;
         }
       }}
@@ -249,21 +230,8 @@ function AuthRegisterPage() {
         <Button variant="primary">Add Signup Embed to page</Button>
       )}
 
-      {embedMode === "popup" && singleSupportsLink && (
-        <Button variant="primary">Set Signup Popup Link</Button>
-      )}
-
-      {embedMode === "popup" && !singleSupportsLink && (
-        <>
-          <CopyButton
-            label={`Copy Popup Url to clipboard`}
-            text={registerAuthPopupUrl(config, domain)}
-          />
-          <p>
-            and paste the url as the "link to" value making sure open in new tab
-            is not enabled.
-          </p>
-        </>
+      {embedMode === "popup" && (
+        <PopupLinkFormSection popupUrl={registerAuthPopupUrl(config, domain)} />
       )}
 
       <section>

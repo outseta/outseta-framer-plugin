@@ -4,6 +4,7 @@ export { PageHeader } from "./PageHeader";
 export { CopyButton } from "./CopyButton";
 export { ErrorDisplay } from "./ErrorDisplay";
 export { PageListControls } from "./PageListControls";
+export { PopupLinkFormSection } from "./PopupLinkFormSection";
 export * from "./LinkList";
 
 export { ArrowLeftIcon } from "./assets/ArrowLeftIcon";

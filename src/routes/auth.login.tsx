@@ -7,7 +7,7 @@ import {
   loginAuthPopupUrl,
   AuthEmbedConfig,
 } from "../outseta";
-import { CopyButton, EmbedModeListControls } from "../common";
+import { EmbedModeListControls, PopupLinkFormSection } from "../common";
 import {
   useEmbedMode,
   useSingleOutsetaEmbedSelection,
@@ -62,21 +62,8 @@ export function AuthLoginPage() {
         <Button variant="primary">Add Login Embed to page</Button>
       )}
 
-      {embedMode === "popup" && singleSupportsLink && (
-        <Button variant="primary">Set Login Popup Link</Button>
-      )}
-
-      {embedMode === "popup" && !singleSupportsLink && (
-        <>
-          <CopyButton
-            label={`Copy Popup Url to clipboard`}
-            text={loginAuthPopupUrl(domain)}
-          />
-          <p>
-            and paste the url as the "link to" value making sure open in new tab
-            is not enabled.
-          </p>
-        </>
+      {embedMode === "popup" && (
+        <PopupLinkFormSection popupUrl={loginAuthPopupUrl(domain)} />
       )}
     </form>
   );

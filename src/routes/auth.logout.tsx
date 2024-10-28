@@ -17,14 +17,15 @@ export function AuthLogoutPage() {
         value={postLogoutPath}
         onChange={(value) => setPostLogoutPath(value)}
       />
+
       <CopyButton
-        label="Copy Popup Url to clipboard"
+        label="Copy popup url to clipboard"
         text={postLogoutPath + "#o-logout-link"}
       />
 
       <p>
-        and paste the url as the "link to" value making sure open in new tab is
-        not enabled.
+        Paste the copied url as the <strong>Link To</strong> value
+        <br /> and set <strong>New Tab</strong> to <em>No</em>.
       </p>
     </form>
   );

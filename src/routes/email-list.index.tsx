@@ -11,12 +11,8 @@ import {
   getEmailListData,
 } from "../outseta";
 
-import { EmbedModeListControls, Alert, CopyButton } from "../common";
-import {
-  useEmbedMode,
-  useSingleOutsetaEmbedSelection,
-  useSingleSupportsLinkSelection,
-} from "../app-state";
+import { EmbedModeListControls, Alert, PopupLinkFormSection } from "../common";
+import { useEmbedMode, useSingleOutsetaEmbedSelection } from "../app-state";
 
 export const Route = createFileRoute("/email-list/")({
   component: EmailListIndex,
@@ -25,7 +21,6 @@ export const Route = createFileRoute("/email-list/")({
 export function EmailListIndex() {
   const { embedMode } = useEmbedMode();
   const { domain, isInvalid } = useConfiguration();
-  const singleSupportsLink = useSingleSupportsLinkSelection();
   const singleOutsetaEmbed = useSingleOutsetaEmbedSelection();
 
   const query = useQuery({
@@ -38,7 +33,6 @@ export function EmailListIndex() {
 
   const emailLists = query.data?.items;
   const defaultUid = emailLists?.[0]?.Uid;
-  const disablePopup = !defaultUid;
 
   const config: EmailListEmbedConfig = { uid: uid || defaultUid || "" };
 
@@ -49,16 +43,6 @@ export function EmailListIndex() {
 
   const embedMutation = useMutation({
     mutationFn: () => upsertEmailListEmbed(config, singleOutsetaEmbed),
-  });
-
-  const popupMutation = useMutation({
-    mutationFn: () => {
-      if (!singleSupportsLink) return Promise.resolve(null);
-      return singleSupportsLink.setAttributes({
-        link: emailListPopupUrl(config, domain),
-        linkOpenInNewTab: false,
-      });
-    },
   });
 
   const items =
@@ -91,9 +75,6 @@ export function EmailListIndex() {
           case "embed":
             embedMutation.mutate();
             break;
-          case "popup":
-            popupMutation.mutate();
-            break;
         }
       }}
     >
@@ -111,27 +92,7 @@ export function EmailListIndex() {
         <Button variant="primary">Add Email List Embed to page</Button>
       )}
 
-      {embedMode === "popup" && singleSupportsLink && (
-        <Button variant="primary" disabled={disablePopup}>
-          Set Email List Popup Link
-        </Button>
-      )}
-
-      {embedMode === "popup" && !singleSupportsLink && (
-        <>
-          <CopyButton
-            label={`Copy Popup Url to clipboard`}
-            text={emailListPopupUrl(config, domain)}
-            disabled={disablePopup}
-          />
-          {!disablePopup && (
-            <p>
-              and paste the url as the "link to" value making sure open in new
-              tab is not enabled.
-            </p>
-          )}
-        </>
-      )}
+      <PopupLinkFormSection popupUrl={emailListPopupUrl(config, domain)} />
 
       {domain && emailLists?.length === 0 && (
         <Alert level="warning">

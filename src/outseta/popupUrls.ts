@@ -65,6 +65,7 @@ export function emailListPopupUrl(
   { uid }: EmailListEmbedConfig,
   domain: string,
 ) {
+  if (!uid) return "";
   return popupUrl({
     path: `/email/lists/${uid}/subscribe`,
     domain: domain,
@@ -75,6 +76,7 @@ export function leadCapturePopupUrl(
   { uid }: LeadCaptureEmbedConfig,
   domain: string,
 ) {
+  if (!uid) return "";
   return popupUrl({
     path: `/forms/${uid}`,
     domain: domain,
