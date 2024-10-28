@@ -98,8 +98,8 @@ function User() {
             text={profilePopupUrl(config, domain)}
           />
           <p>
-            and paste the url as the "link to" value making sure open in new tab
-            is not enabled.
+            Paste the copied url as the <strong>Link To</strong> value
+            <br /> and set <strong>New Tab</strong> to <em>No</em>.
           </p>
         </>
       )}

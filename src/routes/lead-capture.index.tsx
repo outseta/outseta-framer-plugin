@@ -10,12 +10,8 @@ import {
   LeadCaptureEmbedConfig,
   leadCapturePopupUrl,
 } from "../outseta";
-import {
-  useEmbedMode,
-  useSingleOutsetaEmbedSelection,
-  useSingleSupportsLinkSelection,
-} from "../app-state";
-import { EmbedModeListControls, Alert, CopyButton } from "../common";
+import { useEmbedMode, useSingleOutsetaEmbedSelection } from "../app-state";
+import { EmbedModeListControls, Alert, PopupLinkFormSection } from "../common";
 
 export const Route = createFileRoute("/lead-capture/")({
   component: LeadCaptureIndex,
@@ -24,7 +20,7 @@ export const Route = createFileRoute("/lead-capture/")({
 export function LeadCaptureIndex() {
   const { embedMode } = useEmbedMode();
   const { domain, isInvalid } = useConfiguration();
-  const singleSupportsLink = useSingleSupportsLinkSelection();
+
   const singleOutsetaEmbed = useSingleOutsetaEmbedSelection();
 
   const query = useQuery({
@@ -37,7 +33,6 @@ export function LeadCaptureIndex() {
 
   const leadCaptures = query.data?.items;
   const defaultUid = leadCaptures?.[0]?.Uid;
-  const disablePopup = !defaultUid;
 
   const config: LeadCaptureEmbedConfig = { uid: uid || defaultUid || "" };
 
@@ -48,16 +43,6 @@ export function LeadCaptureIndex() {
 
   const embedMutation = useMutation({
     mutationFn: () => upsertLeadCaptureEmbed(config, singleOutsetaEmbed),
-  });
-
-  const popupMutation = useMutation({
-    mutationFn: () => {
-      if (!singleSupportsLink) return Promise.resolve(null);
-      return singleSupportsLink.setAttributes({
-        link: leadCapturePopupUrl(config, domain),
-        linkOpenInNewTab: false,
-      });
-    },
   });
 
   const items =
@@ -90,9 +75,6 @@ export function LeadCaptureIndex() {
           case "embed":
             embedMutation.mutate();
             break;
-          case "popup":
-            popupMutation.mutate();
-            break;
         }
       }}
     >
@@ -110,25 +92,7 @@ export function LeadCaptureIndex() {
         <Button>Add Lead Capture Embed to page</Button>
       )}
 
-      {embedMode === "popup" && singleSupportsLink && (
-        <Button disabled={disablePopup}>Set Lead Capture Popup Link</Button>
-      )}
-
-      {embedMode === "popup" && !singleSupportsLink && (
-        <>
-          <CopyButton
-            label={`Copy Popup Url to clipboard`}
-            text={leadCapturePopupUrl(config, domain)}
-            disabled={disablePopup}
-          />
-          {!disablePopup && (
-            <p>
-              and paste the url as the "link to" value making sure open in new
-              tab is not enabled.
-            </p>
-          )}
-        </>
-      )}
+      <PopupLinkFormSection popupUrl={leadCapturePopupUrl(config, domain)} />
 
       {domain && leadCaptures?.length === 0 && (
         <Alert level="warning">
