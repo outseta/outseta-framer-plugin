@@ -1,0 +1,32 @@
+.root {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.item {
+  border-radius: 3px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background-color: var(--framer-color-bg-tertiary);
+}
+
+.item mark {
+  border: 1px solid var(--framer-color-divider);
+  border-radius: 3px;
+  display: inline-block;
+  background-color: white;
+  padding: 2px 6px;
+}
+
+.item h2 {
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.item code {
+  font-size: 12px;
+}

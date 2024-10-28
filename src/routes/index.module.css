@@ -1,0 +1,54 @@
+.header {
+  display: flex;
+  align-items: center;
+  padding: 0 24px;
+  padding-top: 18px;
+  gap: 12px;
+}
+
+.menu {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 6px;
+  padding: 0 12px;
+}
+
+.menu > * {
+  border-radius: 3px;
+  height: auto;
+  gap: 10px;
+  padding: 12px;
+}
+
+.menu svg {
+  transition: transform ease-out 0.15s;
+}
+
+.menu > * svg:last-child {
+  margin-left: auto;
+}
+
+.menu > *:hover svg:last-child {
+  transform: translateX(2px);
+}
+
+.notifications {
+  margin-bottom: 12px;
+}
+
+.notifications span {
+  font-weight: normal;
+}
+
+.notifications span:first-of-type::before {
+  content: "(";
+}
+
+.notifications span:last-of-type::after {
+  content: ")";
+}
+
+.notifications span + span::before {
+  content: ", ";
+}

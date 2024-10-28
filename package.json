@@ -1,0 +1,39 @@
+{
+  "name": "test-plugin",
+  "private": true,
+  "version": "v3",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@rollbar/react": "^0.12.0-beta",
+    "@tanstack/react-query": "^5.51.11",
+    "@tanstack/react-router": "^1.56.5",
+    "@triozer/framer-toolbox": "^0.4.3",
+    "axios": "^1.7.7",
+    "framer-plugin": "^0.4.0",
+    "react": "^18",
+    "react-dom": "^18",
+    "rollbar": "^2.26.4",
+    "vite-plugin-mkcert": "^1"
+  },
+  "devDependencies": {
+    "@tanstack/router-devtools": "^1.48.4",
+    "@tanstack/router-plugin": "^1.48.3",
+    "@types/react": "^18",
+    "@types/react-dom": "^18",
+    "@typescript-eslint/eslint-plugin": "^7",
+    "@typescript-eslint/parser": "^7",
+    "@vitejs/plugin-react-swc": "^3",
+    "eslint": "^8",
+    "eslint-plugin-react-hooks": "^4",
+    "eslint-plugin-react-refresh": "^0",
+    "typescript": "^5.3.3",
+    "vite": "^5",
+    "vite-plugin-framer": "^0"
+  }
+}

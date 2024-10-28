@@ -1,0 +1,19 @@
+.root {
+  border: 1px solid #8ac2ff;
+  padding: 12px;
+  border-radius: 3px;
+  text-align: center;
+  text-wrap: balance;
+}
+
+.root a:hover {
+  text-decoration: underline;
+}
+
+.warning {
+  border-color: #eba267;
+}
+
+.error {
+  border-color: #eb6767;
+}

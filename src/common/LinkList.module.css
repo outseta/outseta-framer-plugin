@@ -1,0 +1,60 @@
+.list {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 6px;
+  padding: 0 12px;
+}
+
+.item {
+  position: relative;
+  border-radius: 3px;
+  height: auto;
+  gap: 8px;
+  padding: 12px;
+}
+
+.item h3 {
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.item h3 a {
+  color: currentColor;
+}
+
+.item h3 a::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+
+.item p {
+  font-size: 10px;
+  font-weight: 400;
+}
+
+.item p a {
+  position: relative;
+}
+
+.item p a:hover {
+  text-decoration: underline;
+}
+
+.item svg {
+  margin-left: auto;
+  margin-right: 3px;
+  opacity: 0.8;
+  width: 12px;
+  height: 12px;
+  transition: all ease-out 0.15s;
+}
+
+.item:hover svg:last-child {
+  opacity: 1;
+  transform: translateY(-1px) translateX(1px);
+}

@@ -1,0 +1,23 @@
+.root {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.root a {
+  color: var(--framer-color-primary);
+}
+
+.root a:hover {
+  text-decoration: underline;
+}
+
+.root menu {
+  display: flex;
+  gap: 6px;
+}
+
+.root menu > * {
+  width: auto;
+  background-color: transparent;
+}
