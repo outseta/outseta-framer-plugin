@@ -36,7 +36,6 @@
 
 .root main > p {
   padding: 0 18px;
-  text-align: center;
 }
 
 .root main > h3 {
@@ -59,6 +58,26 @@
 .root main > form p {
   text-align: center;
   text-wrap: balance;
+}
+
+.root main > form > button + div {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0 auto;
+  max-width: 90%;
+}
+
+.root main > form > div + p {
+  margin: 0 auto;
+  max-width: 90%;
+  margin-top: -8px;
+  margin-bottom: 0px;
+}
+
+.root main > form p small {
+  display: block;
+  font-size: 10px;
 }
 
 .root main > form pre {
