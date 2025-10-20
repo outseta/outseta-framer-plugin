@@ -40,18 +40,27 @@ const rollbar = new Rollbar(rollbarConfig);
 import { routeTree } from "./routeTree.gen";
 import { ErrorDisplay } from "./common";
 
+// Error component for router
+const RouterErrorComponent = ({
+  error,
+  reset,
+}: {
+  error: Error;
+  reset: () => void;
+}) => {
+  useEffect(() => {
+    if (error) {
+      console.error("Tanstack Router", error);
+      rollbar.error(error);
+    }
+  }, [error]);
+  return <ErrorDisplay error={error} resetError={reset} />;
+};
+
 // Create a new router instance
 const router = createRouter({
   routeTree,
-  defaultErrorComponent: ({ error, reset }) => {
-    useEffect(() => {
-      if (error) {
-        console.error("Tanstack Router", error);
-        rollbar.error(error);
-      }
-    }, [error]);
-    return <ErrorDisplay error={error} resetError={reset} />;
-  },
+  defaultErrorComponent: RouterErrorComponent,
 });
 
 // Register the router instance for type safety
