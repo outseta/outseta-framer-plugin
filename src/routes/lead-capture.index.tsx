@@ -11,7 +11,12 @@ import {
   leadCapturePopupUrl,
 } from "../outseta";
 import { useEmbedMode, useSingleOutsetaEmbedSelection } from "../app-state";
-import { EmbedModeListControls, Alert, PopupLinkFormSection } from "../common";
+import {
+  EmbedModeListControls,
+  Alert,
+  PopupLinkFormSection,
+  ExternalLink,
+} from "../common";
 
 export const Route = createFileRoute("/lead-capture/")({
   component: LeadCaptureIndex,
@@ -97,9 +102,9 @@ export function LeadCaptureIndex() {
       {domain && leadCaptures?.length === 0 && (
         <Alert level="warning">
           Add a{" "}
-          <a href={`https://${domain}/#/app/email/forms/`} target="_blank">
+          <ExternalLink href={`https://${domain}/#/app/email/forms/`}>
             lead capture form in Outseta
-          </a>{" "}
+          </ExternalLink>{" "}
           to start collecting leads.
         </Alert>
       )}

@@ -17,7 +17,11 @@ import {
   AuthEmbedConfig,
   upsertAuthEmbed,
 } from "../outseta";
-import { EmbedModeListControls, PopupLinkFormSection } from "../common";
+import {
+  EmbedModeListControls,
+  PopupLinkFormSection,
+  ExternalLink,
+} from "../common";
 import { useEmbedMode, useSingleOutsetaEmbedSelection } from "../app-state";
 import { useConfiguration } from "../custom-code";
 import { Alert } from "../common/Alert";
@@ -214,12 +218,9 @@ function AuthRegisterPage() {
           {!discountCodeExists && (
             <p>
               Remember to add{" "}
-              <a
-                href={`https://${domain}/#/app/billing/discounts/`}
-                target="_blank"
-              >
+              <ExternalLink href={`https://${domain}/#/app/billing/discounts/`}>
                 the discount code in Outseta
-              </a>
+              </ExternalLink>
               .
             </p>
           )}
@@ -238,9 +239,9 @@ function AuthRegisterPage() {
         {allPlans?.length === 0 && (
           <Alert level="warning">
             Add at least one{" "}
-            <a href={`https://${domain}/#/app/billing/plans/`} target="_blank">
+            <ExternalLink href={`https://${domain}/#/app/billing/plans/`}>
               plan in Outseta
-            </a>{" "}
+            </ExternalLink>{" "}
             to enable signup.
           </Alert>
         )}

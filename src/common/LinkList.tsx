@@ -1,4 +1,5 @@
 import { ExternalLinkIcon } from "./assets/ExternalLink";
+import { ExternalLink } from "./ExternalLink";
 
 import classes from "./LinkList.module.css";
 
@@ -10,18 +11,20 @@ export function LinkListItem({
   title,
   subtitle,
   url,
+  campaign,
 }: {
   title: string | React.ReactNode;
   subtitle?: string | React.ReactNode;
   url: string;
+  campaign?: string;
 }) {
   return (
     <div className={`button ${classes.item}`}>
       <div>
         <h3>
-          <a href={url} target="_blank">
+          <ExternalLink href={url} campaign={campaign}>
             {title}
-          </a>
+          </ExternalLink>
         </h3>
         <p>{subtitle}</p>
       </div>

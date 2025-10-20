@@ -5,7 +5,8 @@ export { CopyButton } from "./CopyButton";
 export { ErrorDisplay } from "./ErrorDisplay";
 export { PageListControls } from "./PageListControls";
 export { PopupLinkFormSection } from "./PopupLinkFormSection";
-export * from "./LinkList";
+export { LinkList, LinkListItem } from "./LinkList";
+export { ExternalLink } from "./ExternalLink";
 
 export { ArrowLeftIcon } from "./assets/ArrowLeftIcon";
 export { ArrowRightIcon } from "./assets/ArrowRightIcon";

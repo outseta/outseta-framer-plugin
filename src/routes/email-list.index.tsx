@@ -11,7 +11,12 @@ import {
   getEmailListData,
 } from "../outseta";
 
-import { EmbedModeListControls, Alert, PopupLinkFormSection } from "../common";
+import {
+  EmbedModeListControls,
+  Alert,
+  PopupLinkFormSection,
+  ExternalLink,
+} from "../common";
 import { useEmbedMode, useSingleOutsetaEmbedSelection } from "../app-state";
 
 export const Route = createFileRoute("/email-list/")({
@@ -97,9 +102,9 @@ export function EmailListIndex() {
       {domain && emailLists?.length === 0 && (
         <Alert level="warning">
           Add an{" "}
-          <a href={`https://${domain}/#/app/email/lists/`} target="_blank">
+          <ExternalLink href={`https://${domain}/#/app/email/lists/`}>
             email list in Outseta
-          </a>{" "}
+          </ExternalLink>{" "}
           to start collecting emails.
         </Alert>
       )}

@@ -7,6 +7,7 @@ import { getContentGroupData } from "../outseta";
 import classes from "./protected-content.module.css";
 import { usePageQuery } from "../pages";
 import { Alert } from "../common/Alert";
+import { ExternalLink } from "../common";
 
 export const Route = createFileRoute("/protected-content/")({
   component: ProtectedContent,
@@ -147,12 +148,11 @@ export function ProtectedContent() {
         <section>
           <Alert level="warning">
             Add a{" "}
-            <a
+            <ExternalLink
               href={`https://${domain}/#/app/auth/nocode/content-groups`}
-              target="_blank"
             >
               content group
-            </a>{" "}
+            </ExternalLink>{" "}
             in Outseta to protect your pages.
           </Alert>
         </section>
@@ -162,12 +162,11 @@ export function ProtectedContent() {
         <section>
           <Alert level="warning">
             Add or edit a{" "}
-            <a
+            <ExternalLink
               href={`https://${domain}/#/app/auth/nocode/content-groups`}
-              target="_blank"
             >
               content group
-            </a>{" "}
+            </ExternalLink>{" "}
             in Outseta to protect your pages.
           </Alert>
         </section>

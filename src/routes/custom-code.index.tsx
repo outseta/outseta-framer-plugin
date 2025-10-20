@@ -4,7 +4,7 @@ import { useMutation } from "@tanstack/react-query";
 import { Button, TextControls } from "@triozer/framer-toolbox";
 
 import { setCustomCode, useCustomCode } from "../custom-code";
-import { PageListControls } from "../common";
+import { PageListControls, ExternalLink } from "../common";
 
 export const Route = createFileRoute("/custom-code/")({
   component: CustomCode,
@@ -55,13 +55,11 @@ function CustomCode() {
 
       {!customCode.domain && (
         <p>
-          <a href="https://outseta.com" target="_blank">
-            Sign up
-          </a>{" "}
-          for an account or{" "}
-          <a href="https://go.outseta.com/#/login" target="_blank">
+          <ExternalLink href="https://outseta.com">Sign up</ExternalLink> for an
+          account or{" "}
+          <ExternalLink href="https://go.outseta.com/#/login">
             login
-          </a>{" "}
+          </ExternalLink>{" "}
           to your existing acount to find your domain.
         </p>
       )}
