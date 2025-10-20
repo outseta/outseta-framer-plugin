@@ -5,14 +5,14 @@ import React, {
   ReactNode,
   useEffect,
 } from "react";
-import { subscribeToCustomCode } from "./custom-code";
+import { subscribeToCustomCode, type AuthCallbackConfig } from "./custom-code";
 import { useQuery } from "@tanstack/react-query";
 import { getPlanData } from "../outseta";
 
 type CustomCodeState = {
   status: "loading" | "connected" | "disconnected";
   domain: string;
-  postLoginPath: string;
+  authCallbackConfig: AuthCallbackConfig;
   postSignupPath: string;
   disabled: boolean;
 };
@@ -22,7 +22,7 @@ const CustomCodeContext = createContext<CustomCodeState | undefined>(undefined);
 const initialState: CustomCodeState = {
   status: "loading",
   domain: "",
-  postLoginPath: "",
+  authCallbackConfig: { mode: "default" },
   postSignupPath: "",
   disabled: false,
 };

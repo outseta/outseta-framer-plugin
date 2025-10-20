@@ -1,14 +1,29 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState, type FormEvent } from "react";
 import { useMutation } from "@tanstack/react-query";
-import { Button, TextControls } from "@triozer/framer-toolbox";
+import { Button, TextControls, ListControls } from "@triozer/framer-toolbox";
 
-import { setCustomCode, useCustomCode } from "../custom-code";
-import { PageListControls, ExternalLink } from "../common";
+import {
+  setCustomCode,
+  useCustomCode,
+  type AuthCallbackConfig,
+} from "../custom-code";
+
+import { ExternalLink, PageListControls } from "../common";
 
 export const Route = createFileRoute("/custom-code/")({
   component: CustomCode,
 });
+
+// Helper to extract mode from config
+const getMode = (config: AuthCallbackConfig) => config.mode;
+
+// Helper to extract path from config
+const getPath = (config: AuthCallbackConfig): string => {
+  return config.mode === "specific" || config.mode === "custom"
+    ? config.path
+    : "";
+};
 
 function CustomCode() {
   const navigate = useNavigate();
@@ -16,8 +31,11 @@ function CustomCode() {
   const customCode = useCustomCode();
 
   const [domain, setDomain] = useState<string>(customCode.domain);
-  const [postLoginPath, setPostLoginPath] = useState<string>(
-    customCode.postLoginPath,
+  const [authCallbackMode, setAuthCallbackMode] = useState<
+    AuthCallbackConfig["mode"]
+  >(getMode(customCode.authCallbackConfig));
+  const [authCallbackPath, setAuthCallbackPath] = useState<string>(
+    getPath(customCode.authCallbackConfig),
   );
   const [postSignupPath, setPostSignupPath] = useState<string>(
     customCode.postSignupPath,
@@ -29,10 +47,16 @@ function CustomCode() {
   });
 
   const domainHasChanged = domain !== customCode.domain;
-  const postLoginPathHasChanged = postLoginPath !== customCode.postLoginPath;
+  const authCallbackModeHasChanged =
+    authCallbackMode !== getMode(customCode.authCallbackConfig);
+  const authCallbackPathHasChanged =
+    authCallbackPath !== getPath(customCode.authCallbackConfig);
   const postSignupPathHasChanged = postSignupPath !== customCode.postSignupPath;
   const nothingHasChanged =
-    !domainHasChanged && !postLoginPathHasChanged && !postSignupPathHasChanged;
+    !domainHasChanged &&
+    !authCallbackModeHasChanged &&
+    !authCallbackPathHasChanged &&
+    !postSignupPathHasChanged;
   const disabled =
     !domain || nothingHasChanged || !domain.includes(".outseta.com");
 
@@ -42,7 +66,23 @@ function CustomCode() {
         event.preventDefault();
         if (!domain) return;
 
-        mutation.mutate({ domain, postLoginPath, postSignupPath });
+        // Build the config object based on mode
+        let authCallbackConfig: AuthCallbackConfig;
+        if (authCallbackMode === "default") {
+          authCallbackConfig = { mode: "default" };
+        } else if (authCallbackMode === "current") {
+          authCallbackConfig = { mode: "current" };
+        } else if (authCallbackMode === "specific") {
+          authCallbackConfig = { mode: "specific", path: authCallbackPath };
+        } else {
+          authCallbackConfig = { mode: "custom", path: authCallbackPath };
+        }
+
+        mutation.mutate({
+          domain,
+          authCallbackConfig,
+          postSignupPath,
+        });
       }}
     >
       <TextControls
@@ -64,11 +104,41 @@ function CustomCode() {
         </p>
       )}
 
-      <PageListControls
-        title="Post Login Path"
-        value={postLoginPath}
-        onChange={(value) => setPostLoginPath(value)}
-      />
+      <fieldset>
+        <ListControls
+          title="Post Login Path"
+          items={[
+            { label: "As Configured in Outseta", value: "default" },
+            { label: "The Current Page", value: "current" },
+            { label: "Framer Page", value: "specific" },
+            { label: "Custom URL", value: "custom" },
+          ]}
+          required
+          value={authCallbackMode}
+          onChange={(value) =>
+            setAuthCallbackMode(value as AuthCallbackConfig["mode"])
+          }
+        />
+
+        {authCallbackMode === "specific" && (
+          <PageListControls
+            title="&nbsp;"
+            value={authCallbackPath}
+            required
+            onChange={(value) => setAuthCallbackPath(value)}
+          />
+        )}
+
+        {authCallbackMode === "custom" && (
+          <TextControls
+            title="&nbsp;"
+            placeholder="https://example.com/login-success"
+            value={authCallbackPath}
+            required
+            onChange={(value) => setAuthCallbackPath(value)}
+          />
+        )}
+      </fieldset>
 
       <PageListControls
         title="Post Signup Path"
@@ -86,13 +156,11 @@ function CustomCode() {
         </p>
         <p>
           <small>
-            Overrides the values set in{" "}
-            <em>
-              {
-                "Auth > Sign up and Login > Post Login URL, Post Signup URL and Signup Confirmation URL"
-              }
-            </em>{" "}
-            for your convinience working with multiple domains in Framer.
+            The Authentication Callback can use the default configured in
+            Outseta <em>{"(Auth > Sign up and Login > Post Login URL)"}</em>,
+            redirect to the current page, a specific page, or a custom URL. Post
+            Signup URL and Signup Confirmation URL are overridden for your
+            convenience when working with multiple domains in Framer.
           </small>
         </p>
       </div>

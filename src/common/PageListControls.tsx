@@ -4,10 +4,12 @@ import { usePageQuery } from "../pages";
 export function PageListControls({
   title,
   value,
+  required,
   onChange,
 }: {
   title: string;
   value: string;
+  required?: boolean;
   onChange: (
     value: string,
     event: React.ChangeEvent<HTMLSelectElement>,
@@ -16,8 +18,11 @@ export function PageListControls({
   const pageQuery = usePageQuery();
   const nonCollectionPages =
     pageQuery.data?.filter((page) => !page.collectionId) || [];
+
+  console.log(pageQuery.data);
+
   const items = nonCollectionPages.map((page) => ({
-    label: page.path || "",
+    label: page.path === "/" ? "/Home" : page.path || "",
     value: page.path || "",
   }));
 
@@ -26,6 +31,7 @@ export function PageListControls({
       title={title}
       items={items}
       value={value}
+      required={required}
       onChange={onChange}
     />
   );
