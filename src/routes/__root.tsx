@@ -29,7 +29,7 @@ function Root() {
 
     if (widget === "auth" && widgetMode === "register") {
       navigate({ to: "/auth", from: "/" });
-    } else if (widgetMode === "login" && widgetMode === "login") {
+    } else if (widget === "auth" && widgetMode === "login") {
       navigate({ to: "/auth/login", from: "/" });
     } else if (widget === "profile") {
       navigate({ to: "/user", from: "/" });
