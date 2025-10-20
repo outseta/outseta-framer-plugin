@@ -12,7 +12,7 @@ import {
 } from "../common";
 
 import classes from "./index.module.css";
-import { CustomCodeSummary, useConfiguration } from "../custom-code";
+import { CustomCodeSummary } from "../custom-code";
 import { useNotifications } from "../notifications";
 import { Separator } from "@triozer/framer-toolbox";
 import { DisconnectedLinkListItem } from "../custom-code/DisconnectedLinkListItem";
