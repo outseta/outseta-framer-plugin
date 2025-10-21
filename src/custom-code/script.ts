@@ -1,7 +1,7 @@
 export const parseOutsetaScript = (code: string) => {
   const domainRegex = /domain: '(.+?)'/;
   const authCallbackUrlRegex =
-    /authenticationCallbackUrl:\s*([^,\n]+?)(?:,|\n)/;
+    /authenticationCallbackUrl:\s*(['"]?)([^,\n'"]+?)\1(?:,|\n)/;
   const postRegistrationRegex = /postRegistrationUrl:\s*"([^"]*)"/;
 
   const domainMatch = code.match(domainRegex);
@@ -9,11 +9,11 @@ export const parseOutsetaScript = (code: string) => {
   const postSignupPathMatch = code.match(postRegistrationRegex);
 
   return {
-    domain: domainMatch ? domainMatch[1] : "",
+    domain: domainMatch ? domainMatch[1] : undefined,
     authCallbackUrl: authCallbackUrlMatch
-      ? authCallbackUrlMatch[1].trim()
+      ? authCallbackUrlMatch[2].trim()
       : undefined,
-    postSignupPath: postSignupPathMatch ? postSignupPathMatch[1] : "",
+    postSignupPath: postSignupPathMatch ? postSignupPathMatch[1] : undefined,
   };
 };
 
@@ -33,8 +33,8 @@ export const createOutsetaScript = ({
             load: 'auth,profile,nocode,leadCapture,support,emailList',
             monitorDom: 'true',
             auth: {
-              ${authCallbackUrl ? `// Override the Post Login URL configured in Outseta` : ""}
-              ${authCallbackUrl ? `authenticationCallbackUrl: ${authCallbackUrl},` : ""}
+              ${authCallbackUrl ? `// Override the Post Login URL configured in Outseta` : `// Use the Post Login URL configured in Outseta`}
+              authenticationCallbackUrl: ${authCallbackUrl},
 
               // Overrides the Signup Confirmation URL
               registrationConfirmationUrl: window.location.href,
