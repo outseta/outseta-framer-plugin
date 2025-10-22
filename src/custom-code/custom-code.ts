@@ -37,9 +37,9 @@ export const setCustomCode = async ({
 
 export const subscribeToCustomCode = (
   callback: (props: {
-    domain: string;
+    domain?: string;
     authCallbackConfig: AuthCallbackConfig;
-    postSignupPath: string;
+    postSignupPath?: string;
     disabled: boolean;
   }) => void,
 ) => {
