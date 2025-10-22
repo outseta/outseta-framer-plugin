@@ -1,7 +1,7 @@
 export type AuthCallbackConfig =
   | { mode: "default" }
   | { mode: "current" }
-  | { mode: "specific"; path: string }
+  | { mode: "page"; path: string }
   | { mode: "custom"; path: string };
 
 // Helper: Convert auth callback config to JavaScript expression
@@ -13,7 +13,7 @@ export const authCallbackModeToUrlExpression = (
       return undefined;
     case "current":
       return "window.location.href";
-    case "specific":
+    case "page":
       return `new URL("${config.path}", window.location.origin).href`;
     case "custom":
       return `"${config.path}"`;
@@ -32,11 +32,11 @@ export const authCallbackUrlExpressionToMode = (
     return { mode: "current" };
   }
 
-  const specificMatch = expression.match(
+  const pageMatch = expression.match(
     /^new URL\("([^"]+)",\s*window\.location\.origin\)\.href$/,
   );
-  if (specificMatch) {
-    return { mode: "specific", path: specificMatch[1] };
+  if (pageMatch) {
+    return { mode: "page", path: pageMatch[1] };
   }
 
   const customMatch = expression.match(/^"([^"]+)"$/);

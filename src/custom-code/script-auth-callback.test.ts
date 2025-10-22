@@ -18,15 +18,15 @@ describe("authCallbackModeToUrlExpression", () => {
     expect(result).toBe("window.location.href");
   });
 
-  it("should return new URL expression for specific mode", () => {
-    const config: AuthCallbackConfig = { mode: "specific", path: "/dashboard" };
+  it("should return new URL expression for page mode", () => {
+    const config: AuthCallbackConfig = { mode: "page", path: "/dashboard" };
     const result = authCallbackModeToUrlExpression(config);
     expect(result).toBe('new URL("/dashboard", window.location.origin).href');
   });
 
-  it("should return new URL expression for specific mode with complex path", () => {
+  it("should return new URL expression for page mode with complex path", () => {
     const config: AuthCallbackConfig = {
-      mode: "specific",
+      mode: "page",
       path: "/auth/callback?redirect=/profile",
     };
     const result = authCallbackModeToUrlExpression(config);
@@ -55,8 +55,8 @@ describe("authCallbackModeToUrlExpression", () => {
     );
   });
 
-  it("should handle empty path in specific mode", () => {
-    const config: AuthCallbackConfig = { mode: "specific", path: "" };
+  it("should handle empty path in page mode", () => {
+    const config: AuthCallbackConfig = { mode: "page", path: "" };
     const result = authCallbackModeToUrlExpression(config);
     expect(result).toBe('new URL("", window.location.origin).href');
   });
@@ -84,19 +84,19 @@ describe("authCallbackUrlExpressionToMode", () => {
     expect(result).toEqual({ mode: "current" });
   });
 
-  it("should return specific mode for new URL expression", () => {
+  it("should return page mode for new URL expression", () => {
     const result = authCallbackUrlExpressionToMode(
       'new URL("/dashboard", window.location.origin).href',
     );
-    expect(result).toEqual({ mode: "specific", path: "/dashboard" });
+    expect(result).toEqual({ mode: "page", path: "/dashboard" });
   });
 
-  it("should return specific mode for new URL expression with complex path", () => {
+  it("should return page mode for new URL expression with complex path", () => {
     const result = authCallbackUrlExpressionToMode(
       'new URL("/auth/callback?redirect=/profile", window.location.origin).href',
     );
     expect(result).toEqual({
-      mode: "specific",
+      mode: "page",
       path: "/auth/callback?redirect=/profile",
     });
   });
@@ -144,7 +144,7 @@ describe("authCallbackUrlExpressionToMode", () => {
     const result = authCallbackUrlExpressionToMode(
       'new URL("/dashboard",window.location.origin).href',
     );
-    expect(result).toEqual({ mode: "specific", path: "/dashboard" });
+    expect(result).toEqual({ mode: "page", path: "/dashboard" });
   });
 
   it("should return default mode for malformed expressions", () => {
@@ -171,6 +171,7 @@ describe("authCallbackUrlExpressionToMode", () => {
     expect(result3).toEqual({ mode: "default" });
     expect(result4).toEqual({ mode: "default" });
     expect(result5).toEqual({ mode: "default" });
+    expect(result6).toEqual({ mode: "default" });
     expect(result7).toEqual({ mode: "default" });
   });
 });
@@ -190,9 +191,9 @@ describe("authCallbackModeToUrlExpression and authCallbackUrlExpressionToMode ro
     expect(converted).toEqual(original);
   });
 
-  it("should maintain consistency for specific mode", () => {
+  it("should maintain consistency for page mode", () => {
     const original: AuthCallbackConfig = {
-      mode: "specific",
+      mode: "page",
       path: "/dashboard",
     };
     const expression = authCallbackModeToUrlExpression(original);
@@ -200,9 +201,9 @@ describe("authCallbackModeToUrlExpression and authCallbackUrlExpressionToMode ro
     expect(converted).toEqual(original);
   });
 
-  it("should maintain consistency for specific mode with complex path", () => {
+  it("should maintain consistency for page mode with complex path", () => {
     const original: AuthCallbackConfig = {
-      mode: "specific",
+      mode: "page",
       path: "/auth/callback?redirect=/profile",
     };
     const expression = authCallbackModeToUrlExpression(original);
@@ -230,8 +231,8 @@ describe("authCallbackModeToUrlExpression and authCallbackUrlExpressionToMode ro
     expect(converted).toEqual(original);
   });
 
-  it("should fallback to default mode for specific mode with empty path", () => {
-    const original: AuthCallbackConfig = { mode: "specific", path: "" };
+  it("should fallback to default mode for page mode with empty path", () => {
+    const original: AuthCallbackConfig = { mode: "page", path: "" };
     const expression = authCallbackModeToUrlExpression(original);
     const converted = authCallbackUrlExpressionToMode(expression);
     expect(converted).toEqual({ mode: "default" });

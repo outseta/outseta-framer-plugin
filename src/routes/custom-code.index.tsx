@@ -20,9 +20,7 @@ const getMode = (config: AuthCallbackConfig) => config.mode;
 
 // Helper to extract path from config
 const getPath = (config: AuthCallbackConfig): string => {
-  return config.mode === "specific" || config.mode === "custom"
-    ? config.path
-    : "";
+  return config.mode === "page" || config.mode === "custom" ? config.path : "";
 };
 
 function CustomCode() {
@@ -72,8 +70,8 @@ function CustomCode() {
           authCallbackConfig = { mode: "default" };
         } else if (authCallbackMode === "current") {
           authCallbackConfig = { mode: "current" };
-        } else if (authCallbackMode === "specific") {
-          authCallbackConfig = { mode: "specific", path: authCallbackPath };
+        } else if (authCallbackMode === "page") {
+          authCallbackConfig = { mode: "page", path: authCallbackPath };
         } else {
           authCallbackConfig = { mode: "custom", path: authCallbackPath };
         }
@@ -110,7 +108,7 @@ function CustomCode() {
           items={[
             { label: "As Configured in Outseta", value: "default" },
             { label: "The Current Page", value: "current" },
-            { label: "Framer Page", value: "specific" },
+            { label: "Framer Page", value: "page" },
             { label: "Custom URL", value: "custom" },
           ]}
           required
@@ -120,7 +118,7 @@ function CustomCode() {
           }
         />
 
-        {authCallbackMode === "specific" && (
+        {authCallbackMode === "page" && (
           <PageListControls
             title="&nbsp;"
             value={authCallbackPath}
@@ -158,7 +156,7 @@ function CustomCode() {
           <small>
             The Authentication Callback can use the default configured in
             Outseta <em>{"(Auth > Sign up and Login > Post Login URL)"}</em>,
-            redirect to the current page, a specific page, or a custom URL. Post
+            redirect to the current page, a Framer page, or a custom URL. Post
             Signup URL and Signup Confirmation URL are overridden for your
             convenience when working with multiple domains in Framer.
           </small>
