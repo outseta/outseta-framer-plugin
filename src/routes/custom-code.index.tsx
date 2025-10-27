@@ -18,9 +18,14 @@ export const Route = createFileRoute("/custom-code/")({
 // Helper to extract mode from config
 const getMode = (config: AuthCallbackConfig) => config.mode;
 
-// Helper to extract path from config
-const getPath = (config: AuthCallbackConfig): string => {
-  return config.mode === "page" || config.mode === "custom" ? config.path : "";
+// Helper to extract page path from config
+const getPagePath = (config: AuthCallbackConfig): string => {
+  return config.mode === "page" ? config.path : "";
+};
+
+// Helper to extract custom URL from config
+const getCustomUrl = (config: AuthCallbackConfig): string => {
+  return config.mode === "custom" ? config.path : "";
 };
 
 function CustomCode() {
@@ -32,8 +37,11 @@ function CustomCode() {
   const [authCallbackMode, setAuthCallbackMode] = useState<
     AuthCallbackConfig["mode"]
   >(getMode(customCode.authCallbackConfig));
-  const [authCallbackPath, setAuthCallbackPath] = useState<string>(
-    getPath(customCode.authCallbackConfig),
+  const [authCallbackPagePath, setAuthCallbackPagePath] = useState<string>(
+    getPagePath(customCode.authCallbackConfig),
+  );
+  const [authCallbackCustomUrl, setAuthCallbackCustomUrl] = useState<string>(
+    getCustomUrl(customCode.authCallbackConfig),
   );
   const [postSignupPath, setPostSignupPath] = useState<string>(
     customCode.postSignupPath,
@@ -47,8 +55,17 @@ function CustomCode() {
   const domainHasChanged = domain !== customCode.domain;
   const authCallbackModeHasChanged =
     authCallbackMode !== getMode(customCode.authCallbackConfig);
+
+  // Check the appropriate path based on current mode
+  const authCallbackPagePathHasChanged =
+    authCallbackMode === "page" &&
+    authCallbackPagePath !== getPagePath(customCode.authCallbackConfig);
+  const authCallbackCustomUrlHasChanged =
+    authCallbackMode === "custom" &&
+    authCallbackCustomUrl !== getCustomUrl(customCode.authCallbackConfig);
   const authCallbackPathHasChanged =
-    authCallbackPath !== getPath(customCode.authCallbackConfig);
+    authCallbackPagePathHasChanged || authCallbackCustomUrlHasChanged;
+
   const postSignupPathHasChanged = postSignupPath !== customCode.postSignupPath;
   const nothingHasChanged =
     !domainHasChanged &&
@@ -71,9 +88,9 @@ function CustomCode() {
         } else if (authCallbackMode === "current") {
           authCallbackConfig = { mode: "current" };
         } else if (authCallbackMode === "page") {
-          authCallbackConfig = { mode: "page", path: authCallbackPath };
+          authCallbackConfig = { mode: "page", path: authCallbackPagePath };
         } else {
-          authCallbackConfig = { mode: "custom", path: authCallbackPath };
+          authCallbackConfig = { mode: "custom", path: authCallbackCustomUrl };
         }
 
         mutation.mutate({
@@ -121,9 +138,9 @@ function CustomCode() {
         {authCallbackMode === "page" && (
           <PageListControls
             title="&nbsp;"
-            value={authCallbackPath}
+            value={authCallbackPagePath}
             required
-            onChange={(value) => setAuthCallbackPath(value)}
+            onChange={(value) => setAuthCallbackPagePath(value)}
           />
         )}
 
@@ -131,9 +148,9 @@ function CustomCode() {
           <TextControls
             title="&nbsp;"
             placeholder="https://example.com/login-success"
-            value={authCallbackPath}
+            value={authCallbackCustomUrl}
             required
-            onChange={(value) => setAuthCallbackPath(value)}
+            onChange={(value) => setAuthCallbackCustomUrl(value)}
           />
         )}
       </fieldset>
