@@ -56,15 +56,6 @@
   margin: 0 18px;
 }
 
-.root main > form > fieldset {
-  border: none;
-  padding: 0;
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
 .root main > form p {
   text-align: center;
   text-wrap: balance;
@@ -79,6 +70,21 @@
 
 .root main > form p a:hover {
   text-decoration: underline;
+}
+
+.root main > form > fieldset {
+  border: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.root main form > fieldset > p {
+  margin-left: calc(50% - 16px);
+  text-align: left;
+  font-size: smaller;
 }
 
 .root main > section {

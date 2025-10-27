@@ -153,6 +153,36 @@ function CustomCode() {
             onChange={(value) => setAuthCallbackCustomUrl(value)}
           />
         )}
+
+        {authCallbackMode === "default" && (
+          <p>
+            Redirect users to the URL configured in your{" "}
+            {customCode.domain ? (
+              <>
+                <ExternalLink
+                  href={`https://${customCode.domain}/#/app/auth/sign-up-login`}
+                >
+                  Outseta dashboard
+                </ExternalLink>
+              </>
+            ) : (
+              "Outseta dashboard"
+            )}
+            .
+          </p>
+        )}
+
+        {authCallbackMode === "current" && (
+          <p>Return users to the same page they logged in from.</p>
+        )}
+
+        {authCallbackMode === "page" && (
+          <p>Return users to a specific Framer page (selected above).</p>
+        )}
+
+        {authCallbackMode === "custom" && (
+          <p>Redirect users to a custom URL (configured above).</p>
+        )}
       </fieldset>
 
       <PageListControls
