@@ -5,7 +5,7 @@ export type AuthCallbackConfig =
   | { mode: "custom"; path: string };
 
 // Helper: Convert auth callback config to JavaScript expression
-export const authCallbackModeToUrlExpression = (
+export const authCallbackConfigToExpression = (
   config: AuthCallbackConfig,
 ): string | undefined => {
   switch (config.mode) {
@@ -21,34 +21,32 @@ export const authCallbackModeToUrlExpression = (
 };
 
 // Helper: Convert JavaScript expression back to auth callback config
-export const authCallbackUrlExpressionToMode = (
+export const authCallbackExpressionToMode = (
   expression: string | undefined,
 ): AuthCallbackConfig => {
   if (!expression) {
     return { mode: "default" };
   }
 
+  // Current Mode
   if (expression === "window.location.href") {
     return { mode: "current" };
   }
 
+  // Page Mode
   const pageMatch = expression.match(
-    /^new URL\("([^"]+)",\s*window\.location\.origin\)\.href$/,
+    /^new\s+URL\s*\(\s*"([^"]+)"\s*,\s*window\.location\.origin\s*\)\s*\.href$/,
   );
   if (pageMatch) {
     return { mode: "page", path: pageMatch[1] };
   }
 
-  const customMatch = expression.match(/^"([^"]+)"$/);
+  // Custom Mode
+  const customMatch = expression.match(/^["']([^"']+)["']$/);
   if (customMatch) {
     return { mode: "custom", path: customMatch[1] };
   }
 
-  // Log unexpected URL expression format to Rollbar
-  console.error(
-    `Unexpected auth callback URL expression format: ${expression}`,
-  );
-
-  // Fallback to default if we can't parse it
+  // Fallback to default mode
   return { mode: "default" };
 };

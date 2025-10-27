@@ -1,40 +1,74 @@
 export const parseOutsetaScript = (code: string) => {
-  const domainRegex = /domain: '(.+?)'/;
+  // Captures the full expression after domain
+  const domainRegex = /domain:\s*([\s\S]+?)(?=,\s*(\n|\})|\n|\}|$)/;
+  // Captures the full expression after authenticationCallbackUrl
   const authCallbackUrlRegex =
-    /authenticationCallbackUrl:\s*(['"]?)([^,\n'"]+?)\1(?:,|\n)/;
-  const postRegistrationRegex = /postRegistrationUrl:\s*"([^"]*)"/;
+    /authenticationCallbackUrl:\s*([\s\S]+?)(?=,\s*(\n|\})|\n|\}|$)/;
+  const postRegistrationRegex = /postRegistrationUrl:\s*['"]([^'"]*)['"]/;
 
   const domainMatch = code.match(domainRegex);
   const authCallbackUrlMatch = code.match(authCallbackUrlRegex);
   const postSignupPathMatch = code.match(postRegistrationRegex);
 
+  // Extract and validate domain
+  let domainExpression = undefined;
+  if (domainMatch) {
+    const captured = domainMatch[1].trim();
+    // Check if it starts with a quote and ensure it has a matching closing quote
+    if (
+      (captured.startsWith('"') && captured.endsWith('"')) ||
+      (captured.startsWith("'") && captured.endsWith("'"))
+    ) {
+      domainExpression = captured;
+    } else if (!captured.startsWith('"') && !captured.startsWith("'")) {
+      // It's an unquoted expression
+      domainExpression = captured;
+    }
+    // Otherwise it's malformed (unclosed quote), so leave it as undefined
+  }
+
+  // Extract and validate authCallbackExpression
+  let authCallbackExpression = undefined;
+  if (authCallbackUrlMatch) {
+    const captured = authCallbackUrlMatch[1].trim();
+    // Check if it starts with a quote and ensure it has a matching closing quote
+    if (
+      (captured.startsWith('"') && captured.endsWith('"')) ||
+      (captured.startsWith("'") && captured.endsWith("'"))
+    ) {
+      authCallbackExpression = captured;
+    } else if (!captured.startsWith('"') && !captured.startsWith("'")) {
+      // It's an unquoted expression
+      authCallbackExpression = captured;
+    }
+    // Otherwise it's malformed (unclosed quote), so leave it as undefined
+  }
+
   return {
-    domain: domainMatch ? domainMatch[1] : undefined,
-    authCallbackUrl: authCallbackUrlMatch
-      ? authCallbackUrlMatch[2].trim()
-      : undefined,
+    domainExpression,
+    authCallbackExpression,
     postSignupPath: postSignupPathMatch ? postSignupPathMatch[1] : undefined,
   };
 };
 
 export const createOutsetaScript = ({
-  domain,
-  authCallbackUrl,
+  domainExpression,
+  authCallbackExpression,
   postSignupPath,
 }: {
-  domain: string;
-  authCallbackUrl?: string;
+  domainExpression: string;
+  authCallbackExpression?: string;
   postSignupPath?: string;
 }) => {
   return `
         <script>
           var o_options = {
-            domain: '${domain}',
+            domain: ${domainExpression},
             load: 'auth,profile,nocode,leadCapture,support,emailList',
             monitorDom: 'true',
             auth: {
-              ${authCallbackUrl ? `// Override the Post Login URL configured in Outseta` : `// Use the Post Login URL configured in Outseta`}
-              authenticationCallbackUrl: ${authCallbackUrl},
+              ${authCallbackExpression ? `// Override the Post Login URL configured in Outseta` : `// Use the Post Login URL configured in Outseta`}
+              authenticationCallbackUrl: ${authCallbackExpression},
 
               // Overrides the Signup Confirmation URL
               registrationConfirmationUrl: window.location.href,
