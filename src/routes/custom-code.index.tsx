@@ -20,7 +20,6 @@ export const Route = createFileRoute("/custom-code/")({
   component: CustomCode,
 });
 
-// Discriminated union schema for form validation
 const customCodeFormSchema = z.intersection(
   z.object({
     domain: z
@@ -50,7 +49,7 @@ const customCodeFormSchema = z.intersection(
     z.object({
       authCallbackMode: z.literal("custom"),
       authCallbackPagePath: z.string().optional(),
-      authCallbackCustomUrl: z.url(),
+      authCallbackCustomUrl: z.url("A valid URL is required"),
     }),
   ]),
 );

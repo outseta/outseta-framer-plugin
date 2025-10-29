@@ -87,6 +87,10 @@
   font-size: smaller;
 }
 
+.root main form > fieldset > p:global(.error) {
+  color: firebrick;
+}
+
 .root main > section {
   padding: 0 18px;
   display: flex;
