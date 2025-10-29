@@ -19,8 +19,6 @@ export function PageListControls({
   const nonCollectionPages =
     pageQuery.data?.filter((page) => !page.collectionId) || [];
 
-  console.log(pageQuery.data);
-
   const items = nonCollectionPages.map((page) => ({
     label: page.path === "/" ? "/Home" : page.path || "",
     value: page.path || "",
