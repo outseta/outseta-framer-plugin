@@ -5,7 +5,8 @@ import React, {
   ReactNode,
   useEffect,
 } from "react";
-import { subscribeToCustomCode, type AuthCallbackConfig } from "./custom-code";
+import { subscribeToCustomCode } from "./custom-code";
+import type { AuthCallbackConfig } from "./script-auth-callback";
 import { useQuery } from "@tanstack/react-query";
 import { getPlanData } from "../outseta";
 
@@ -35,8 +36,13 @@ export const CustomCodeProvider: React.FC<{ children: ReactNode }> = ({
   useEffect(() => {
     subscribeToCustomCode((customCode) => {
       setState({
-        ...customCode,
         status: customCode.domain ? "connected" : "disconnected",
+        domain: customCode.domain ?? "",
+        authCallbackConfig: customCode.authCallbackConfig ?? {
+          mode: "default",
+        },
+        postSignupPath: customCode.postSignupPath ?? "",
+        disabled: customCode.disabled ?? false,
       });
     });
   }, []);
