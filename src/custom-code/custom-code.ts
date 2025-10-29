@@ -7,19 +7,6 @@ import {
 } from "./script-auth-callback";
 import { domainToExpression, expressionToDomain } from "./script-domain";
 
-// Helper to strip quotes from values
-const stripQuotes = (value: string | undefined): string | undefined => {
-  if (!value) return undefined;
-  // If the value is quoted (single or double), remove the quotes
-  if (
-    (value.startsWith('"') && value.endsWith('"')) ||
-    (value.startsWith("'") && value.endsWith("'"))
-  ) {
-    return value.slice(1, -1);
-  }
-  return value;
-};
-
 export const setCustomCode = async ({
   domain,
   authCallbackConfig = { mode: "default" },
