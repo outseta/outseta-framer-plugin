@@ -5,11 +5,13 @@ export function PageListControls({
   title,
   value,
   required,
+  onBlur,
   onChange,
 }: {
   title: string;
   value: string;
   required?: boolean;
+  onBlur: (event: React.FocusEvent<HTMLSelectElement>) => void;
   onChange: (
     value: string,
     event: React.ChangeEvent<HTMLSelectElement>,
@@ -31,6 +33,7 @@ export function PageListControls({
       value={value}
       required={required}
       onChange={onChange}
+      onBlur={onBlur}
     />
   );
 }

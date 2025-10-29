@@ -1,6 +1,11 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useMutation } from "@tanstack/react-query";
-import { useForm } from "@tanstack/react-form";
+import {
+  revalidateLogic,
+  useForm,
+  type AnyFieldApi,
+} from "@tanstack/react-form";
+import { z } from "zod";
 import { Button, TextControls, ListControls } from "@triozer/framer-toolbox";
 
 import {
@@ -15,14 +20,43 @@ export const Route = createFileRoute("/custom-code/")({
   component: CustomCode,
 });
 
+// Discriminated union schema for form validation
+const customCodeFormSchema = z.intersection(
+  z.object({
+    domain: z
+      .hostname("An Outseta domain is required")
+      .endsWith(
+        ".outseta.com",
+        "An Outseta domain is required, must end with .outseta.com",
+      ),
+    postSignupPath: z.string(),
+  }),
+  z.discriminatedUnion("authCallbackMode", [
+    z.object({
+      authCallbackMode: z.literal("default"),
+      authCallbackPagePath: z.string().optional(),
+      authCallbackCustomUrl: z.string().optional(),
+    }),
+    z.object({
+      authCallbackMode: z.literal("current"),
+      authCallbackPagePath: z.string().optional(),
+      authCallbackCustomUrl: z.string().optional(),
+    }),
+    z.object({
+      authCallbackMode: z.literal("page"),
+      authCallbackPagePath: z.string().trim().nonempty(),
+      authCallbackCustomUrl: z.string().optional(),
+    }),
+    z.object({
+      authCallbackMode: z.literal("custom"),
+      authCallbackPagePath: z.string().optional(),
+      authCallbackCustomUrl: z.url(),
+    }),
+  ]),
+);
+
 // Form data type
-type CustomCodeFormData = {
-  domain: string;
-  authCallbackMode: AuthCallbackConfig["mode"];
-  authCallbackPagePath: string;
-  authCallbackCustomUrl: string;
-  postSignupPath: string;
-};
+type CustomCodeFormData = z.infer<typeof customCodeFormSchema>;
 
 function CustomCode() {
   const navigate = useNavigate();
@@ -34,61 +68,78 @@ function CustomCode() {
   });
 
   // Compute initial form values once
-  const initialValues: CustomCodeFormData = {
-    domain: customCode.domain || "",
-    authCallbackMode: customCode.authCallbackConfig.mode,
-    authCallbackPagePath:
-      customCode.authCallbackConfig.mode === "page"
-        ? customCode.authCallbackConfig.path
-        : "",
-    authCallbackCustomUrl:
-      customCode.authCallbackConfig.mode === "custom"
-        ? customCode.authCallbackConfig.url
-        : "",
-    postSignupPath: customCode.postSignupPath || "",
+  const getInitialValues = (): CustomCodeFormData => {
+    const mode = customCode.authCallbackConfig.mode;
+    const base = {
+      domain: customCode.domain || "",
+      postSignupPath: customCode.postSignupPath || "",
+    };
+
+    switch (mode) {
+      case "page":
+        return {
+          ...base,
+          authCallbackMode: "page" as const,
+          authCallbackPagePath: customCode.authCallbackConfig.path || "",
+          authCallbackCustomUrl: undefined,
+        };
+      case "custom":
+        return {
+          ...base,
+          authCallbackMode: "custom" as const,
+          authCallbackPagePath: undefined,
+          authCallbackCustomUrl: customCode.authCallbackConfig.url || "",
+        };
+      case "current":
+        return {
+          ...base,
+          authCallbackMode: "current" as const,
+          authCallbackPagePath: undefined,
+          authCallbackCustomUrl: undefined,
+        };
+      default:
+        return {
+          ...base,
+          authCallbackMode: "default" as const,
+          authCallbackPagePath: undefined,
+          authCallbackCustomUrl: undefined,
+        };
+    }
   };
+
+  const initialValues = getInitialValues();
 
   const form = useForm({
     defaultValues: initialValues,
+    validationLogic: revalidateLogic({
+      mode: "submit",
+      modeAfterSubmission: "change",
+    }),
     validators: {
-      onSubmit: ({ value }) => {
-        if (value.authCallbackMode === "page" && !value.authCallbackPagePath) {
-          return {
-            fields: {
-              authCallbackPagePath: "Page path is required when mode is 'page'",
-            },
-          };
-        }
-        if (
-          value.authCallbackMode === "custom" &&
-          !value.authCallbackCustomUrl
-        ) {
-          return {
-            fields: {
-              authCallbackCustomUrl:
-                "Custom URL is required when mode is 'custom'",
-            },
-          };
-        }
-        return undefined;
-      },
+      onDynamic: customCodeFormSchema,
     },
     onSubmit: async ({ value }) => {
-      if (!value.domain) return;
-
-      // Build the config object based on mode
+      // Build the config object based on mode with proper type narrowing
       let authCallbackConfig: AuthCallbackConfig;
-      if (value.authCallbackMode === "default") {
-        authCallbackConfig = { mode: "default" };
-      } else if (value.authCallbackMode === "current") {
-        authCallbackConfig = { mode: "current" };
-      } else if (value.authCallbackMode === "page") {
-        authCallbackConfig = { mode: "page", path: value.authCallbackPagePath };
-      } else {
-        authCallbackConfig = {
-          mode: "custom",
-          url: value.authCallbackCustomUrl,
-        };
+      switch (value.authCallbackMode) {
+        case "default":
+          authCallbackConfig = { mode: "default" };
+          break;
+        case "current":
+          authCallbackConfig = { mode: "current" };
+          break;
+        case "page":
+          authCallbackConfig = {
+            mode: "page",
+            path: value.authCallbackPagePath as string,
+          };
+          break;
+        case "custom":
+          authCallbackConfig = {
+            mode: "custom",
+            url: value.authCallbackCustomUrl as string,
+          };
+          break;
       }
 
       mutation.mutate({
@@ -107,61 +158,32 @@ function CustomCode() {
         form.handleSubmit();
       }}
     >
-      <form.Field
-        name="domain"
-        validators={{
-          onChange: ({ value }) => {
-            if (!value) {
-              return "Domain is required";
-            }
-            if (!value.includes(".outseta.com")) {
-              return "Domain must include .outseta.com";
-            }
-            return undefined;
-          },
-        }}
-      >
+      <form.Field name="domain">
         {(field) => (
-          <>
+          <fieldset>
             <TextControls
               title="Outseta Domain"
               placeholder="your-domain.outseta.com"
-              value={field.state.value}
+              value={field.state.value as string}
               required
+              onBlur={field.handleBlur}
               onChange={(value) => field.handleChange(value)}
             />
-            {field.state.meta.errors.length > 0 && (
-              <p style={{ color: "red", fontSize: "0.875rem" }}>
-                {field.state.meta.errors[0]}
-              </p>
-            )}
-          </>
+            <FieldErrors field={field} />
+            <p>
+              <ExternalLink href="https://outseta.com">Sign up</ExternalLink>{" "}
+              for an account or{" "}
+              <ExternalLink href="https://go.outseta.com/#/login">
+                login
+              </ExternalLink>{" "}
+              to your existing acount to find your domain.
+            </p>
+          </fieldset>
         )}
       </form.Field>
 
-      {!customCode.domain && (
-        <p>
-          <ExternalLink href="https://outseta.com">Sign up</ExternalLink> for an
-          account or{" "}
-          <ExternalLink href="https://go.outseta.com/#/login">
-            login
-          </ExternalLink>{" "}
-          to your existing acount to find your domain.
-        </p>
-      )}
-
       <fieldset>
-        <form.Field
-          name="authCallbackMode"
-          validators={{
-            onChange: ({ value }) => {
-              if (!value) {
-                return "Post Login Path is required";
-              }
-              return undefined;
-            },
-          }}
-        >
+        <form.Field name="authCallbackMode">
           {(field) => (
             <ListControls
               title="Post Login Path"
@@ -171,8 +193,8 @@ function CustomCode() {
                 { label: "Framer Page", value: "page" },
                 { label: "Custom URL", value: "custom" },
               ]}
-              required
-              value={field.state.value}
+              value={field.state.value as AuthCallbackConfig["mode"]}
+              onBlur={field.handleBlur}
               onChange={(value) =>
                 field.handleChange(value as AuthCallbackConfig["mode"])
               }
@@ -185,30 +207,16 @@ function CustomCode() {
           children={(authCallbackMode) => {
             if (authCallbackMode === "page") {
               return (
-                <form.Field
-                  name="authCallbackPagePath"
-                  validators={{
-                    onChange: ({ value }) => {
-                      if (!value) {
-                        return "Page path is required when mode is 'page'";
-                      }
-                      return undefined;
-                    },
-                  }}
-                >
+                <form.Field name="authCallbackPagePath">
                   {(field) => (
                     <>
                       <PageListControls
                         title="&nbsp;"
-                        value={field.state.value}
-                        required
+                        value={(field.state.value as string | undefined) || ""}
+                        onBlur={field.handleBlur}
                         onChange={(value) => field.handleChange(value)}
                       />
-                      {field.state.meta.errors.length > 0 && (
-                        <p style={{ color: "red", fontSize: "0.875rem" }}>
-                          {field.state.meta.errors[0]}
-                        </p>
-                      )}
+                      <FieldErrors field={field} />
                     </>
                   )}
                 </form.Field>
@@ -223,31 +231,18 @@ function CustomCode() {
           children={(authCallbackMode) => {
             if (authCallbackMode === "custom") {
               return (
-                <form.Field
-                  name="authCallbackCustomUrl"
-                  validators={{
-                    onChange: ({ value }) => {
-                      if (!value) {
-                        return "Custom URL is required when mode is 'custom'";
-                      }
-                      return undefined;
-                    },
-                  }}
-                >
+                <form.Field name="authCallbackCustomUrl">
                   {(field) => (
                     <>
                       <TextControls
                         title="&nbsp;"
                         placeholder="https://example.com/login-success"
-                        value={field.state.value}
+                        value={(field.state.value as string | undefined) || ""}
                         required
+                        onBlur={field.handleBlur}
                         onChange={(value) => field.handleChange(value)}
                       />
-                      {field.state.meta.errors.length > 0 && (
-                        <p style={{ color: "red", fontSize: "0.875rem" }}>
-                          {field.state.meta.errors[0]}
-                        </p>
-                      )}
+                      <FieldErrors field={field} />
                     </>
                   )}
                 </form.Field>
@@ -299,38 +294,17 @@ function CustomCode() {
         {(field) => (
           <PageListControls
             title="Post Signup Path"
-            value={field.state.value}
+            value={field.state.value as string}
+            onBlur={field.handleBlur}
             onChange={(value) => field.handleChange(value)}
           />
         )}
       </form.Field>
 
-      <form.Subscribe
-        selector={(state) => {
-          const values = state.values;
-          const hasChanges =
-            values.domain !== initialValues.domain ||
-            values.authCallbackMode !== initialValues.authCallbackMode ||
-            (values.authCallbackMode === "page" &&
-              values.authCallbackPagePath !==
-                initialValues.authCallbackPagePath) ||
-            (values.authCallbackMode === "custom" &&
-              values.authCallbackCustomUrl !==
-                initialValues.authCallbackCustomUrl) ||
-            values.postSignupPath !== initialValues.postSignupPath;
-
-          const isValidDomain =
-            values.domain && values.domain.includes(".outseta.com");
-
-          return {
-            canSubmit: hasChanges && isValidDomain && state.canSubmit,
-            isSubmitting: state.isSubmitting,
-          };
-        }}
-      >
-        {({ canSubmit, isSubmitting }) => (
-          <Button variant="primary" disabled={!canSubmit || isSubmitting}>
-            {isSubmitting ? "..." : customCode.domain ? "Update" : "Connect"}
+      <form.Subscribe selector={(state) => [state.isSubmitting]}>
+        {([isSubmitting]) => (
+          <Button variant="primary" disabled={isSubmitting}>
+            {customCode.domain ? "Update Outseta Script" : "Add Outseta Script"}
           </Button>
         )}
       </form.Subscribe>
@@ -351,5 +325,19 @@ function CustomCode() {
         </p>
       </div>
     </form>
+  );
+}
+
+function FieldErrors({ field }: { field: AnyFieldApi }) {
+  if (field.state.meta.errors.length === 0) return null;
+  if (!field.state.value) return null;
+
+  const error = field.state.meta.errors[0];
+  return (
+    <p className="error">
+      {typeof error === "string" && error}
+      {typeof error !== "string" &&
+        ((error as { message?: string })?.message || "Invalid value")}
+    </p>
   );
 }
