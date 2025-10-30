@@ -1,7 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { Button, ListControls } from "@triozer/framer-toolbox";
 import { useMutation } from "@tanstack/react-query";
+import { revalidateLogic, useForm } from "@tanstack/react-form";
 
 import {
   upsertProfileEmbed,
@@ -29,13 +30,38 @@ function User() {
   const singleSupportsLink = useSingleSupportsLinkSelection();
   const singleOutsetaEmbed = useSingleOutsetaEmbedSelection();
 
-  const [tab, setTab] = useState<ProfileTabOption>("profile");
+  const form = useForm({
+    defaultValues: {
+      tab:
+        ((singleOutsetaEmbed?.controls.profileDefaultTab as ProfileTabOption) ||
+          "profile") as ProfileTabOption,
+    },
+    validationLogic: revalidateLogic({ mode: "submit", modeAfterSubmission: "change" }),
+    onSubmit: async () => {
+      switch (embedMode) {
+        case "embed":
+          await embedMutation.mutateAsync();
+          break;
+        case "popup":
+          await popupMutation.mutateAsync();
+          break;
+      }
+    },
+  });
 
-  const config: ProfileEmbedConfig = { tab };
+  const config: ProfileEmbedConfig = {
+    tab: (form.useStore((s) => s.values.tab) as ProfileTabOption) || "profile",
+  };
 
+  // Sync form value when embed control changes
   useEffect(() => {
-    const tab = singleOutsetaEmbed?.controls.profileDefaultTab;
-    setTab((tab as ProfileTabOption) || "profile");
+    const next =
+      ((singleOutsetaEmbed?.controls.profileDefaultTab as ProfileTabOption) ||
+        "profile") as ProfileTabOption;
+    if (form.state.values.tab !== next) {
+      form.setFieldValue("tab", next);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [singleOutsetaEmbed?.controls.profileDefaultTab]);
 
   const embedMutation = useMutation({
@@ -52,43 +78,53 @@ function User() {
     },
   });
 
+  // Auto-apply on tab change when an embed exists
+  const didInit = useRef(false);
+  const selectedTab = form.useStore((s) => s.values.tab) as ProfileTabOption;
+  useEffect(() => {
+    if (!didInit.current) {
+      didInit.current = true;
+      return;
+    }
+    if (!singleOutsetaEmbed) return;
+    embedMutation.mutate();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedTab, singleOutsetaEmbed]);
+
   return (
     <form
-      onChange={() => {
-        if (!singleOutsetaEmbed) return;
-        embedMutation.mutate();
-      }}
       onSubmit={(event) => {
         event.preventDefault();
-
-        switch (embedMode) {
-          case "embed":
-            embedMutation.mutate();
-            break;
-          case "popup":
-            popupMutation.mutate();
-            break;
-        }
+        form.handleSubmit();
       }}
     >
       <EmbedModeListControls disabled={!!singleOutsetaEmbed} />
 
-      <ListControls
-        title="Default Tab"
-        items={ProfileTabOptions.map((option) => ({
-          value: option,
-          label: ProfileTabOptionLabels[option],
-        }))}
-        value={tab}
-        onChange={(value) => setTab(value)}
-      />
+      <form.Field name="tab">
+        {(field) => (
+          <ListControls
+            title="Default Tab"
+            items={ProfileTabOptions.map((option) => ({
+              value: option,
+              label: ProfileTabOptionLabels[option],
+            }))}
+            value={field.state.value as ProfileTabOption}
+            onChange={(value) => field.handleChange(value)}
+            onBlur={field.handleBlur}
+          />
+        )}
+      </form.Field>
 
       {embedMode === "embed" && !singleOutsetaEmbed && (
-        <Button variant="primary">Add Profile Embed to page</Button>
+        <Button variant="primary" disabled={embedMutation.isPending}>
+          Add Profile Embed to page
+        </Button>
       )}
 
       {embedMode === "popup" && singleSupportsLink && (
-        <Button variant="primary">Set Profile Popup Link</Button>
+        <Button variant="primary" disabled={popupMutation.isPending}>
+          Set Profile Popup Link
+        </Button>
       )}
 
       {embedMode === "popup" && !singleSupportsLink && (
