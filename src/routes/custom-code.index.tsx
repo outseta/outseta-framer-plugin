@@ -204,7 +204,7 @@ function CustomCode() {
       }
 
       let postSignupConfig: PostSignupConfig;
-      switch ((value as any).postSignupMode) {
+      switch (value.postSignupMode) {
         case "default":
           postSignupConfig = { mode: "default" };
           break;
@@ -214,13 +214,13 @@ function CustomCode() {
         case "page":
           postSignupConfig = {
             mode: "page",
-            path: (value as any).postSignupPagePath as string,
+            path: value.postSignupPagePath as string,
           };
           break;
         case "custom":
           postSignupConfig = {
             mode: "custom",
-            url: (value as any).postSignupCustomUrl as string,
+            url: value.postSignupCustomUrl as string,
           };
           break;
         default:
@@ -395,7 +395,7 @@ function CustomCode() {
         </form.Field>
 
         <form.Subscribe
-          selector={(state) => (state.values as any).postSignupMode}
+          selector={(state) => state.values.postSignupMode}
           children={(postSignupMode) => {
             if (postSignupMode === "page") {
               return (
@@ -419,7 +419,7 @@ function CustomCode() {
         />
 
         <form.Subscribe
-          selector={(state) => (state.values as any).postSignupMode}
+          selector={(state) => state.values.postSignupMode}
           children={(postSignupMode) => {
             if (postSignupMode === "custom") {
               return (
@@ -445,7 +445,7 @@ function CustomCode() {
         />
 
         <form.Subscribe
-          selector={(state) => (state.values as any).postSignupMode}
+          selector={(state) => state.values.postSignupMode}
           children={(postSignupMode) => (
             <>
               {postSignupMode === "default" && (
