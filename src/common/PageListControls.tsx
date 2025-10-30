@@ -11,7 +11,7 @@ export function PageListControls({
   title: string;
   value: string;
   required?: boolean;
-  onBlur: (event: React.FocusEvent<HTMLSelectElement>) => void;
+  onBlur?: (event: React.FocusEvent<HTMLSelectElement>) => void;
   onChange: (
     value: string,
     event: React.ChangeEvent<HTMLSelectElement>,
