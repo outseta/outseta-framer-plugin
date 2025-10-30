@@ -1,18 +1,18 @@
-export type AuthCallbackConfig =
+export type PostSignupConfig =
   | { mode: "default" }
-  | { mode: "current" }
+  | { mode: "message" }
   | { mode: "page"; path: string }
   | { mode: "custom"; url: string };
 
 // Convert config to a JavaScript expression suitable for the script generator.
-export const authCallbackConfigToExpression = (
-  config: AuthCallbackConfig,
+export const postSignupConfigToExpression = (
+  config: PostSignupConfig,
 ): string => {
   switch (config.mode) {
     case "default":
       return `undefined`;
-    case "current":
-      return `window.location.href`;
+    case "message":
+      return `null`;
     case "page":
       return `new URL("${config.path}", window.location.origin).href`;
     case "custom":
@@ -23,18 +23,17 @@ export const authCallbackConfigToExpression = (
 };
 
 // Convert a parsed JavaScript expression back to a config object.
-export const authCallbackExpressionToMode = (
+export const postSignupExpressionToMode = (
   expression: string,
-): AuthCallbackConfig => {
+): PostSignupConfig => {
   expression = expression.trim();
 
   if (expression === "") {
     return { mode: "default" };
   }
 
-  // Current Mode
-  if (expression === "window.location.href") {
-    return { mode: "current" };
+  if (expression === "null") {
+    return { mode: "message" };
   }
 
   // Page Mode: new URL("/path", window.location.origin).href
@@ -53,6 +52,6 @@ export const authCallbackExpressionToMode = (
     return { mode: "custom", url };
   }
 
-  // Fallback to default mode
+  // Fallback: if it's some other expression, treat as default to be safe
   return { mode: "default" };
 };
