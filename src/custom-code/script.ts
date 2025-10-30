@@ -1,10 +1,10 @@
-export type ParsedOutsetaScript = {
+export type OutsetaScriptOptions = {
   domainExpression?: string;
   authCallbackExpression?: string;
   postSignupPath?: string;
 };
 
-export const parseOutsetaScript = (code: string): ParsedOutsetaScript => {
+export const parseOutsetaScript = (code: string): OutsetaScriptOptions => {
   // Captures the full expression after domain
   const domainRegex = /domain:\s*([\s\S]+?)(?=,\s*(\n|\})|\n|\}|$)/;
   // Captures the full expression after authenticationCallbackUrl
@@ -57,17 +57,11 @@ export const parseOutsetaScript = (code: string): ParsedOutsetaScript => {
   };
 };
 
-export type CreateOutsetaScriptOptions = {
-  domainExpression: string;
-  authCallbackExpression?: string;
-  postSignupPath?: string;
-};
-
 export const createOutsetaScript = ({
   domainExpression,
   authCallbackExpression,
   postSignupPath,
-}: CreateOutsetaScriptOptions): string => {
+}: OutsetaScriptOptions): string => {
   return `
         <script>
           var o_options = {
