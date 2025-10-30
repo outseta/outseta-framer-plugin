@@ -18,8 +18,8 @@ export const setCustomCode = async ({
   postSignupConfig = { mode: "default" },
 }: {
   domain: string | null;
-  authCallbackConfig?: AuthCallbackConfig;
-  postSignupConfig?: PostSignupConfig;
+  authCallbackConfig: AuthCallbackConfig;
+  postSignupConfig: PostSignupConfig;
 }) => {
   if (!domain) {
     return await framer.setCustomCode({ html: null, location: "headEnd" });
@@ -39,7 +39,7 @@ export const setCustomCode = async ({
 
 export const subscribeToCustomCode = (
   callback: (props: {
-    domain?: string;
+    domain: string;
     authCallbackConfig: AuthCallbackConfig;
     postSignupConfig: PostSignupConfig;
     disabled: boolean;

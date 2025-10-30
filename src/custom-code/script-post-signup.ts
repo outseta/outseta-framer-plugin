@@ -5,56 +5,53 @@ export type PostSignupConfig =
   | { mode: "custom"; url: string };
 
 // Convert config to a JavaScript expression suitable for the script generator.
-// Returns:
-// - null to omit the line (default)
-// - 'undefined' to force embed message
-// - 'new URL("/path", window.location.origin).href' for page
-// - '"https://..."' for custom
 export const postSignupConfigToExpression = (
   config: PostSignupConfig,
-): string | null => {
+): string => {
   switch (config.mode) {
     case "default":
-      return null; // Omit the line completely, use Outseta default
+      return `undefined`;
     case "message":
-      return "undefined"; // Explicitly use the embed message
+      return `null`;
     case "page":
       return `new URL("${config.path}", window.location.origin).href`;
     case "custom":
       return JSON.stringify(config.url);
+    default:
+      return `undefined`;
   }
 };
 
 // Convert a parsed JavaScript expression back to a config object.
 export const postSignupExpressionToMode = (
-  expression: string | undefined,
+  expression: string,
 ): PostSignupConfig => {
-  if (expression === undefined) {
+  expression = expression.trim();
+
+  if (expression === "") {
     return { mode: "default" };
   }
 
-  const trimmed = expression.trim();
-
-  if (trimmed === "undefined") {
+  if (expression === "null") {
     return { mode: "message" };
   }
 
   // Page Mode: new URL("/path", window.location.origin).href
-  const pageMatch = trimmed.match(
+  const pageMatch = expression.match(
     /^new\s+URL\s*\(\s*"([^"]+)"\s*,\s*window\.location\.origin\s*\)\s*\.href$/,
   );
-  if (pageMatch) {
-    return { mode: "page", path: pageMatch[1] };
+  const path = pageMatch?.[1]?.trim();
+  if (path) {
+    return { mode: "page", path };
   }
 
   // Custom Mode: quoted absolute or relative URL
-  const customMatch = trimmed.match(/^['"]([^'"]+)['"]$/);
-  if (customMatch) {
-    return { mode: "custom", url: customMatch[1] };
+  const customMatch = expression.match(/^['"]([^'"]+)['"]$/);
+  const url = customMatch?.[1]?.trim();
+  if (url) {
+    return { mode: "custom", url };
   }
 
   // Fallback: if it's some other expression, treat as default to be safe
   return { mode: "default" };
 };
-
-
