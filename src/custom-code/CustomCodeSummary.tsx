@@ -31,7 +31,13 @@ export function CustomCodeSummary() {
         <p>
           <strong>{domain}</strong>
           <span> · </span>
-          <Link onClick={() => disconnectMutation.mutate()}>disconnect</Link>
+          <button
+            type="button"
+            className={classes.disconnectButton}
+            onClick={() => disconnectMutation.mutate()}
+          >
+            disconnect
+          </button>
           <span> · </span>
           <Link to="/custom-code">edit</Link>
         </p>
