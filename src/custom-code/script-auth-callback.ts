@@ -2,7 +2,7 @@ export type AuthCallbackConfig =
   | { mode: "default" }
   | { mode: "current" }
   | { mode: "page"; path: string }
-  | { mode: "custom"; path: string };
+  | { mode: "custom"; url: string };
 
 // Helper: Convert auth callback config to JavaScript expression
 export const authCallbackConfigToExpression = (
@@ -16,7 +16,7 @@ export const authCallbackConfigToExpression = (
     case "page":
       return `new URL("${config.path}", window.location.origin).href`;
     case "custom":
-      return `"${config.path}"`;
+      return `"${config.url}"`;
   }
 };
 
@@ -44,7 +44,7 @@ export const authCallbackExpressionToMode = (
   // Custom Mode
   const customMatch = expression.match(/^["']([^"']+)["']$/);
   if (customMatch) {
-    return { mode: "custom", path: customMatch[1] };
+    return { mode: "custom", url: customMatch[1] };
   }
 
   // Fallback to default mode
