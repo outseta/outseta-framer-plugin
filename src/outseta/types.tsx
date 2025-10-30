@@ -116,3 +116,46 @@ export type EmailListEmbedConfig = {
 export type LeadCaptureEmbedConfig = {
   uid: string;
 };
+
+// ----- API response types -----
+
+export type PlanFamilyPlan = {
+  Uid: string;
+  Name: string;
+};
+
+export type PlanFamily = {
+  Uid: string;
+  Name: string;
+  Plans: PlanFamilyPlan[];
+};
+
+export type PlansResponse = {
+  DiscountsExist: boolean;
+  PlanFamilies: PlanFamily[];
+};
+
+export type BasicItem = {
+  Uid: string;
+  Name: string;
+};
+
+export type ListItemsResponse<TItem extends object = BasicItem> = {
+  items: TItem[];
+};
+
+export type ContentGroupItem = {
+  Uid: string;
+  Pattern: string;
+  MatchMode: number;
+};
+
+export type ContentGroup = {
+  Uid: string;
+  Name: string;
+  ContentGroupItems: ContentGroupItem[];
+  AllowedPlans: BasicItem[];
+  AllowedAddOns: BasicItem[];
+};
+
+export type ContentGroupsResponse = ListItemsResponse<ContentGroup>;

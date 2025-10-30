@@ -26,7 +26,7 @@ function UserContentOverrides() {
         <Separator />
         <CopyButton
           disabled={!query.isSuccess}
-          text={query.data}
+          text={query.data ?? ""}
           label="Copy the Outseta Code Overrides"
         />
         <Separator />
