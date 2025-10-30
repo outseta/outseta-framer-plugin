@@ -27,7 +27,7 @@ describe("authCallbackModeToUrlExpression", () => {
   it("should return double quoted string for custom mode", () => {
     const config: AuthCallbackConfig = {
       mode: "custom",
-      path: "https://example.com/callback",
+      url: "https://example.com/callback",
     };
     const result = authCallbackConfigToExpression(config);
     expect(result).toBe('"https://example.com/callback"');
@@ -36,7 +36,7 @@ describe("authCallbackModeToUrlExpression", () => {
   it("should return double quoted string for custom mode with complex URL", () => {
     const config: AuthCallbackConfig = {
       mode: "custom",
-      path: "https://myapp.com/auth/callback?state=xyz&redirect=/dashboard",
+      url: "https://myapp.com/auth/callback?state=xyz&redirect=/dashboard",
     };
     const result = authCallbackConfigToExpression(config);
     expect(result).toBe(
@@ -50,8 +50,8 @@ describe("authCallbackModeToUrlExpression", () => {
     expect(result).toBe('new URL("", window.location.origin).href');
   });
 
-  it("should handle empty path in custom mode", () => {
-    const config: AuthCallbackConfig = { mode: "custom", path: "" };
+  it("should handle empty url in custom mode", () => {
+    const config: AuthCallbackConfig = { mode: "custom", url: "" };
     const result = authCallbackConfigToExpression(config);
     expect(result).toBe('""');
   });
@@ -93,7 +93,7 @@ describe("authCallbackUrlExpressionToMode", () => {
     );
     expect(result).toEqual({
       mode: "custom",
-      path: "https://example.com/callback",
+      url: "https://example.com/callback",
     });
   });
 
@@ -103,7 +103,7 @@ describe("authCallbackUrlExpressionToMode", () => {
     );
     expect(result).toEqual({
       mode: "custom",
-      path: "https://myapp.com/auth/callback?state=xyz&redirect=/dashboard",
+      url: "https://myapp.com/auth/callback?state=xyz&redirect=/dashboard",
     });
   });
 
@@ -193,7 +193,7 @@ describe("authCallbackModeToUrlExpression and authCallbackUrlExpressionToMode ro
   it("should maintain consistency for custom mode", () => {
     const original: AuthCallbackConfig = {
       mode: "custom",
-      path: "https://example.com/callback",
+      url: "https://example.com/callback",
     };
     const expression = authCallbackConfigToExpression(original);
     const converted = authCallbackExpressionToMode(expression);
@@ -203,7 +203,7 @@ describe("authCallbackModeToUrlExpression and authCallbackUrlExpressionToMode ro
   it("should maintain consistency for custom mode with complex URL", () => {
     const original: AuthCallbackConfig = {
       mode: "custom",
-      path: "https://myapp.com/auth/callback?state=xyz&redirect=/dashboard",
+      url: "https://myapp.com/auth/callback?state=xyz&redirect=/dashboard",
     };
     const expression = authCallbackConfigToExpression(original);
     const converted = authCallbackExpressionToMode(expression);
@@ -217,8 +217,8 @@ describe("authCallbackModeToUrlExpression and authCallbackUrlExpressionToMode ro
     expect(converted).toEqual({ mode: "default" });
   });
 
-  it("should fallback to default mode for custom mode with empty path", () => {
-    const original: AuthCallbackConfig = { mode: "custom", path: "" };
+  it("should fallback to default mode for custom mode with empty url", () => {
+    const original: AuthCallbackConfig = { mode: "custom", url: "" };
     const expression = authCallbackConfigToExpression(original);
     const converted = authCallbackExpressionToMode(expression);
     expect(converted).toEqual({ mode: "default" });

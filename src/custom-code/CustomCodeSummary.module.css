@@ -21,3 +21,20 @@
   width: auto;
   background-color: transparent;
 }
+
+.disconnectButton {
+  display: inline;
+  width: auto;
+  padding: 0;
+  color: var(--framer-color-primary);
+  font: inherit;
+  text-decoration: none;
+  background: none;
+  border: none;
+}
+
+.disconnectButton:hover,
+.disconnectButton:focus {
+  background: none;
+  text-decoration: underline;
+}
