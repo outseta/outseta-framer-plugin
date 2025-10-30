@@ -1,7 +1,8 @@
 export type OutsetaScriptOptions = {
   domainExpression?: string;
   authCallbackExpression?: string;
-  postSignupPath?: string;
+  // When null, omit the entire line. When undefined or a string, include the line as-is.
+  postSignupExpression?: string | null;
 };
 
 export const parseOutsetaScript = (code: string): OutsetaScriptOptions => {
@@ -10,11 +11,13 @@ export const parseOutsetaScript = (code: string): OutsetaScriptOptions => {
   // Captures the full expression after authenticationCallbackUrl
   const authCallbackUrlRegex =
     /authenticationCallbackUrl:\s*([\s\S]+?)(?=,\s*(\n|\})|\n|\}|$)/;
-  const postRegistrationRegex = /postRegistrationUrl:\s*['"]([^'"]*)['"]/;
+  // Capture the full expression after postRegistrationUrl (quoted, undefined, or new URL(...).href)
+  const postRegistrationRegex =
+    /postRegistrationUrl:\s*([\s\S]+?)(?=,\s*(\n|\})|\n|\}|$)/;
 
   const domainMatch = code.match(domainRegex);
   const authCallbackUrlMatch = code.match(authCallbackUrlRegex);
-  const postSignupPathMatch = code.match(postRegistrationRegex);
+  const postSignupExpressionMatch = code.match(postRegistrationRegex);
 
   // Extract and validate domain
   let domainExpression = undefined;
@@ -53,15 +56,22 @@ export const parseOutsetaScript = (code: string): OutsetaScriptOptions => {
   return {
     domainExpression,
     authCallbackExpression,
-    postSignupPath: postSignupPathMatch ? postSignupPathMatch[1] : undefined,
+    postSignupExpression: postSignupExpressionMatch
+      ? postSignupExpressionMatch[1].trim()
+      : undefined,
   };
 };
 
 export const createOutsetaScript = ({
   domainExpression,
   authCallbackExpression,
-  postSignupPath,
-}: OutsetaScriptOptions): string => {
+  postSignupExpression,
+}: OutsetaScriptOptions & { domainExpression: string }): string => {
+  const hasAuthCallback = Boolean(authCallbackExpression);
+  const postSignupLine =
+    postSignupExpression == null
+      ? ""
+      : `\n              // Override the Post Signup URL or signup embed's post signup message\n              postRegistrationUrl: ${postSignupExpression},`;
   return `
         <script>
           var o_options = {
@@ -69,13 +79,12 @@ export const createOutsetaScript = ({
             load: 'auth,profile,nocode,leadCapture,support,emailList',
             monitorDom: 'true',
             auth: {
-              ${authCallbackExpression ? `// Override the Post Login URL configured in Outseta` : `// Use the Post Login URL configured in Outseta`}
+              ${hasAuthCallback ? `// Override the Post Login URL configured in Outseta` : `// Use the Post Login URL configured in Outseta`}
               authenticationCallbackUrl: ${authCallbackExpression},
 
               // Overrides the Signup Confirmation URL
               registrationConfirmationUrl: window.location.href,
-              // Override the Post Signup URL or signup embed's post signup message
-              postRegistrationUrl: "${postSignupPath || ``}" ? new URL("${postSignupPath || ``}", window.location.origin).href : undefined,
+              ${postSignupLine}
             },
             nocode: {
               // Nice to clean up the url so the access token is less visible

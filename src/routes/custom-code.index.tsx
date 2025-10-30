@@ -12,6 +12,7 @@ import {
   setCustomCode,
   useCustomCode,
   type AuthCallbackConfig,
+  type PostSignupConfig,
 } from "../custom-code";
 
 import { ExternalLink, PageListControls } from "../common";
@@ -28,9 +29,9 @@ const customCodeFormSchema = z.intersection(
         ".outseta.com",
         "An Outseta domain is required, must end with .outseta.com",
       ),
-    postSignupPath: z.string(),
   }),
-  z.discriminatedUnion("authCallbackMode", [
+  z.intersection(
+    z.discriminatedUnion("authCallbackMode", [
     z.object({
       authCallbackMode: z.literal("default"),
       authCallbackPagePath: z.string().optional(),
@@ -51,7 +52,30 @@ const customCodeFormSchema = z.intersection(
       authCallbackPagePath: z.string().optional(),
       authCallbackCustomUrl: z.url("A valid URL is required"),
     }),
-  ]),
+    ]),
+    z.discriminatedUnion("postSignupMode", [
+      z.object({
+        postSignupMode: z.literal("default"),
+        postSignupPagePath: z.string().optional(),
+        postSignupCustomUrl: z.string().optional(),
+      }),
+      z.object({
+        postSignupMode: z.literal("message"),
+        postSignupPagePath: z.string().optional(),
+        postSignupCustomUrl: z.string().optional(),
+      }),
+      z.object({
+        postSignupMode: z.literal("page"),
+        postSignupPagePath: z.string().trim().nonempty(),
+        postSignupCustomUrl: z.string().optional(),
+      }),
+      z.object({
+        postSignupMode: z.literal("custom"),
+        postSignupPagePath: z.string().optional(),
+        postSignupCustomUrl: z.url("A valid URL is required"),
+      }),
+    ]),
+  ),
 );
 
 // Form data type
@@ -71,7 +95,6 @@ function CustomCode() {
     const mode = customCode.authCallbackConfig.mode;
     const base = {
       domain: customCode.domain || "",
-      postSignupPath: customCode.postSignupPath || "",
     };
 
     switch (mode) {
@@ -81,6 +104,7 @@ function CustomCode() {
           authCallbackMode: "page" as const,
           authCallbackPagePath: customCode.authCallbackConfig.path || "",
           authCallbackCustomUrl: undefined,
+          // post-signup defaults below will be overridden after
         };
       case "custom":
         return {
@@ -88,6 +112,7 @@ function CustomCode() {
           authCallbackMode: "custom" as const,
           authCallbackPagePath: undefined,
           authCallbackCustomUrl: customCode.authCallbackConfig.url || "",
+          // post-signup defaults below will be overridden after
         };
       case "current":
         return {
@@ -95,6 +120,7 @@ function CustomCode() {
           authCallbackMode: "current" as const,
           authCallbackPagePath: undefined,
           authCallbackCustomUrl: undefined,
+          // post-signup defaults below will be overridden after
         };
       default:
         return {
@@ -102,11 +128,47 @@ function CustomCode() {
           authCallbackMode: "default" as const,
           authCallbackPagePath: undefined,
           authCallbackCustomUrl: undefined,
+          // post-signup defaults below will be overridden after
         };
     }
   };
 
-  const initialValues = getInitialValues();
+  // Start with auth values, then mix in post-signup initial values
+  let initialValues = getInitialValues() as any;
+  const ps = customCode.postSignupConfig;
+  switch (ps.mode) {
+    case "page":
+      initialValues = {
+        ...initialValues,
+        postSignupMode: "page" as const,
+        postSignupPagePath: ps.path,
+        postSignupCustomUrl: undefined,
+      };
+      break;
+    case "custom":
+      initialValues = {
+        ...initialValues,
+        postSignupMode: "custom" as const,
+        postSignupPagePath: undefined,
+        postSignupCustomUrl: ps.url,
+      };
+      break;
+    case "message":
+      initialValues = {
+        ...initialValues,
+        postSignupMode: "message" as const,
+        postSignupPagePath: undefined,
+        postSignupCustomUrl: undefined,
+      };
+      break;
+    default:
+      initialValues = {
+        ...initialValues,
+        postSignupMode: "default" as const,
+        postSignupPagePath: undefined,
+        postSignupCustomUrl: undefined,
+      };
+  }
 
   const form = useForm({
     defaultValues: initialValues,
@@ -141,10 +203,34 @@ function CustomCode() {
           break;
       }
 
+      let postSignupConfig: PostSignupConfig;
+      switch ((value as any).postSignupMode) {
+        case "default":
+          postSignupConfig = { mode: "default" };
+          break;
+        case "message":
+          postSignupConfig = { mode: "message" };
+          break;
+        case "page":
+          postSignupConfig = {
+            mode: "page",
+            path: (value as any).postSignupPagePath as string,
+          };
+          break;
+        case "custom":
+          postSignupConfig = {
+            mode: "custom",
+            url: (value as any).postSignupCustomUrl as string,
+          };
+          break;
+        default:
+          postSignupConfig = { mode: "default" };
+      }
+
       mutation.mutate({
         domain: value.domain,
         authCallbackConfig,
-        postSignupPath: value.postSignupPath,
+        postSignupConfig,
       });
     },
   });
@@ -289,16 +375,113 @@ function CustomCode() {
         />
       </fieldset>
 
-      <form.Field name="postSignupPath">
-        {(field) => (
-          <PageListControls
-            title="Post Signup Path"
-            value={field.state.value as string}
-            onBlur={field.handleBlur}
-            onChange={(value) => field.handleChange(value)}
-          />
-        )}
-      </form.Field>
+      <fieldset>
+        <form.Field name="postSignupMode">
+          {(field) => (
+            <ListControls
+              title="Post Signup URL"
+              items={[
+                { label: "As Configured in Outseta", value: "default" },
+                { label: "In Signup Embed Message", value: "message" },
+                { label: "Framer Page", value: "page" },
+                { label: "Custom URL", value: "custom" },
+              ]}
+              value={field.state.value as PostSignupConfig["mode"]}
+              onBlur={field.handleBlur}
+              onChange={(value) =>
+                field.handleChange(value as PostSignupConfig["mode"]) }
+            />
+          )}
+        </form.Field>
+
+        <form.Subscribe
+          selector={(state) => (state.values as any).postSignupMode}
+          children={(postSignupMode) => {
+            if (postSignupMode === "page") {
+              return (
+                <form.Field name="postSignupPagePath">
+                  {(field) => (
+                    <>
+                      <PageListControls
+                        title="\u00A0"
+                        value={(field.state.value as string | undefined) || ""}
+                        onBlur={field.handleBlur}
+                        onChange={(value) => field.handleChange(value)}
+                      />
+                      <FieldErrors field={field} />
+                    </>
+                  )}
+                </form.Field>
+              );
+            }
+            return null;
+          }}
+        />
+
+        <form.Subscribe
+          selector={(state) => (state.values as any).postSignupMode}
+          children={(postSignupMode) => {
+            if (postSignupMode === "custom") {
+              return (
+                <form.Field name="postSignupCustomUrl">
+                  {(field) => (
+                    <>
+                      <TextControls
+                        title="\u00A0"
+                        placeholder="https://example.com/welcome"
+                        value={(field.state.value as string | undefined) || ""}
+                        required
+                        onBlur={field.handleBlur}
+                        onChange={(value) => field.handleChange(value)}
+                      />
+                      <FieldErrors field={field} />
+                    </>
+                  )}
+                </form.Field>
+              );
+            }
+            return null;
+          }}
+        />
+
+        <form.Subscribe
+          selector={(state) => (state.values as any).postSignupMode}
+          children={(postSignupMode) => (
+            <>
+              {postSignupMode === "default" && (
+                <p>
+                  Use the URL configured in your
+                  {" "}
+                  {customCode.domain ? (
+                    <>
+                      <ExternalLink
+                        href={`https://${customCode.domain}/#/app/auth/sign-up-login`}
+                      >
+                        Outseta dashboard
+                      </ExternalLink>
+                    </>
+                  ) : (
+                    "Outseta dashboard"
+                  )}
+                  .
+                </p>
+              )}
+
+              {postSignupMode === "message" && (
+                <p>Show the post signup message in the signup embed.</p>
+              )}
+
+              {postSignupMode === "page" && (
+                <p>Send users to a specific Framer page (selected above).</p>
+              )}
+
+              {postSignupMode === "custom" && (
+                <p>Redirect users to a custom URL (configured above).</p>
+              )}
+            </>
+          )}
+        />
+      </fieldset>
 
       <form.Subscribe selector={(state) => [state.isSubmitting]}>
         {([isSubmitting]) => (

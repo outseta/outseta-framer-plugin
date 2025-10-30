@@ -7,6 +7,7 @@ import React, {
 } from "react";
 import { subscribeToCustomCode } from "./custom-code";
 import type { AuthCallbackConfig } from "./script-auth-callback";
+import type { PostSignupConfig } from "./script-post-signup";
 import { useQuery } from "@tanstack/react-query";
 import { getPlanData } from "../outseta";
 
@@ -14,7 +15,7 @@ type CustomCodeState = {
   status: "loading" | "connected" | "disconnected";
   domain: string;
   authCallbackConfig: AuthCallbackConfig;
-  postSignupPath: string;
+  postSignupConfig: PostSignupConfig;
   disabled: boolean;
 };
 
@@ -24,7 +25,7 @@ const initialState: CustomCodeState = {
   status: "loading",
   domain: "",
   authCallbackConfig: { mode: "default" },
-  postSignupPath: "",
+  postSignupConfig: { mode: "default" },
   disabled: false,
 };
 
@@ -41,7 +42,7 @@ export const CustomCodeProvider: React.FC<{ children: ReactNode }> = ({
         authCallbackConfig: customCode.authCallbackConfig ?? {
           mode: "default",
         },
-        postSignupPath: customCode.postSignupPath ?? "",
+        postSignupConfig: customCode.postSignupConfig ?? { mode: "default" },
         disabled: customCode.disabled ?? false,
       });
     });

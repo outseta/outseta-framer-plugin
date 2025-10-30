@@ -5,16 +5,21 @@ import {
   authCallbackConfigToExpression,
   authCallbackExpressionToMode,
 } from "./script-auth-callback";
+import {
+  type PostSignupConfig,
+  postSignupConfigToExpression,
+  postSignupExpressionToMode,
+} from "./script-post-signup";
 import { domainToExpression, expressionToDomain } from "./script-domain";
 
 export const setCustomCode = async ({
   domain,
   authCallbackConfig = { mode: "default" },
-  postSignupPath,
+  postSignupConfig = { mode: "default" },
 }: {
   domain: string | null;
   authCallbackConfig?: AuthCallbackConfig;
-  postSignupPath?: string;
+  postSignupConfig?: PostSignupConfig;
 }) => {
   if (!domain) {
     return await framer.setCustomCode({ html: null, location: "headEnd" });
@@ -22,10 +27,11 @@ export const setCustomCode = async ({
     const domainExpression = domainToExpression(domain);
     const authCallbackExpression =
       authCallbackConfigToExpression(authCallbackConfig);
+    const postSignupExpression = postSignupConfigToExpression(postSignupConfig);
     const script = createOutsetaScript({
       domainExpression,
       authCallbackExpression,
-      postSignupPath,
+      postSignupExpression,
     });
     return await framer.setCustomCode({ html: script, location: "headEnd" });
   }
@@ -35,7 +41,7 @@ export const subscribeToCustomCode = (
   callback: (props: {
     domain?: string;
     authCallbackConfig: AuthCallbackConfig;
-    postSignupPath?: string;
+    postSignupConfig: PostSignupConfig;
     disabled: boolean;
   }) => void,
 ) => {
@@ -48,11 +54,14 @@ export const subscribeToCustomCode = (
     const authCallbackConfig = authCallbackExpressionToMode(
       outsetaScript.authCallbackExpression,
     );
+    const postSignupConfig = postSignupExpressionToMode(
+      outsetaScript.postSignupExpression,
+    );
 
     callback({
       domain,
       authCallbackConfig,
-      postSignupPath: outsetaScript.postSignupPath,
+      postSignupConfig,
       disabled,
     });
   });
