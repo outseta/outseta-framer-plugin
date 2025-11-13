@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 import { ListControls } from "@triozer/framer-toolbox";
 import { usePageQuery } from "../pages";
 
