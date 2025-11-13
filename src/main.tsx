@@ -1,8 +1,11 @@
 import "./framer-globals.css";
 import "@triozer/framer-toolbox/index.css";
 
-import React, { useEffect } from "react";
-import ReactDOM from "react-dom/client";
+import * as React from "react";
+import { useEffect } from "react";
+import { createRoot } from "react-dom/client";
+import { TanStackDevtools } from "@tanstack/react-devtools";
+import { FormDevtoolsPlugin } from "@tanstack/react-form-devtools";
 import Rollbar from "rollbar";
 import {
   Provider as RollbarProvider,
@@ -96,7 +99,7 @@ framer.showUI({
   width: 400,
 });
 
-ReactDOM.createRoot(root).render(
+createRoot(root).render(
   <React.StrictMode>
     {/* Last resort error handling */}
     <RollbarProvider instance={rollbar}>
@@ -112,5 +115,10 @@ ReactDOM.createRoot(root).render(
         </QueryClientProvider>
       </RollbarErrorBoundary>
     </RollbarProvider>
+
+    <TanStackDevtools
+      config={{ hideUntilHover: true }}
+      plugins={[FormDevtoolsPlugin()]}
+    />
   </React.StrictMode>,
 );

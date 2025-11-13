@@ -1,10 +1,10 @@
 import { framer } from "framer-plugin";
 import { createOutsetaScript, parseOutsetaScript } from "./script";
 import {
-  AuthCallbackConfig,
+  PostLoginConfig,
   authCallbackConfigToExpression,
   authCallbackExpressionToMode,
-} from "./script-auth-callback";
+} from "./script-post-login";
 import {
   type PostSignupConfig,
   postSignupConfigToExpression,
@@ -12,21 +12,23 @@ import {
 } from "./script-post-signup";
 import { domainToExpression, expressionToDomain } from "./script-domain";
 
+export type CustomCodeConfig = {
+  domain?: string;
+  postLoginConfig: PostLoginConfig;
+  postSignupConfig: PostSignupConfig;
+};
+
 export const setCustomCode = async ({
   domain,
-  authCallbackConfig = { mode: "default" },
-  postSignupConfig = { mode: "default" },
-}: {
-  domain: string | null;
-  authCallbackConfig: AuthCallbackConfig;
-  postSignupConfig: PostSignupConfig;
-}) => {
+  postLoginConfig = { postLoginMode: "default" },
+  postSignupConfig = { postSignupMode: "default" },
+}: CustomCodeConfig) => {
   if (!domain) {
     return await framer.setCustomCode({ html: null, location: "headEnd" });
   } else {
     const domainExpression = domainToExpression(domain);
     const authCallbackExpression =
-      authCallbackConfigToExpression(authCallbackConfig);
+      authCallbackConfigToExpression(postLoginConfig);
     const postSignupExpression = postSignupConfigToExpression(postSignupConfig);
     const script = createOutsetaScript({
       domainExpression,
@@ -39,8 +41,8 @@ export const setCustomCode = async ({
 
 export const subscribeToCustomCode = (
   callback: (props: {
-    domain: string;
-    authCallbackConfig: AuthCallbackConfig;
+    domain?: string;
+    postLoginConfig: PostLoginConfig;
     postSignupConfig: PostSignupConfig;
     disabled: boolean;
   }) => void,
@@ -51,7 +53,7 @@ export const subscribeToCustomCode = (
 
     const domain = expressionToDomain(outsetaScript.domainExpression);
     // Convert URL expression back to mode + path
-    const authCallbackConfig = authCallbackExpressionToMode(
+    const postLoginConfig = authCallbackExpressionToMode(
       outsetaScript.authCallbackExpression,
     );
     const postSignupConfig = postSignupExpressionToMode(
@@ -60,7 +62,7 @@ export const subscribeToCustomCode = (
 
     callback({
       domain,
-      authCallbackConfig,
+      postLoginConfig,
       postSignupConfig,
       disabled,
     });
