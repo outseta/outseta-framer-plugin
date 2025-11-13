@@ -930,10 +930,10 @@ describe("signupConfirmationExpression parsing and generation", () => {
             auth: {
               // Override the Post Login URL configured in Outseta
               authenticationCallbackUrl: "https://example.com/callback",
-              // Override the Signup Confirmation URL configured in Outseta
-              registrationConfirmationUrl: window.location.href,
               // Override the Post Signup URL configured in Outseta
               postRegistrationUrl: new URL("/dashboard", window.location.origin).href,
+              // Override the Signup Confirmation URL configured in Outseta
+              registrationConfirmationUrl: window.location.href,
             },
             nocode: {
               // Nice to clean up the url so the access token is less visible

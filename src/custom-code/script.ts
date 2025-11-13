@@ -61,10 +61,10 @@ export const createOutsetaScript = ({
             auth: {
               ${authCallbackExpression ? `// Override the Post Login URL configured in Outseta` : ""}
               ${authCallbackExpression ? `authenticationCallbackUrl: ${authCallbackExpression},` : ""}
-              ${signupConfirmationExpression ? `// Override the Signup Confirmation URL configured in Outseta` : ""}
-              ${signupConfirmationExpression ? `registrationConfirmationUrl: ${signupConfirmationExpression},` : ""}
               ${postSignupExpression ? `// Override the Post Signup URL configured in Outseta` : ""}
               ${postSignupExpression ? `postRegistrationUrl: ${postSignupExpression},` : ""}
+              ${signupConfirmationExpression ? `// Override the Signup Confirmation URL configured in Outseta` : ""}
+              ${signupConfirmationExpression ? `registrationConfirmationUrl: ${signupConfirmationExpression},` : ""}
             },
             nocode: {
               // Nice to clean up the url so the access token is less visible

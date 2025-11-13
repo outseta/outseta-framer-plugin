@@ -138,9 +138,9 @@ function CustomCode() {
 
       <PostLoginFieldSection form={form} />
 
-      <SignupConfirmationFieldSection form={form} />
-
       <PostSignupFieldSection form={form} />
+
+      <SignupConfirmationFieldSection form={form} />
 
       <form.AppForm>
         <form.SubmitButton
