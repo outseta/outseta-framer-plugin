@@ -14,9 +14,9 @@ export const SignupConfirmationFieldSection = withForm({
               label="Signup Confirmation"
               items={[
                 { label: "As Configured in Outseta", value: "default" },
-                { label: "Stay on the same page", value: "current" },
-                { label: "Redirect to Framer Page", value: "page" },
-                { label: "Redirect to Custom URL", value: "custom" },
+                { label: "The page the user was on", value: "current" },
+                { label: "A Framer page", value: "page" },
+                { label: "A custom URL", value: "custom" },
               ]}
             />
           )}
@@ -28,32 +28,6 @@ export const SignupConfirmationFieldSection = withForm({
           children={(signupConfirmationMode) => {
             return (
               <>
-                {/* Default mode */}
-                {signupConfirmationMode === "default" ? (
-                  <p>
-                    Redirect users to the URL configured in your{" "}
-                    {form.state.values.domain ? (
-                      <>
-                        <ExternalLink
-                          href={`https://${form.state.values.domain}/#/app/auth/sign-up-login`}
-                        >
-                          Outseta dashboard
-                        </ExternalLink>
-                      </>
-                    ) : (
-                      "Outseta dashboard"
-                    )}
-                    .
-                  </p>
-                ) : null}
-
-                {/* Current mode */}
-                {signupConfirmationMode === "current" ? (
-                  <p>
-                    Only use with <strong>popup</strong> signup embeds.
-                  </p>
-                ) : null}
-
                 {/* Page mode */}
                 <form.AppField
                   name="signupConfirmationPagePath"
