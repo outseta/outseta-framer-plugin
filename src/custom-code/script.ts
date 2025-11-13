@@ -1,6 +1,7 @@
 export type OutsetaScriptOptions = {
   domainExpression?: string;
   authCallbackExpression?: string;
+  signupConfirmationExpression?: string;
   postSignupExpression?: string;
   tokenStorageExpression?: string;
 };
@@ -16,11 +17,15 @@ export const parseOutsetaScript = (code: string): OutsetaScriptOptions => {
   // Capture the full expression after postRegistrationUrl
   const postRegistrationRegex =
     /postRegistrationUrl:\s*([\s\S]+?)(?=,\s*(\n|\})|\n|\}|$)/;
+  // Capture the full expression after registrationConfirmationUrl
+  const signupConfirmationRegex =
+    /registrationConfirmationUrl:\s*([\s\S]+?)(?=,\s*(\n|\})|\n|\}|$)/;
 
   const domainMatch = code.match(domainRegex);
   const tokenStorageMatch = code.match(tokenStorageRegex);
   const authCallbackUrlMatch = code.match(authCallbackUrlRegex);
   const postSignupExpressionMatch = code.match(postRegistrationRegex);
+  const signupConfirmationMatch = code.match(signupConfirmationRegex);
 
   return {
     domainExpression: domainMatch ? domainMatch[1].trim() : undefined,
@@ -33,12 +38,16 @@ export const parseOutsetaScript = (code: string): OutsetaScriptOptions => {
     postSignupExpression: postSignupExpressionMatch
       ? postSignupExpressionMatch[1].trim()
       : undefined,
+    signupConfirmationExpression: signupConfirmationMatch
+      ? signupConfirmationMatch[1].trim()
+      : undefined,
   };
 };
 
 export const createOutsetaScript = ({
   domainExpression,
   authCallbackExpression,
+  signupConfirmationExpression,
   postSignupExpression,
   tokenStorageExpression,
 }: OutsetaScriptOptions): string => {
@@ -52,10 +61,10 @@ export const createOutsetaScript = ({
             auth: {
               ${authCallbackExpression ? `// Override the Post Login URL configured in Outseta` : ""}
               ${authCallbackExpression ? `authenticationCallbackUrl: ${authCallbackExpression},` : ""}
-              // Override the Signup Confirmation URL
-              registrationConfirmationUrl: window.location.href,
               ${postSignupExpression ? `// Override the Post Signup URL configured in Outseta` : ""}
               ${postSignupExpression ? `postRegistrationUrl: ${postSignupExpression},` : ""}
+              ${signupConfirmationExpression ? `// Override the Signup Confirmation URL configured in Outseta` : ""}
+              ${signupConfirmationExpression ? `registrationConfirmationUrl: ${signupConfirmationExpression},` : ""}
             },
             nocode: {
               // Nice to clean up the url so the access token is less visible

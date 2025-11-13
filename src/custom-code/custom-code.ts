@@ -11,6 +11,11 @@ import {
   postSignupExpressionToMode,
 } from "./script-post-signup";
 import {
+  type SignupConfirmationConfig,
+  signupConfirmationConfigToExpression,
+  signupConfirmationExpressionToMode,
+} from "./script-signup-confirmation";
+import {
   type TokenStorageConfig,
   tokenStorageConfigToExpression,
   tokenStorageExpressionToConfig,
@@ -22,6 +27,7 @@ export type CustomCodeConfig = {
   domain?: string;
   tokenStorageConfig: TokenStorageConfig;
   postLoginConfig: PostLoginConfig;
+  signupConfirmationConfig: SignupConfirmationConfig;
   postSignupConfig: PostSignupConfig;
 };
 
@@ -29,6 +35,7 @@ export const setCustomCode = async ({
   domain,
   tokenStorageConfig = defaultTokenStorageConfig,
   postLoginConfig = { postLoginMode: "default" },
+  signupConfirmationConfig = { signupConfirmationMode: "default" },
   postSignupConfig = { postSignupMode: "default" },
 }: CustomCodeConfig) => {
   if (!domain) {
@@ -39,12 +46,15 @@ export const setCustomCode = async ({
       tokenStorageConfigToExpression(tokenStorageConfig);
     const authCallbackExpression =
       authCallbackConfigToExpression(postLoginConfig);
+    const signupConfirmationExpression =
+      signupConfirmationConfigToExpression(signupConfirmationConfig);
     const postSignupExpression = postSignupConfigToExpression(postSignupConfig);
 
     const script = createOutsetaScript({
       domainExpression,
       tokenStorageExpression,
       authCallbackExpression,
+      signupConfirmationExpression,
       postSignupExpression,
     });
     return await framer.setCustomCode({ html: script, location: "headEnd" });
@@ -56,6 +66,7 @@ export const subscribeToCustomCode = (
     domain?: string;
     tokenStorageConfig: TokenStorageConfig;
     postLoginConfig: PostLoginConfig;
+    signupConfirmationConfig: SignupConfirmationConfig;
     postSignupConfig: PostSignupConfig;
 
     disabled: boolean;
@@ -73,6 +84,9 @@ export const subscribeToCustomCode = (
     const postLoginConfig = authCallbackExpressionToMode(
       outsetaScript.authCallbackExpression,
     );
+    const signupConfirmationConfig = signupConfirmationExpressionToMode(
+      outsetaScript.signupConfirmationExpression,
+    );
     const postSignupConfig = postSignupExpressionToMode(
       outsetaScript.postSignupExpression,
     );
@@ -81,6 +95,7 @@ export const subscribeToCustomCode = (
       domain,
       tokenStorageConfig,
       postLoginConfig,
+      signupConfirmationConfig,
       postSignupConfig,
       disabled,
     });

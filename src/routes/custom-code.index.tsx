@@ -9,11 +9,13 @@ import {
   DomainFieldSection,
   TokenStorageFieldSection,
   PostLoginFieldSection,
+  SignupConfirmationFieldSection,
   PostSignupFieldSection,
   customCodeFormOptions,
 } from "../custom-code";
 import { type TokenStorageConfig } from "../custom-code/script-token-storage";
 import { type PostLoginConfig } from "../custom-code/script-post-login";
+import { type SignupConfirmationConfig } from "../custom-code/script-signup-confirmation";
 import { type PostSignupConfig } from "../custom-code/script-post-signup";
 import { type CustomCodeSchema } from "../custom-code/custom-code-form";
 
@@ -62,6 +64,28 @@ function buildPostSignupConfig(value: CustomCodeSchema): PostSignupConfig {
   }
 }
 
+// Type-safe helper to construct SignupConfirmationConfig from form values
+function buildSignupConfirmationConfig(
+  value: CustomCodeSchema,
+): SignupConfirmationConfig {
+  switch (value.signupConfirmationMode) {
+    case "default":
+      return { signupConfirmationMode: "default" };
+    case "current":
+      return { signupConfirmationMode: "current" };
+    case "page":
+      return {
+        signupConfirmationMode: "page",
+        signupConfirmationPagePath: value.signupConfirmationPagePath,
+      };
+    case "custom":
+      return {
+        signupConfirmationMode: "custom",
+        signupConfirmationCustomUrl: value.signupConfirmationCustomUrl,
+      };
+  }
+}
+
 export const Route = createFileRoute("/custom-code/")({
   component: CustomCode,
 });
@@ -81,18 +105,21 @@ function CustomCode() {
       domain: customCode.domain,
       ...customCode.tokenStorageConfig,
       ...customCode.postLoginConfig,
+      ...customCode.signupConfirmationConfig,
       ...customCode.postSignupConfig,
     },
 
     onSubmit: ({ value }) => {
       const tokenStorageConfig = buildTokenStorageConfig(value);
       const postLoginConfig = buildPostLoginConfig(value);
+      const signupConfirmationConfig = buildSignupConfirmationConfig(value);
       const postSignupConfig = buildPostSignupConfig(value);
 
       mutation.mutate({
         domain: value.domain,
         tokenStorageConfig,
         postLoginConfig,
+        signupConfirmationConfig,
         postSignupConfig,
       });
     },
@@ -112,6 +139,8 @@ function CustomCode() {
       <PostLoginFieldSection form={form} />
 
       <PostSignupFieldSection form={form} />
+
+      <SignupConfirmationFieldSection form={form} />
 
       <form.AppForm>
         <form.SubmitButton

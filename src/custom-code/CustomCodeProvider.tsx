@@ -16,6 +16,10 @@ import {
   defaultPostLoginConfig,
 } from "./script-post-login";
 import {
+  type SignupConfirmationConfig,
+  defaultSignupConfirmationConfig,
+} from "./script-signup-confirmation";
+import {
   type PostSignupConfig,
   defaultPostSignupConfig,
 } from "./script-post-signup";
@@ -28,6 +32,7 @@ type CustomCodeState = {
   domain: string;
   tokenStorageConfig: TokenStorageConfig;
   postLoginConfig: PostLoginConfig;
+  signupConfirmationConfig: SignupConfirmationConfig;
   postSignupConfig: PostSignupConfig;
   disabled: boolean;
 };
@@ -39,6 +44,7 @@ const initialState: CustomCodeState = {
   domain: "",
   tokenStorageConfig: defaultTokenStorageConfig,
   postLoginConfig: defaultPostLoginConfig,
+  signupConfirmationConfig: defaultSignupConfirmationConfig,
   postSignupConfig: defaultPostSignupConfig,
   disabled: false,
 };
@@ -59,6 +65,9 @@ export const CustomCodeProvider: React.FC<{ children: ReactNode }> = ({
           customCode.postLoginConfig ?? initialState.postLoginConfig,
         postSignupConfig:
           customCode.postSignupConfig ?? initialState.postSignupConfig,
+        signupConfirmationConfig:
+          customCode.signupConfirmationConfig ??
+          initialState.signupConfirmationConfig,
         disabled: customCode.disabled ?? initialState.disabled,
       });
     });
