@@ -53,12 +53,12 @@ export const CustomCodeProvider: React.FC<{ children: ReactNode }> = ({
       setState({
         status: customCode.domain ? "connected" : "disconnected",
         domain: customCode.domain ?? initialState.domain,
+        tokenStorageConfig:
+          customCode.tokenStorageConfig ?? initialState.tokenStorageConfig,
         postLoginConfig:
           customCode.postLoginConfig ?? initialState.postLoginConfig,
         postSignupConfig:
           customCode.postSignupConfig ?? initialState.postSignupConfig,
-        tokenStorageConfig:
-          customCode.tokenStorageConfig ?? initialState.tokenStorageConfig,
         disabled: customCode.disabled ?? initialState.disabled,
       });
     });

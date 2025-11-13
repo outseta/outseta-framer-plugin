@@ -79,21 +79,21 @@ function CustomCode() {
     ...customCodeFormOptions,
     defaultValues: {
       domain: customCode.domain,
+      ...customCode.tokenStorageConfig,
       ...customCode.postLoginConfig,
       ...customCode.postSignupConfig,
-      ...customCode.tokenStorageConfig,
     },
 
     onSubmit: ({ value }) => {
+      const tokenStorageConfig = buildTokenStorageConfig(value);
       const postLoginConfig = buildPostLoginConfig(value);
       const postSignupConfig = buildPostSignupConfig(value);
-      const tokenStorageConfig = buildTokenStorageConfig(value);
 
       mutation.mutate({
         domain: value.domain,
+        tokenStorageConfig,
         postLoginConfig,
         postSignupConfig,
-        tokenStorageConfig,
       });
     },
   });
