@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { ListControls } from "@triozer/framer-toolbox";
 import { usePageQuery } from "../pages";
 
@@ -19,13 +19,20 @@ export function PageListControls({
   ) => void;
 }) {
   const pageQuery = usePageQuery();
-  const nonCollectionPages =
-    pageQuery.data?.filter((page) => !page.collectionId) || [];
 
-  const items = nonCollectionPages.map((page) => ({
-    label: page.path === "/" ? "/Home" : page.path || "",
-    value: page.path || "",
-  }));
+  const items = useMemo(() => {
+    const nonCollectionPages =
+      pageQuery.data?.filter((page) => !page.collectionId) || [];
+    return nonCollectionPages.map((page) => ({
+      label: page.path === "/" ? "/Home" : page.path || "",
+      value: page.path || "",
+    }));
+  }, [pageQuery.data]);
+
+  const onChangeRef = useRef(onChange);
+  useEffect(() => {
+    onChangeRef.current = onChange;
+  }, [onChange]);
 
   useEffect(() => {
     // Auto-select first option if no value is set and items are available
@@ -36,9 +43,9 @@ export function PageListControls({
         target: { value: firstValue },
         currentTarget: { value: firstValue },
       } as React.ChangeEvent<HTMLSelectElement>;
-      onChange(firstValue, syntheticEvent);
+      onChangeRef.current(firstValue, syntheticEvent);
     }
-  }, [items, value, onChange]);
+  }, [items, value]);
 
   return (
     <ListControls
