@@ -8,6 +8,10 @@ import React, {
 import { subscribeToCustomCode } from "./custom-code";
 
 import {
+  type TokenStorageConfig,
+  defaultTokenStorageConfig,
+} from "./script-token-storage";
+import {
   type PostLoginConfig,
   defaultPostLoginConfig,
 } from "./script-post-login";
@@ -15,12 +19,14 @@ import {
   type PostSignupConfig,
   defaultPostSignupConfig,
 } from "./script-post-signup";
+
 import { useQuery } from "@tanstack/react-query";
 import { getPlanData } from "../outseta";
 
 type CustomCodeState = {
   status: "loading" | "connected" | "disconnected";
   domain: string;
+  tokenStorageConfig: TokenStorageConfig;
   postLoginConfig: PostLoginConfig;
   postSignupConfig: PostSignupConfig;
   disabled: boolean;
@@ -31,6 +37,7 @@ const CustomCodeContext = createContext<CustomCodeState | undefined>(undefined);
 const initialState: CustomCodeState = {
   status: "loading",
   domain: "",
+  tokenStorageConfig: defaultTokenStorageConfig,
   postLoginConfig: defaultPostLoginConfig,
   postSignupConfig: defaultPostSignupConfig,
   disabled: false,
@@ -46,6 +53,8 @@ export const CustomCodeProvider: React.FC<{ children: ReactNode }> = ({
       setState({
         status: customCode.domain ? "connected" : "disconnected",
         domain: customCode.domain ?? initialState.domain,
+        tokenStorageConfig:
+          customCode.tokenStorageConfig ?? initialState.tokenStorageConfig,
         postLoginConfig:
           customCode.postLoginConfig ?? initialState.postLoginConfig,
         postSignupConfig:

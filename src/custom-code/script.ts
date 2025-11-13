@@ -2,11 +2,14 @@ export type OutsetaScriptOptions = {
   domainExpression?: string;
   authCallbackExpression?: string;
   postSignupExpression?: string;
+  tokenStorageExpression?: string;
 };
 
 export const parseOutsetaScript = (code: string): OutsetaScriptOptions => {
   // Captures the full expression after domain
   const domainRegex = /domain:\s*([\s\S]+?)(?=,\s*(\n|\})|\n|\}|$)/;
+  // Capture the full expression after tokenStorage
+  const tokenStorageRegex = /tokenStorage:\s*([\s\S]+?)(?=,\s*(\n|\})|\n|\}|$)/;
   // Captures the full expression after authenticationCallbackUrl
   const authCallbackUrlRegex =
     /authenticationCallbackUrl:\s*([\s\S]+?)(?=,\s*(\n|\})|\n|\}|$)/;
@@ -15,11 +18,15 @@ export const parseOutsetaScript = (code: string): OutsetaScriptOptions => {
     /postRegistrationUrl:\s*([\s\S]+?)(?=,\s*(\n|\})|\n|\}|$)/;
 
   const domainMatch = code.match(domainRegex);
+  const tokenStorageMatch = code.match(tokenStorageRegex);
   const authCallbackUrlMatch = code.match(authCallbackUrlRegex);
   const postSignupExpressionMatch = code.match(postRegistrationRegex);
 
   return {
     domainExpression: domainMatch ? domainMatch[1].trim() : undefined,
+    tokenStorageExpression: tokenStorageMatch
+      ? tokenStorageMatch[1].trim()
+      : undefined,
     authCallbackExpression: authCallbackUrlMatch
       ? authCallbackUrlMatch[1].trim()
       : undefined,
@@ -33,6 +40,7 @@ export const createOutsetaScript = ({
   domainExpression,
   authCallbackExpression,
   postSignupExpression,
+  tokenStorageExpression,
 }: OutsetaScriptOptions): string => {
   const script = `
         <script>
@@ -40,6 +48,7 @@ export const createOutsetaScript = ({
             domain: ${domainExpression},
             load: 'auth,profile,nocode,leadCapture,support,emailList',
             monitorDom: 'true',
+            ${tokenStorageExpression ? `tokenStorage: ${tokenStorageExpression},` : ""}
             auth: {
               ${authCallbackExpression ? `// Override the Post Login URL configured in Outseta` : ""}
               ${authCallbackExpression ? `authenticationCallbackUrl: ${authCallbackExpression},` : ""}

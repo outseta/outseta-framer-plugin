@@ -7,13 +7,20 @@ import {
   setCustomCode,
   useCustomCode,
   DomainFieldSection,
+  TokenStorageFieldSection,
   PostLoginFieldSection,
   PostSignupFieldSection,
   customCodeFormOptions,
 } from "../custom-code";
-import { PostLoginConfig } from "../custom-code/script-post-login";
-import { PostSignupConfig } from "../custom-code/script-post-signup";
-import type { CustomCodeSchema } from "../custom-code/custom-code-form";
+import { type TokenStorageConfig } from "../custom-code/script-token-storage";
+import { type PostLoginConfig } from "../custom-code/script-post-login";
+import { type PostSignupConfig } from "../custom-code/script-post-signup";
+import { type CustomCodeSchema } from "../custom-code/custom-code-form";
+
+// Type-safe helper to construct TokenStorageConfig from form values
+function buildTokenStorageConfig(value: CustomCodeSchema): TokenStorageConfig {
+  return { tokenStorage: value.tokenStorage };
+}
 
 // Type-safe helper to construct PostLoginConfig from form values
 function buildPostLoginConfig(value: CustomCodeSchema): PostLoginConfig {
@@ -72,16 +79,19 @@ function CustomCode() {
     ...customCodeFormOptions,
     defaultValues: {
       domain: customCode.domain,
+      ...customCode.tokenStorageConfig,
       ...customCode.postLoginConfig,
       ...customCode.postSignupConfig,
     },
 
     onSubmit: ({ value }) => {
+      const tokenStorageConfig = buildTokenStorageConfig(value);
       const postLoginConfig = buildPostLoginConfig(value);
       const postSignupConfig = buildPostSignupConfig(value);
 
       mutation.mutate({
         domain: value.domain,
+        tokenStorageConfig,
         postLoginConfig,
         postSignupConfig,
       });
@@ -96,6 +106,8 @@ function CustomCode() {
       }}
     >
       <DomainFieldSection form={form} />
+
+      <TokenStorageFieldSection form={form} />
 
       <PostLoginFieldSection form={form} />
 
