@@ -529,8 +529,6 @@ describe("createOutsetaScript", () => {
             auth: {
               // Override the Post Login URL configured in Outseta
               authenticationCallbackUrl: "https://example.com/callback",
-              // Override the Signup Confirmation URL
-              registrationConfirmationUrl: window.location.href,
               // Override the Post Signup URL configured in Outseta
               postRegistrationUrl: new URL("/welcome", window.location.origin).href,
             },
@@ -559,8 +557,6 @@ describe("createOutsetaScript", () => {
             load: 'auth,profile,nocode,leadCapture,support,emailList',
             monitorDom: 'true',
             auth: {
-              // Override the Signup Confirmation URL
-              registrationConfirmationUrl: window.location.href,
             },
             nocode: {
               // Nice to clean up the url so the access token is less visible
@@ -589,8 +585,6 @@ describe("createOutsetaScript", () => {
             auth: {
               // Override the Post Login URL configured in Outseta
               authenticationCallbackUrl: "https://myapp.com/auth/callback",
-              // Override the Signup Confirmation URL
-              registrationConfirmationUrl: window.location.href,
             },
             nocode: {
               // Nice to clean up the url so the access token is less visible
@@ -618,8 +612,6 @@ describe("createOutsetaScript", () => {
             load: 'auth,profile,nocode,leadCapture,support,emailList',
             monitorDom: 'true',
             auth: {
-              // Override the Signup Confirmation URL
-              registrationConfirmationUrl: window.location.href,
               // Override the Post Signup URL configured in Outseta
               postRegistrationUrl: new URL("/dashboard", window.location.origin).href,
             },
@@ -648,8 +640,6 @@ describe("createOutsetaScript", () => {
             load: 'auth,profile,nocode,leadCapture,support,emailList',
             monitorDom: 'true',
             auth: {
-              // Override the Signup Confirmation URL
-              registrationConfirmationUrl: window.location.href,
             },
             nocode: {
               // Nice to clean up the url so the access token is less visible
@@ -677,8 +667,6 @@ describe("createOutsetaScript", () => {
             monitorDom: 'true',
             tokenStorage: "local",
             auth: {
-              // Override the Signup Confirmation URL
-              registrationConfirmationUrl: window.location.href,
             },
             nocode: {
               // Nice to clean up the url so the access token is less visible
@@ -710,8 +698,6 @@ describe("createOutsetaScript", () => {
             auth: {
               // Override the Post Login URL configured in Outseta
               authenticationCallbackUrl: "https://example.com/callback",
-              // Override the Signup Confirmation URL
-              registrationConfirmationUrl: window.location.href,
               // Override the Post Signup URL configured in Outseta
               postRegistrationUrl: new URL("/welcome", window.location.origin).href,
             },
@@ -723,5 +709,240 @@ describe("createOutsetaScript", () => {
         </script>
         <script src="https://cdn.outseta.com/outseta.min.js" data-options="o_options"></script>
       `);
+  });
+});
+
+describe("signupConfirmationExpression parsing and generation", () => {
+  describe("parseOutsetaScript - signupConfirmationExpression", () => {
+    it("should parse registrationConfirmationUrl with window.location.href", () => {
+      const script = `
+        <script>
+          var o_options = {
+            domain: 'test.outseta.com',
+            auth: {
+              registrationConfirmationUrl: window.location.href,
+            },
+          };
+        </script>
+      `;
+
+      const { signupConfirmationExpression } = parseOutsetaScript(script);
+      expect(signupConfirmationExpression).toBe("window.location.href");
+    });
+
+    it("should parse registrationConfirmationUrl with custom URL", () => {
+      const script = `
+        <script>
+          var o_options = {
+            domain: 'test.outseta.com',
+            auth: {
+              registrationConfirmationUrl: "https://example.com/confirmed",
+            },
+          };
+        </script>
+      `;
+
+      const { signupConfirmationExpression } = parseOutsetaScript(script);
+      expect(signupConfirmationExpression).toBe(
+        '"https://example.com/confirmed"',
+      );
+    });
+
+    it("should parse registrationConfirmationUrl with new URL expression", () => {
+      const script = `
+        <script>
+          var o_options = {
+            domain: 'test.outseta.com',
+            auth: {
+              registrationConfirmationUrl: new URL("/welcome", window.location.origin).href,
+            },
+          };
+        </script>
+      `;
+
+      const { signupConfirmationExpression } = parseOutsetaScript(script);
+      expect(signupConfirmationExpression).toBe(
+        'new URL("/welcome", window.location.origin).href',
+      );
+    });
+
+    it("should return undefined when registrationConfirmationUrl is not present", () => {
+      const script = `
+        <script>
+          var o_options = {
+            domain: 'test.outseta.com',
+            auth: {
+              authenticationCallbackUrl: "https://example.com/callback",
+            },
+          };
+        </script>
+      `;
+
+      const { signupConfirmationExpression } = parseOutsetaScript(script);
+      expect(signupConfirmationExpression).toBe(undefined);
+    });
+
+    it("should handle whitespace in registrationConfirmationUrl", () => {
+      const script = `
+        <script>
+          var o_options = {
+            domain: 'test.outseta.com',
+            auth: {
+              registrationConfirmationUrl:     window.location.href,
+            },
+          };
+        </script>
+      `;
+
+      const { signupConfirmationExpression } = parseOutsetaScript(script);
+      expect(signupConfirmationExpression).toBe("window.location.href");
+    });
+  });
+
+  describe("createOutsetaScript - signupConfirmationExpression", () => {
+    it("should not include registrationConfirmationUrl when expression is undefined", () => {
+      const config = {
+        domainExpression: "'test.outseta.com'",
+        signupConfirmationExpression: undefined,
+      };
+
+      const result = createOutsetaScript(config);
+
+      expect(result).toBe(`
+        <script>
+          var o_options = {
+            domain: 'test.outseta.com',
+            load: 'auth,profile,nocode,leadCapture,support,emailList',
+            monitorDom: 'true',
+            auth: {
+            },
+            nocode: {
+              // Nice to clean up the url so the access token is less visible
+              clearQuerystring: true
+            }
+          };
+        </script>
+        <script src="https://cdn.outseta.com/outseta.min.js" data-options="o_options"></script>
+      `);
+    });
+
+    it("should include registrationConfirmationUrl with window.location.href", () => {
+      const config = {
+        domainExpression: "'test.outseta.com'",
+        signupConfirmationExpression: "window.location.href",
+      };
+
+      const result = createOutsetaScript(config);
+
+      expect(result).toBe(`
+        <script>
+          var o_options = {
+            domain: 'test.outseta.com',
+            load: 'auth,profile,nocode,leadCapture,support,emailList',
+            monitorDom: 'true',
+            auth: {
+              // Override the Signup Confirmation URL configured in Outseta
+              registrationConfirmationUrl: window.location.href,
+            },
+            nocode: {
+              // Nice to clean up the url so the access token is less visible
+              clearQuerystring: true
+            }
+          };
+        </script>
+        <script src="https://cdn.outseta.com/outseta.min.js" data-options="o_options"></script>
+      `);
+    });
+
+    it("should include registrationConfirmationUrl with custom URL", () => {
+      const config = {
+        domainExpression: "'test.outseta.com'",
+        signupConfirmationExpression: '"https://example.com/confirmed"',
+      };
+
+      const result = createOutsetaScript(config);
+
+      expect(result).toBe(`
+        <script>
+          var o_options = {
+            domain: 'test.outseta.com',
+            load: 'auth,profile,nocode,leadCapture,support,emailList',
+            monitorDom: 'true',
+            auth: {
+              // Override the Signup Confirmation URL configured in Outseta
+              registrationConfirmationUrl: "https://example.com/confirmed",
+            },
+            nocode: {
+              // Nice to clean up the url so the access token is less visible
+              clearQuerystring: true
+            }
+          };
+        </script>
+        <script src="https://cdn.outseta.com/outseta.min.js" data-options="o_options"></script>
+      `);
+    });
+
+    it("should include registrationConfirmationUrl with new URL expression", () => {
+      const config = {
+        domainExpression: "'test.outseta.com'",
+        signupConfirmationExpression:
+          'new URL("/welcome", window.location.origin).href',
+      };
+
+      const result = createOutsetaScript(config);
+
+      expect(result).toBe(`
+        <script>
+          var o_options = {
+            domain: 'test.outseta.com',
+            load: 'auth,profile,nocode,leadCapture,support,emailList',
+            monitorDom: 'true',
+            auth: {
+              // Override the Signup Confirmation URL configured in Outseta
+              registrationConfirmationUrl: new URL("/welcome", window.location.origin).href,
+            },
+            nocode: {
+              // Nice to clean up the url so the access token is less visible
+              clearQuerystring: true
+            }
+          };
+        </script>
+        <script src="https://cdn.outseta.com/outseta.min.js" data-options="o_options"></script>
+      `);
+    });
+
+    it("should include all URL configurations together", () => {
+      const config = {
+        domainExpression: "'test.outseta.com'",
+        authCallbackExpression: '"https://example.com/callback"',
+        signupConfirmationExpression: "window.location.href",
+        postSignupExpression: 'new URL("/dashboard", window.location.origin).href',
+      };
+
+      const result = createOutsetaScript(config);
+
+      expect(result).toBe(`
+        <script>
+          var o_options = {
+            domain: 'test.outseta.com',
+            load: 'auth,profile,nocode,leadCapture,support,emailList',
+            monitorDom: 'true',
+            auth: {
+              // Override the Post Login URL configured in Outseta
+              authenticationCallbackUrl: "https://example.com/callback",
+              // Override the Signup Confirmation URL configured in Outseta
+              registrationConfirmationUrl: window.location.href,
+              // Override the Post Signup URL configured in Outseta
+              postRegistrationUrl: new URL("/dashboard", window.location.origin).href,
+            },
+            nocode: {
+              // Nice to clean up the url so the access token is less visible
+              clearQuerystring: true
+            }
+          };
+        </script>
+        <script src="https://cdn.outseta.com/outseta.min.js" data-options="o_options"></script>
+      `);
+    });
   });
 });

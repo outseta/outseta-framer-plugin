@@ -10,6 +10,10 @@ import {
   defaultPostSignupConfig,
   postSignupSchema,
 } from "./script-post-signup";
+import {
+  defaultSignupConfirmationConfig,
+  signupConfirmationSchema,
+} from "./script-signup-confirmation";
 
 export const customCodeSchema = z
   .object({
@@ -19,6 +23,7 @@ export const customCodeSchema = z
   })
   .and(tokenStorageSchema)
   .and(postLoginSchema)
+  .and(signupConfirmationSchema)
   .and(postSignupSchema);
 
 export type CustomCodeSchema = z.infer<typeof customCodeSchema>;
@@ -27,6 +32,7 @@ const defaultValues = {
   domain: "",
   ...defaultTokenStorageConfig,
   ...defaultPostLoginConfig,
+  ...defaultSignupConfirmationConfig,
   ...defaultPostSignupConfig,
 };
 
