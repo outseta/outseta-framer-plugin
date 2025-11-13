@@ -20,16 +20,16 @@ import { domainToExpression, expressionToDomain } from "./script-domain";
 
 export type CustomCodeConfig = {
   domain?: string;
+  tokenStorageConfig: TokenStorageConfig;
   postLoginConfig: PostLoginConfig;
   postSignupConfig: PostSignupConfig;
-  tokenStorageConfig: TokenStorageConfig;
 };
 
 export const setCustomCode = async ({
   domain,
+  tokenStorageConfig = defaultTokenStorageConfig,
   postLoginConfig = { postLoginMode: "default" },
   postSignupConfig = { postSignupMode: "default" },
-  tokenStorageConfig = defaultTokenStorageConfig,
 }: CustomCodeConfig) => {
   if (!domain) {
     return await framer.setCustomCode({ html: null, location: "headEnd" });

@@ -25,9 +25,9 @@ export type CustomCodeSchema = z.infer<typeof customCodeSchema>;
 
 const defaultValues = {
   domain: "",
+  ...defaultTokenStorageConfig,
   ...defaultPostLoginConfig,
   ...defaultPostSignupConfig,
-  ...defaultTokenStorageConfig,
 };
 
 export const customCodeFormOptions = formOptions({

@@ -8,31 +8,30 @@ export type OutsetaScriptOptions = {
 export const parseOutsetaScript = (code: string): OutsetaScriptOptions => {
   // Captures the full expression after domain
   const domainRegex = /domain:\s*([\s\S]+?)(?=,\s*(\n|\})|\n|\}|$)/;
+  // Capture the full expression after tokenStorage
+  const tokenStorageRegex = /tokenStorage:\s*([\s\S]+?)(?=,\s*(\n|\})|\n|\}|$)/;
   // Captures the full expression after authenticationCallbackUrl
   const authCallbackUrlRegex =
     /authenticationCallbackUrl:\s*([\s\S]+?)(?=,\s*(\n|\})|\n|\}|$)/;
   // Capture the full expression after postRegistrationUrl
   const postRegistrationRegex =
     /postRegistrationUrl:\s*([\s\S]+?)(?=,\s*(\n|\})|\n|\}|$)/;
-  // Capture the full expression after tokenStorage
-  const tokenStorageRegex =
-    /tokenStorage:\s*([\s\S]+?)(?=,\s*(\n|\})|\n|\}|$)/;
 
   const domainMatch = code.match(domainRegex);
+  const tokenStorageMatch = code.match(tokenStorageRegex);
   const authCallbackUrlMatch = code.match(authCallbackUrlRegex);
   const postSignupExpressionMatch = code.match(postRegistrationRegex);
-  const tokenStorageMatch = code.match(tokenStorageRegex);
 
   return {
     domainExpression: domainMatch ? domainMatch[1].trim() : undefined,
+    tokenStorageExpression: tokenStorageMatch
+      ? tokenStorageMatch[1].trim()
+      : undefined,
     authCallbackExpression: authCallbackUrlMatch
       ? authCallbackUrlMatch[1].trim()
       : undefined,
     postSignupExpression: postSignupExpressionMatch
       ? postSignupExpressionMatch[1].trim()
-      : undefined,
-    tokenStorageExpression: tokenStorageMatch
-      ? tokenStorageMatch[1].trim()
       : undefined,
   };
 };

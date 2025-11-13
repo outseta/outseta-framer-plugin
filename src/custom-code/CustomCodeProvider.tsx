@@ -8,6 +8,10 @@ import React, {
 import { subscribeToCustomCode } from "./custom-code";
 
 import {
+  type TokenStorageConfig,
+  defaultTokenStorageConfig,
+} from "./script-token-storage";
+import {
   type PostLoginConfig,
   defaultPostLoginConfig,
 } from "./script-post-login";
@@ -15,19 +19,16 @@ import {
   type PostSignupConfig,
   defaultPostSignupConfig,
 } from "./script-post-signup";
-import {
-  type TokenStorageConfig,
-  defaultTokenStorageConfig,
-} from "./script-token-storage";
+
 import { useQuery } from "@tanstack/react-query";
 import { getPlanData } from "../outseta";
 
 type CustomCodeState = {
   status: "loading" | "connected" | "disconnected";
   domain: string;
+  tokenStorageConfig: TokenStorageConfig;
   postLoginConfig: PostLoginConfig;
   postSignupConfig: PostSignupConfig;
-  tokenStorageConfig: TokenStorageConfig;
   disabled: boolean;
 };
 
@@ -36,9 +37,9 @@ const CustomCodeContext = createContext<CustomCodeState | undefined>(undefined);
 const initialState: CustomCodeState = {
   status: "loading",
   domain: "",
+  tokenStorageConfig: defaultTokenStorageConfig,
   postLoginConfig: defaultPostLoginConfig,
   postSignupConfig: defaultPostSignupConfig,
-  tokenStorageConfig: defaultTokenStorageConfig,
   disabled: false,
 };
 

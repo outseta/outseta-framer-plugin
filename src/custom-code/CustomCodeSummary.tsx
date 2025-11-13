@@ -14,9 +14,9 @@ export function CustomCodeSummary() {
     mutationFn: () =>
       setCustomCode({
         domain: "",
+        tokenStorageConfig: defaultTokenStorageConfig,
         postLoginConfig: { postLoginMode: "default" },
         postSignupConfig: { postSignupMode: "default" },
-        tokenStorageConfig: defaultTokenStorageConfig,
       }),
   });
 
