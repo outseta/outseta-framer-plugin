@@ -6,15 +6,23 @@ import React, {
   useEffect,
 } from "react";
 import { subscribeToCustomCode } from "./custom-code";
-import type { AuthCallbackConfig } from "./script-auth-callback";
+
+import {
+  type PostLoginConfig,
+  defaultPostLoginConfig,
+} from "./script-post-login";
+import {
+  type PostSignupConfig,
+  defaultPostSignupConfig,
+} from "./script-post-signup";
 import { useQuery } from "@tanstack/react-query";
 import { getPlanData } from "../outseta";
 
 type CustomCodeState = {
   status: "loading" | "connected" | "disconnected";
   domain: string;
-  authCallbackConfig: AuthCallbackConfig;
-  postSignupPath: string;
+  postLoginConfig: PostLoginConfig;
+  postSignupConfig: PostSignupConfig;
   disabled: boolean;
 };
 
@@ -23,8 +31,8 @@ const CustomCodeContext = createContext<CustomCodeState | undefined>(undefined);
 const initialState: CustomCodeState = {
   status: "loading",
   domain: "",
-  authCallbackConfig: { mode: "default" },
-  postSignupPath: "",
+  postLoginConfig: defaultPostLoginConfig,
+  postSignupConfig: defaultPostSignupConfig,
   disabled: false,
 };
 
@@ -37,12 +45,12 @@ export const CustomCodeProvider: React.FC<{ children: ReactNode }> = ({
     subscribeToCustomCode((customCode) => {
       setState({
         status: customCode.domain ? "connected" : "disconnected",
-        domain: customCode.domain ?? "",
-        authCallbackConfig: customCode.authCallbackConfig ?? {
-          mode: "default",
-        },
-        postSignupPath: customCode.postSignupPath ?? "",
-        disabled: customCode.disabled ?? false,
+        domain: customCode.domain ?? initialState.domain,
+        postLoginConfig:
+          customCode.postLoginConfig ?? initialState.postLoginConfig,
+        postSignupConfig:
+          customCode.postSignupConfig ?? initialState.postSignupConfig,
+        disabled: customCode.disabled ?? initialState.disabled,
       });
     });
   }, []);

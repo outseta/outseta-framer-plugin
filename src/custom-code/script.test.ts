@@ -2,16 +2,19 @@ import { describe, it, expect } from "vitest";
 import { parseOutsetaScript, createOutsetaScript } from "./script";
 
 describe("parseOutsetaScript", () => {
-  it("should parse a complete Outseta script with all properties", () => {
-    const script = `
+  describe("complete script", () => {
+    it("should parse a complete Outseta script with all properties", () => {
+      const script = `
       <script>
         var o_options = {
           domain: 'test.outseta.com',
           load: "auth,profile,nocode,leadCapture,support,emailList",
           monitorDom: true,
           auth: {
+            // Override the Post Login URL configured in Outseta
             authenticationCallbackUrl: "https://example.com/callback",
             registrationConfirmationUrl: window.location.href,
+            // Override the Post Signup URL configured in Outseta
             postRegistrationUrl: 'https://example.com/welcome'
           },
           nocode: {
@@ -21,187 +24,406 @@ describe("parseOutsetaScript", () => {
       </script>
     `;
 
-    const result = parseOutsetaScript(script);
+      const { domainExpression, authCallbackExpression, postSignupExpression } =
+        parseOutsetaScript(script);
 
-    expect(result.domainExpression).toBe("'test.outseta.com'");
-    expect(result.authCallbackExpression).toBe(
-      '"https://example.com/callback"',
-    );
-    expect(result.postSignupPath).toBe("https://example.com/welcome");
-  });
+      expect(domainExpression).toBe("'test.outseta.com'");
+      expect(authCallbackExpression).toBe('"https://example.com/callback"');
+      expect(postSignupExpression).toBe("'https://example.com/welcome'");
+    });
 
-  it("should parse script with only domain", () => {
-    const script = `
+    it("should handle empty script", () => {
+      const { domainExpression, authCallbackExpression, postSignupExpression } =
+        parseOutsetaScript("");
+      expect(domainExpression).toBe(undefined);
+      expect(authCallbackExpression).toBe(undefined);
+      expect(postSignupExpression).toBe(undefined);
+    });
+
+    it("should handle and preserve weird whitespace", () => {
+      const script = `
       <script>
         var o_options = {
-          domain: 'myapp.outseta.com',
-          load: 'auth,profile',
-        };
-      </script>
-    `;
-
-    const result = parseOutsetaScript(script);
-
-    expect(result.domainExpression).toBe("'myapp.outseta.com'");
-    expect(result.authCallbackExpression).toBeUndefined();
-    expect(result.postSignupPath).toBeUndefined();
-  });
-
-  it("should parse script with domain and authCallbackUrl but no postSignupPath", () => {
-    const script = `
-      <script>
-        var o_options = {
-          domain: "app.outseta.com",
+          domain: '   test.outseta.com',
+          load: 'auth,profile,nocode,leadCapture,support,emailList',
+          monitorDom: true,
           auth: {
-            authenticationCallbackUrl: 'https://myapp.com/auth/callback',
+            registrationConfirmationUrl:     window.location.href,
+            postRegistrationUrl: null,
+            authenticationCallbackUrl: new        URL("/dashboard", window.location.origin).href
+          },
+          nocode: {
+            clearQuerystring: true
           }
         };
       </script>
     `;
 
-    const result = parseOutsetaScript(script);
-
-    expect(result.domainExpression).toBe('"app.outseta.com"');
-    expect(result.authCallbackExpression).toBe(
-      "'https://myapp.com/auth/callback'",
-    );
-    expect(result.postSignupPath).toBeUndefined();
+      const { domainExpression, authCallbackExpression, postSignupExpression } =
+        parseOutsetaScript(script);
+      expect(domainExpression).toBe("'   test.outseta.com'");
+      expect(authCallbackExpression).toBe(
+        'new        URL("/dashboard", window.location.origin).href',
+      );
+      expect(postSignupExpression).toBe("null");
+    });
   });
 
-  it("should parse script with domain and postSignupPath but no authCallbackUrl", () => {
-    const script = `
-      <script>
-        var o_options = {
-          domain: 'app.outseta.com',
-          auth: {
-            postRegistrationUrl: "https://myapp.com/welcome"
-          }
-        };
-      </script>
-    `;
+  describe("domain", () => {
+    it("should parse regular allowed expressions", () => {
+      const script1 = `
+        <script>
+          var o_options = {
+            domain: 'test.outseta.com',
+          };
+        </script>
+      `;
 
-    const result = parseOutsetaScript(script);
+      const { domainExpression: domainExpression1 } =
+        parseOutsetaScript(script1);
+      expect(domainExpression1).toBe("'test.outseta.com'");
 
-    expect(result.domainExpression).toBe("'app.outseta.com'");
-    expect(result.authCallbackExpression).toBeUndefined();
-    expect(result.postSignupPath).toBe("https://myapp.com/welcome");
+      const script2 = `
+        <script>
+          var o_options = {
+            domain: "myapp.outseta.com",
+          };
+        </script>
+      `;
+
+      const { domainExpression: domainExpression2 } =
+        parseOutsetaScript(script2);
+      expect(domainExpression2).toBe('"myapp.outseta.com"');
+    });
+
+    it("should handle weird whitespace", () => {
+      const script1 = `
+        <script>
+          var o_options = {
+            domain: '   test.outseta.com',
+          };
+        </script>
+      `;
+
+      const { domainExpression: domainExpression1 } =
+        parseOutsetaScript(script1);
+      expect(domainExpression1).toBe("'   test.outseta.com'");
+
+      const script2 = `
+        <script>
+          var o_options = {
+            domain:     'test.outseta.com   '  ,
+          };
+        </script>
+      `;
+
+      const { domainExpression: domainExpression2 } =
+        parseOutsetaScript(script2);
+      expect(domainExpression2).toBe("'test.outseta.com   '");
+    });
+
+    it("should return undefined when missing", () => {
+      const script = `
+        <script>
+          var o_options = {
+            load: 'auth,profile,nocode,leadCapture,support,emailList',
+          };
+        </script>
+      `;
+
+      const { domainExpression } = parseOutsetaScript(script);
+      expect(domainExpression).toBe(undefined);
+    });
+
+    it("should return undefined for empty string", () => {
+      const script = `
+        <script>
+          var o_options = {
+            domain: '',
+          };
+        </script>
+      `;
+
+      const { domainExpression } = parseOutsetaScript(script);
+      expect(domainExpression).toBe("''");
+    });
   });
 
-  it("should handle authCallbackUrl with whitespace", () => {
-    const script = `
-      <script>
-        var o_options = {
-          domain: 'test.outseta.com',
-          auth: {
-            authenticationCallbackUrl: '  https://example.com/callback  ',
-          }
-        };
-      </script>
-    `;
+  describe("authenticationCallbackUrl", () => {
+    it("should parse regular allowed expressions", () => {
+      const script1 = `
+        <script>
+          var o_options = {
+            domain: 'myapp.outseta.com',
+            load: 'auth,profile',
+            auth: {
+              authenticationCallbackUrl: "https://example.com/callback",
+            },
+          };
+        </script>
+      `;
 
-    const result = parseOutsetaScript(script);
+      const { authCallbackExpression: authCallbackExpression1 } =
+        parseOutsetaScript(script1);
+      expect(authCallbackExpression1).toBe('"https://example.com/callback"');
 
-    expect(result.authCallbackExpression).toBe(
-      "'  https://example.com/callback  '",
-    );
+      const script2 = `
+        <script>
+          var o_options = {
+            domain: 'myapp.outseta.com',
+            load: 'auth,profile',
+            auth: {
+              authenticationCallbackUrl: window.location.href,
+            },
+          };
+        </script>
+      `;
+
+      const { authCallbackExpression: authCallbackExpression2 } =
+        parseOutsetaScript(script2);
+      expect(authCallbackExpression2).toBe("window.location.href");
+
+      const script3 = `
+        <script>
+          var o_options = {
+            domain: 'myapp.outseta.com',
+            load: 'auth,profile',
+            auth: {
+              authenticationCallbackUrl: new URL("/dashboard", window.location.origin).href,
+            },
+          };
+        </script>
+      `;
+
+      const { authCallbackExpression: authCallbackExpression3 } =
+        parseOutsetaScript(script3);
+      expect(authCallbackExpression3).toBe(
+        'new URL("/dashboard", window.location.origin).href',
+      );
+    });
+
+    it("should handle weird whitespace", () => {
+      const script1 = `
+        <script>
+          var o_options = {
+            domain: 'myapp.outseta.com',
+            load: 'auth,profile',
+            auth: {
+              authenticationCallbackUrl: '    ',
+            },
+          };
+        </script>
+      `;
+
+      const { authCallbackExpression: authCallbackExpression1 } =
+        parseOutsetaScript(script1);
+      expect(authCallbackExpression1).toBe("'    '");
+
+      const script2 = `
+        <script>
+          var o_options = {
+            domain: 'myapp.outseta.com',
+            load: 'auth,profile',
+            auth: {
+              authenticationCallbackUrl: '    https://example.com/callback',
+            },
+          };
+        </script>
+      `;
+
+      const { authCallbackExpression: authCallbackExpression2 } =
+        parseOutsetaScript(script2);
+      expect(authCallbackExpression2).toBe(
+        "'    https://example.com/callback'",
+      );
+
+      const script3 = `
+        <script>
+          var o_options = {
+            domain: 'myapp.outseta.com',
+            load: 'auth,profile',
+            auth: {
+              authenticationCallbackUrl: new        URL("/dashboard", window.location.origin).href,
+            },
+          };
+        </script>
+      `;
+
+      const { authCallbackExpression: authCallbackExpression3 } =
+        parseOutsetaScript(script3);
+      expect(authCallbackExpression3).toBe(
+        'new        URL("/dashboard", window.location.origin).href',
+      );
+    });
+
+    it("should return undefined when missing", () => {
+      const script = `
+        <script>
+          var o_options = {
+            domain: 'myapp.outseta.com',
+            load: 'auth,profile',
+          };
+        </script>
+      `;
+
+      const { authCallbackExpression } = parseOutsetaScript(script);
+      expect(authCallbackExpression).toBe(undefined);
+    });
+
+    it("should return undefined for empty string", () => {
+      const script = `
+        <script>
+          var o_options = {
+            domain: 'myapp.outseta.com',
+            load: 'auth,profile',
+            auth: {
+              authenticationCallbackUrl: '',
+            },
+          };
+        </script>
+      `;
+
+      const { authCallbackExpression } = parseOutsetaScript(script);
+      expect(authCallbackExpression).toBe("''");
+    });
   });
 
-  it("should handle authCallbackUrl without comma separator", () => {
-    const script = `
-      <script>
-        var o_options = {
-          domain: 'test.outseta.com',
-          auth: {
-            authenticationCallbackUrl: 'https://example.com/callback'
-          }
-        };
-      </script>
-    `;
+  describe("postRegistrationUrl", () => {
+    it("should parse regular allowed expressions", () => {
+      const script1 = `
+        <script>
+          var o_options = {
+            domain: 'myapp.outseta.com',
+            load: 'auth,profile',
+            auth: {
+              postRegistrationUrl: "https://example.com/welcome",
+            },
+          };
+        </script>
+      `;
 
-    const result = parseOutsetaScript(script);
+      const { postSignupExpression: postSignupExpression1 } =
+        parseOutsetaScript(script1);
+      expect(postSignupExpression1).toBe('"https://example.com/welcome"');
 
-    expect(result.authCallbackExpression).toBe(
-      "'https://example.com/callback'",
-    );
-  });
+      const script2 = `
+        <script>
+          var o_options = {
+            domain: 'myapp.outseta.com',
+            load: 'auth,profile',
+            auth: {
+              postRegistrationUrl: null,
+            },
+          };
+        </script>
+      `;
 
-  it("should return undefined for missing properties", () => {
-    const script = `
-      <script>
-        var o_options = {
-          load: 'auth,profile'
-        };
-      </script>
-    `;
+      const { postSignupExpression: postSignupExpression2 } =
+        parseOutsetaScript(script2);
+      expect(postSignupExpression2).toBe("null");
 
-    const result = parseOutsetaScript(script);
+      const script3 = `
+        <script>
+          var o_options = {
+            domain: 'myapp.outseta.com',
+            load: 'auth,profile',
+            auth: {
+              postRegistrationUrl: new URL("/dashboard", window.location.origin).href,
+            },
+          };
+        </script>
+      `;
 
-    expect(result.domainExpression).toBeUndefined();
-    expect(result.authCallbackExpression).toBeUndefined();
-    expect(result.postSignupPath).toBeUndefined();
-  });
+      const { postSignupExpression: postSignupExpression3 } =
+        parseOutsetaScript(script3);
+      expect(postSignupExpression3).toBe(
+        'new URL("/dashboard", window.location.origin).href',
+      );
+    });
 
-  it("should handle empty script", () => {
-    const result = parseOutsetaScript("");
+    it("should handle weird whitespace", () => {
+      const script1 = `
+        <script>
+          var o_options = {
+            domain: 'myapp.outseta.com',
+            load: 'auth,profile',
+            auth: {
+              postRegistrationUrl: '    ',
+            },
+          };
+        </script>
+      `;
 
-    expect(result.domainExpression).toBeUndefined();
-    expect(result.authCallbackExpression).toBeUndefined();
-    expect(result.postSignupPath).toBeUndefined();
-  });
+      const { postSignupExpression: postSignupExpression1 } =
+        parseOutsetaScript(script1);
+      expect(postSignupExpression1).toBe("'    '");
 
-  it("should handle script with no Outseta configuration", () => {
-    const script = `
-      <script>
-        console.log('Hello world');
-      </script>
-    `;
+      const script2 = `
+        <script>
+          var o_options = {
+            domain: 'myapp.outseta.com',
+            load: 'auth,profile',
+            auth: {
+              postRegistrationUrl: '    https://example.com/welcome',
+            },
+          };
+        </script>
+      `;
 
-    const result = parseOutsetaScript(script);
+      const { postSignupExpression: postSignupExpression2 } =
+        parseOutsetaScript(script2);
+      expect(postSignupExpression2).toBe("'    https://example.com/welcome'");
 
-    expect(result.domainExpression).toBeUndefined();
-    expect(result.authCallbackExpression).toBeUndefined();
-    expect(result.postSignupPath).toBeUndefined();
-  });
+      const script3 = `
+        <script>
+          var o_options = {
+            domain: 'myapp.outseta.com',
+            load: 'auth,profile',
+            auth: {
+              postRegistrationUrl: new        URL("/dashboard", window.location.origin).href,
+            },
+          };
+        </script>
+      `;
 
-  it("should handle malformed script gracefully", () => {
-    const script = `
-      <script>
-        var o_options = {
-          domain: 'test.outseta.com',
-          auth: {
-            // Missing closing quote
-            authenticationCallbackUrl: 'https://example.com/callback
-            // Missing postRegistrationUrl entirely
-          }
-        };
-      </script>
-    `;
+      const { postSignupExpression: postSignupExpression3 } =
+        parseOutsetaScript(script3);
+      expect(postSignupExpression3).toBe(
+        'new        URL("/dashboard", window.location.origin).href',
+      );
+    });
 
-    const result = parseOutsetaScript(script);
+    it("should return undefined when missing", () => {
+      const script = `
+        <script>
+          var o_options = {
+            domain: 'myapp.outseta.com',
+            load: 'auth,profile',
+            auth: {},
+          };
+        </script>
+      `;
 
-    // Should still extract what it can
-    expect(result.domainExpression).toBe("'test.outseta.com'");
-    expect(result.authCallbackExpression).toBeUndefined();
-    expect(result.postSignupPath).toBeUndefined();
-  });
+      const { postSignupExpression } = parseOutsetaScript(script);
+      expect(postSignupExpression).toBe(undefined);
+    });
 
-  it("should parse authenticationCallbackUrl with new URL expression", () => {
-    const script = `
-      <script>
-        var o_options = {
-          domain: 'test.outseta.com',
-          auth: {
-            authenticationCallbackUrl: new URL("/404", window.location.origin).href,
-          }
-        };
-      </script>
-    `;
+    it("should return undefined for empty string", () => {
+      const script = `
+        <script>
+          var o_options = {
+            domain: 'myapp.outseta.com',
+            load: 'auth,profile',
+            auth: {
+              postRegistrationUrl: '',
+            },
+          };
+        </script>
+      `;
 
-    const result = parseOutsetaScript(script);
-
-    expect(result.authCallbackExpression).toBe(
-      'new URL("/404", window.location.origin).href',
-    );
+      const { postSignupExpression } = parseOutsetaScript(script);
+      expect(postSignupExpression).toBe("''");
+    });
   });
 });
 
@@ -210,7 +432,7 @@ describe("createOutsetaScript", () => {
     const config = {
       domainExpression: "'test.outseta.com'",
       authCallbackExpression: '"https://example.com/callback"',
-      postSignupPath: "/welcome",
+      postSignupExpression: 'new URL("/welcome", window.location.origin).href',
     };
 
     const result = createOutsetaScript(config);
@@ -224,11 +446,10 @@ describe("createOutsetaScript", () => {
             auth: {
               // Override the Post Login URL configured in Outseta
               authenticationCallbackUrl: "https://example.com/callback",
-
-              // Overrides the Signup Confirmation URL
+              // Override the Signup Confirmation URL
               registrationConfirmationUrl: window.location.href,
-              // Override the Post Signup URL or signup embed's post signup message
-              postRegistrationUrl: "/welcome" ? new URL("/welcome", window.location.origin).href : undefined,
+              // Override the Post Signup URL configured in Outseta
+              postRegistrationUrl: new URL("/welcome", window.location.origin).href,
             },
             nocode: {
               // Nice to clean up the url so the access token is less visible
@@ -243,6 +464,7 @@ describe("createOutsetaScript", () => {
   it("should create script with only domain", () => {
     const config = {
       domainExpression: "'myapp.outseta.com'",
+      postSignupExpression: undefined,
     };
 
     const result = createOutsetaScript(config);
@@ -254,13 +476,8 @@ describe("createOutsetaScript", () => {
             load: 'auth,profile,nocode,leadCapture,support,emailList',
             monitorDom: 'true',
             auth: {
-              // Use the Post Login URL configured in Outseta
-              authenticationCallbackUrl: undefined,
-
-              // Overrides the Signup Confirmation URL
+              // Override the Signup Confirmation URL
               registrationConfirmationUrl: window.location.href,
-              // Override the Post Signup URL or signup embed's post signup message
-              postRegistrationUrl: "" ? new URL("", window.location.origin).href : undefined,
             },
             nocode: {
               // Nice to clean up the url so the access token is less visible
@@ -289,11 +506,8 @@ describe("createOutsetaScript", () => {
             auth: {
               // Override the Post Login URL configured in Outseta
               authenticationCallbackUrl: "https://myapp.com/auth/callback",
-
-              // Overrides the Signup Confirmation URL
+              // Override the Signup Confirmation URL
               registrationConfirmationUrl: window.location.href,
-              // Override the Post Signup URL or signup embed's post signup message
-              postRegistrationUrl: "" ? new URL("", window.location.origin).href : undefined,
             },
             nocode: {
               // Nice to clean up the url so the access token is less visible
@@ -305,10 +519,11 @@ describe("createOutsetaScript", () => {
       `);
   });
 
-  it("should create script with domain and postSignupPath", () => {
+  it("should create script with domain and postSignupExpression (page)", () => {
     const config = {
       domainExpression: "'app.outseta.com'",
-      postSignupPath: "/dashboard",
+      postSignupExpression:
+        'new URL("/dashboard", window.location.origin).href',
     };
 
     const result = createOutsetaScript(config);
@@ -320,13 +535,10 @@ describe("createOutsetaScript", () => {
             load: 'auth,profile,nocode,leadCapture,support,emailList',
             monitorDom: 'true',
             auth: {
-              // Use the Post Login URL configured in Outseta
-              authenticationCallbackUrl: undefined,
-
-              // Overrides the Signup Confirmation URL
+              // Override the Signup Confirmation URL
               registrationConfirmationUrl: window.location.href,
-              // Override the Post Signup URL or signup embed's post signup message
-              postRegistrationUrl: "/dashboard" ? new URL("/dashboard", window.location.origin).href : undefined,
+              // Override the Post Signup URL configured in Outseta
+              postRegistrationUrl: new URL("/dashboard", window.location.origin).href,
             },
             nocode: {
               // Nice to clean up the url so the access token is less visible
@@ -338,10 +550,10 @@ describe("createOutsetaScript", () => {
       `);
   });
 
-  it("should handle empty postSignupPath", () => {
+  it("should include postRegistrationUrl as undefined when no expression is provided", () => {
     const config = {
       domainExpression: "'test.outseta.com'",
-      postSignupPath: "",
+      authCallbackExpression: undefined,
     };
 
     const result = createOutsetaScript(config);
@@ -353,46 +565,8 @@ describe("createOutsetaScript", () => {
             load: 'auth,profile,nocode,leadCapture,support,emailList',
             monitorDom: 'true',
             auth: {
-              // Use the Post Login URL configured in Outseta
-              authenticationCallbackUrl: undefined,
-
-              // Overrides the Signup Confirmation URL
+              // Override the Signup Confirmation URL
               registrationConfirmationUrl: window.location.href,
-              // Override the Post Signup URL or signup embed's post signup message
-              postRegistrationUrl: "" ? new URL("", window.location.origin).href : undefined,
-            },
-            nocode: {
-              // Nice to clean up the url so the access token is less visible
-              clearQuerystring: true
-            }
-          };
-        </script>
-        <script src="https://cdn.outseta.com/outseta.min.js" data-options="o_options"></script>
-      `);
-  });
-
-  it("should handle undefined postSignupPath", () => {
-    const config = {
-      domainExpression: "'test.outseta.com'",
-      postSignupPath: undefined,
-    };
-
-    const result = createOutsetaScript(config);
-
-    expect(result).toBe(`
-        <script>
-          var o_options = {
-            domain: 'test.outseta.com',
-            load: 'auth,profile,nocode,leadCapture,support,emailList',
-            monitorDom: 'true',
-            auth: {
-              // Use the Post Login URL configured in Outseta
-              authenticationCallbackUrl: undefined,
-
-              // Overrides the Signup Confirmation URL
-              registrationConfirmationUrl: window.location.href,
-              // Override the Post Signup URL or signup embed's post signup message
-              postRegistrationUrl: "" ? new URL("", window.location.origin).href : undefined,
             },
             nocode: {
               // Nice to clean up the url so the access token is less visible

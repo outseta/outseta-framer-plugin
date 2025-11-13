@@ -10,7 +10,12 @@ export function CustomCodeSummary() {
   const { domain, status } = useCustomCode();
 
   const disconnectMutation = useMutation({
-    mutationFn: () => setCustomCode({ domain: null }),
+    mutationFn: () =>
+      setCustomCode({
+        domain: "",
+        postLoginConfig: { postLoginMode: "default" },
+        postSignupConfig: { postSignupMode: "default" },
+      }),
   });
 
   if (status === "disconnected") {
