@@ -1,6 +1,5 @@
 import { withForm } from "../forms";
 import { customCodeFormOptions } from "./custom-code-form";
-import { ExternalLink } from "../common";
 
 export const SignupConfirmationFieldSection = withForm({
   ...customCodeFormOptions,

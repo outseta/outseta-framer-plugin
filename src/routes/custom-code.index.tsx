@@ -44,6 +44,26 @@ function buildPostLoginConfig(value: CustomCodeSchema): PostLoginConfig {
   }
 }
 
+// Type-safe helper to construct PostSignupConfig from form values
+function buildPostSignupConfig(value: CustomCodeSchema): PostSignupConfig {
+  switch (value.postSignupMode) {
+    case "default":
+      return { postSignupMode: "default" };
+    case "message":
+      return { postSignupMode: "message" };
+    case "page":
+      return {
+        postSignupMode: "page",
+        postSignupPagePath: value.postSignupPagePath,
+      };
+    case "custom":
+      return {
+        postSignupMode: "custom",
+        postSignupCustomUrl: value.postSignupCustomUrl,
+      };
+  }
+}
+
 // Type-safe helper to construct SignupConfirmationConfig from form values
 function buildSignupConfirmationConfig(
   value: CustomCodeSchema,
@@ -62,26 +82,6 @@ function buildSignupConfirmationConfig(
       return {
         signupConfirmationMode: "custom",
         signupConfirmationCustomUrl: value.signupConfirmationCustomUrl,
-      };
-  }
-}
-
-// Type-safe helper to construct PostSignupConfig from form values
-function buildPostSignupConfig(value: CustomCodeSchema): PostSignupConfig {
-  switch (value.postSignupMode) {
-    case "default":
-      return { postSignupMode: "default" };
-    case "message":
-      return { postSignupMode: "message" };
-    case "page":
-      return {
-        postSignupMode: "page",
-        postSignupPagePath: value.postSignupPagePath,
-      };
-    case "custom":
-      return {
-        postSignupMode: "custom",
-        postSignupCustomUrl: value.postSignupCustomUrl,
       };
   }
 }

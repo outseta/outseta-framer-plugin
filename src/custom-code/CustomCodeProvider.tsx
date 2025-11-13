@@ -63,11 +63,11 @@ export const CustomCodeProvider: React.FC<{ children: ReactNode }> = ({
           customCode.tokenStorageConfig ?? initialState.tokenStorageConfig,
         postLoginConfig:
           customCode.postLoginConfig ?? initialState.postLoginConfig,
+        postSignupConfig:
+          customCode.postSignupConfig ?? initialState.postSignupConfig,
         signupConfirmationConfig:
           customCode.signupConfirmationConfig ??
           initialState.signupConfirmationConfig,
-        postSignupConfig:
-          customCode.postSignupConfig ?? initialState.postSignupConfig,
         disabled: customCode.disabled ?? initialState.disabled,
       });
     });

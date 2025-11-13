@@ -23,8 +23,8 @@ export const customCodeSchema = z
   })
   .and(tokenStorageSchema)
   .and(postLoginSchema)
-  .and(signupConfirmationSchema)
-  .and(postSignupSchema);
+  .and(postSignupSchema)
+  .and(signupConfirmationSchema);
 
 export type CustomCodeSchema = z.infer<typeof customCodeSchema>;
 
@@ -32,8 +32,8 @@ const defaultValues = {
   domain: "",
   ...defaultTokenStorageConfig,
   ...defaultPostLoginConfig,
-  ...defaultSignupConfirmationConfig,
   ...defaultPostSignupConfig,
+  ...defaultSignupConfirmationConfig,
 };
 
 export const customCodeFormOptions = formOptions({

@@ -14,18 +14,18 @@ export const parseOutsetaScript = (code: string): OutsetaScriptOptions => {
   // Captures the full expression after authenticationCallbackUrl
   const authCallbackUrlRegex =
     /authenticationCallbackUrl:\s*([\s\S]+?)(?=,\s*(\n|\})|\n|\}|$)/;
-  // Capture the full expression after registrationConfirmationUrl
-  const signupConfirmationRegex =
-    /registrationConfirmationUrl:\s*([\s\S]+?)(?=,\s*(\n|\})|\n|\}|$)/;
   // Capture the full expression after postRegistrationUrl
   const postRegistrationRegex =
     /postRegistrationUrl:\s*([\s\S]+?)(?=,\s*(\n|\})|\n|\}|$)/;
+  // Capture the full expression after registrationConfirmationUrl
+  const signupConfirmationRegex =
+    /registrationConfirmationUrl:\s*([\s\S]+?)(?=,\s*(\n|\})|\n|\}|$)/;
 
   const domainMatch = code.match(domainRegex);
   const tokenStorageMatch = code.match(tokenStorageRegex);
   const authCallbackUrlMatch = code.match(authCallbackUrlRegex);
-  const signupConfirmationMatch = code.match(signupConfirmationRegex);
   const postSignupExpressionMatch = code.match(postRegistrationRegex);
+  const signupConfirmationMatch = code.match(signupConfirmationRegex);
 
   return {
     domainExpression: domainMatch ? domainMatch[1].trim() : undefined,
@@ -35,11 +35,11 @@ export const parseOutsetaScript = (code: string): OutsetaScriptOptions => {
     authCallbackExpression: authCallbackUrlMatch
       ? authCallbackUrlMatch[1].trim()
       : undefined,
-    signupConfirmationExpression: signupConfirmationMatch
-      ? signupConfirmationMatch[1].trim()
-      : undefined,
     postSignupExpression: postSignupExpressionMatch
       ? postSignupExpressionMatch[1].trim()
+      : undefined,
+    signupConfirmationExpression: signupConfirmationMatch
+      ? signupConfirmationMatch[1].trim()
       : undefined,
   };
 };
