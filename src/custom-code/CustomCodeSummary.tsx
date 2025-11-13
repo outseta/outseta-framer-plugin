@@ -13,8 +13,8 @@ export function CustomCodeSummary() {
     mutationFn: () =>
       setCustomCode({
         domain: "",
-        authCallbackConfig: { mode: "default" },
-        postSignupConfig: { mode: "default" },
+        postLoginConfig: { postLoginMode: "default" },
+        postSignupConfig: { postSignupMode: "default" },
       }),
   });
 

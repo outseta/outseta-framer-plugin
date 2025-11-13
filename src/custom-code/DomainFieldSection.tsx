@@ -22,7 +22,7 @@ export const DomainFieldSection = withForm({
                 <ExternalLink href="https://go.outseta.com/#/login">
                   login
                 </ExternalLink>{" "}
-                to your existing acount to find your domain.
+                to your existing account to find your domain.
               </p>
             </>
           )}
