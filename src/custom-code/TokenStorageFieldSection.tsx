@@ -1,6 +1,5 @@
 import { withForm } from "../forms";
 import { customCodeFormOptions } from "./custom-code-form";
-import { ExternalLink } from "../common";
 
 export const TokenStorageFieldSection = withForm({
   ...customCodeFormOptions,
@@ -14,7 +13,7 @@ export const TokenStorageFieldSection = withForm({
               <field.SelectField
                 label="Token Storage"
                 items={[
-                  { label: "Local Storage (default)", value: "local" },
+                  { label: "Local Storage", value: "local" },
                   { label: "Session Storage", value: "session" },
                   { label: "Cookie", value: "cookie" },
                 ]}
@@ -31,44 +30,22 @@ export const TokenStorageFieldSection = withForm({
               <>
                 {/* Local Storage mode */}
                 {tokenStorage === "local" ? (
-                  <p>
-                    Token persists across tabs and visits.
-                    <br />
-                    <br />
-                    Learn more about{" "}
-                    <ExternalLink href="https://docs.outseta.com/support/kb/articles/token-storage">
-                      token storage options
-                    </ExternalLink>
-                    .
-                  </p>
+                  <p>Users are logged in across tabs and visits.</p>
                 ) : null}
 
                 {/* Session Storage mode */}
                 {tokenStorage === "session" ? (
                   <p>
-                    Token only valid in current tab, cleared when tab closes.
-                    <br />
-                    <br />
-                    Learn more about{" "}
-                    <ExternalLink href="https://docs.outseta.com/support/kb/articles/token-storage">
-                      token storage options
-                    </ExternalLink>
-                    .
+                    Users are logged in only in the current tab, and are logged
+                    out when the tab is closed.
                   </p>
                 ) : null}
 
                 {/* Cookie mode */}
                 {tokenStorage === "cookie" ? (
                   <p>
-                    Token persists across tabs and visits, available across all
-                    subdomains.
-                    <br />
-                    <br />
-                    Learn more about{" "}
-                    <ExternalLink href="https://docs.outseta.com/support/kb/articles/token-storage">
-                      token storage options
-                    </ExternalLink>
-                    .
+                    Users are logged in across tabs and visits, even across
+                    different subdomains.
                   </p>
                 ) : null}
               </>
