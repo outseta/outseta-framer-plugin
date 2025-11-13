@@ -2,6 +2,7 @@ export type OutsetaScriptOptions = {
   domainExpression?: string;
   authCallbackExpression?: string;
   postSignupExpression?: string;
+  tokenStorageExpression?: string;
 };
 
 export const parseOutsetaScript = (code: string): OutsetaScriptOptions => {
@@ -13,10 +14,14 @@ export const parseOutsetaScript = (code: string): OutsetaScriptOptions => {
   // Capture the full expression after postRegistrationUrl
   const postRegistrationRegex =
     /postRegistrationUrl:\s*([\s\S]+?)(?=,\s*(\n|\})|\n|\}|$)/;
+  // Capture the full expression after tokenStorage
+  const tokenStorageRegex =
+    /tokenStorage:\s*([\s\S]+?)(?=,\s*(\n|\})|\n|\}|$)/;
 
   const domainMatch = code.match(domainRegex);
   const authCallbackUrlMatch = code.match(authCallbackUrlRegex);
   const postSignupExpressionMatch = code.match(postRegistrationRegex);
+  const tokenStorageMatch = code.match(tokenStorageRegex);
 
   return {
     domainExpression: domainMatch ? domainMatch[1].trim() : undefined,
@@ -26,6 +31,9 @@ export const parseOutsetaScript = (code: string): OutsetaScriptOptions => {
     postSignupExpression: postSignupExpressionMatch
       ? postSignupExpressionMatch[1].trim()
       : undefined,
+    tokenStorageExpression: tokenStorageMatch
+      ? tokenStorageMatch[1].trim()
+      : undefined,
   };
 };
 
@@ -33,6 +41,7 @@ export const createOutsetaScript = ({
   domainExpression,
   authCallbackExpression,
   postSignupExpression,
+  tokenStorageExpression,
 }: OutsetaScriptOptions): string => {
   const script = `
         <script>
@@ -47,6 +56,7 @@ export const createOutsetaScript = ({
               registrationConfirmationUrl: window.location.href,
               ${postSignupExpression ? `// Override the Post Signup URL configured in Outseta` : ""}
               ${postSignupExpression ? `postRegistrationUrl: ${postSignupExpression},` : ""}
+              ${tokenStorageExpression ? `tokenStorage: ${tokenStorageExpression},` : ""}
             },
             nocode: {
               // Nice to clean up the url so the access token is less visible

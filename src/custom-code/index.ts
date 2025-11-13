@@ -6,3 +6,4 @@ export * from "./custom-code-form";
 export * from "./DomainFieldSection";
 export * from "./PostLoginFieldSection";
 export * from "./PostSignupFieldSection";
+export * from "./TokenStorageFieldSection";

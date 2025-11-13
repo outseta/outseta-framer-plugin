@@ -15,7 +15,8 @@ describe("parseOutsetaScript", () => {
             authenticationCallbackUrl: "https://example.com/callback",
             registrationConfirmationUrl: window.location.href,
             // Override the Post Signup URL configured in Outseta
-            postRegistrationUrl: 'https://example.com/welcome'
+            postRegistrationUrl: 'https://example.com/welcome',
+            tokenStorage: "local"
           },
           nocode: {
             clearQuerystring: true
@@ -24,20 +25,30 @@ describe("parseOutsetaScript", () => {
       </script>
     `;
 
-      const { domainExpression, authCallbackExpression, postSignupExpression } =
-        parseOutsetaScript(script);
+      const {
+        domainExpression,
+        authCallbackExpression,
+        postSignupExpression,
+        tokenStorageExpression,
+      } = parseOutsetaScript(script);
 
       expect(domainExpression).toBe("'test.outseta.com'");
       expect(authCallbackExpression).toBe('"https://example.com/callback"');
       expect(postSignupExpression).toBe("'https://example.com/welcome'");
+      expect(tokenStorageExpression).toBe('"local"');
     });
 
     it("should handle empty script", () => {
-      const { domainExpression, authCallbackExpression, postSignupExpression } =
-        parseOutsetaScript("");
+      const {
+        domainExpression,
+        authCallbackExpression,
+        postSignupExpression,
+        tokenStorageExpression,
+      } = parseOutsetaScript("");
       expect(domainExpression).toBe(undefined);
       expect(authCallbackExpression).toBe(undefined);
       expect(postSignupExpression).toBe(undefined);
+      expect(tokenStorageExpression).toBe(undefined);
     });
 
     it("should handle and preserve weird whitespace", () => {
@@ -425,6 +436,86 @@ describe("parseOutsetaScript", () => {
       expect(postSignupExpression).toBe("''");
     });
   });
+
+  describe("tokenStorage", () => {
+    it("should parse tokenStorage with double quotes", () => {
+      const script = `
+        <script>
+          var o_options = {
+            domain: 'test.outseta.com',
+            auth: {
+              tokenStorage: "local",
+            },
+          };
+        </script>
+      `;
+
+      const { tokenStorageExpression } = parseOutsetaScript(script);
+      expect(tokenStorageExpression).toBe('"local"');
+    });
+
+    it("should parse tokenStorage with single quotes", () => {
+      const script = `
+        <script>
+          var o_options = {
+            domain: 'test.outseta.com',
+            auth: {
+              tokenStorage: 'session',
+            },
+          };
+        </script>
+      `;
+
+      const { tokenStorageExpression } = parseOutsetaScript(script);
+      expect(tokenStorageExpression).toBe("'session'");
+    });
+
+    it("should parse tokenStorage cookie", () => {
+      const script = `
+        <script>
+          var o_options = {
+            domain: 'test.outseta.com',
+            auth: {
+              tokenStorage: "cookie",
+            },
+          };
+        </script>
+      `;
+
+      const { tokenStorageExpression } = parseOutsetaScript(script);
+      expect(tokenStorageExpression).toBe('"cookie"');
+    });
+
+    it("should return undefined when missing", () => {
+      const script = `
+        <script>
+          var o_options = {
+            domain: 'myapp.outseta.com',
+            auth: {},
+          };
+        </script>
+      `;
+
+      const { tokenStorageExpression } = parseOutsetaScript(script);
+      expect(tokenStorageExpression).toBe(undefined);
+    });
+
+    it("should handle whitespace", () => {
+      const script = `
+        <script>
+          var o_options = {
+            domain: 'myapp.outseta.com',
+            auth: {
+              tokenStorage:    "local"   ,
+            },
+          };
+        </script>
+      `;
+
+      const { tokenStorageExpression } = parseOutsetaScript(script);
+      expect(tokenStorageExpression).toBe('"local"');
+    });
+  });
 });
 
 describe("createOutsetaScript", () => {
@@ -567,6 +658,70 @@ describe("createOutsetaScript", () => {
             auth: {
               // Override the Signup Confirmation URL
               registrationConfirmationUrl: window.location.href,
+            },
+            nocode: {
+              // Nice to clean up the url so the access token is less visible
+              clearQuerystring: true
+            }
+          };
+        </script>
+        <script src="https://cdn.outseta.com/outseta.min.js" data-options="o_options"></script>
+      `);
+  });
+
+  it("should create script with tokenStorage", () => {
+    const config = {
+      domainExpression: "'test.outseta.com'",
+      tokenStorageExpression: '"local"',
+    };
+
+    const result = createOutsetaScript(config);
+
+    expect(result).toBe(`
+        <script>
+          var o_options = {
+            domain: 'test.outseta.com',
+            load: 'auth,profile,nocode,leadCapture,support,emailList',
+            monitorDom: 'true',
+            auth: {
+              // Override the Signup Confirmation URL
+              registrationConfirmationUrl: window.location.href,
+              tokenStorage: "local",
+            },
+            nocode: {
+              // Nice to clean up the url so the access token is less visible
+              clearQuerystring: true
+            }
+          };
+        </script>
+        <script src="https://cdn.outseta.com/outseta.min.js" data-options="o_options"></script>
+      `);
+  });
+
+  it("should create script with all properties including tokenStorage", () => {
+    const config = {
+      domainExpression: "'test.outseta.com'",
+      authCallbackExpression: '"https://example.com/callback"',
+      postSignupExpression: 'new URL("/welcome", window.location.origin).href',
+      tokenStorageExpression: '"session"',
+    };
+
+    const result = createOutsetaScript(config);
+
+    expect(result).toBe(`
+        <script>
+          var o_options = {
+            domain: 'test.outseta.com',
+            load: 'auth,profile,nocode,leadCapture,support,emailList',
+            monitorDom: 'true',
+            auth: {
+              // Override the Post Login URL configured in Outseta
+              authenticationCallbackUrl: "https://example.com/callback",
+              // Override the Signup Confirmation URL
+              registrationConfirmationUrl: window.location.href,
+              // Override the Post Signup URL configured in Outseta
+              postRegistrationUrl: new URL("/welcome", window.location.origin).href,
+              tokenStorage: "session",
             },
             nocode: {
               // Nice to clean up the url so the access token is less visible

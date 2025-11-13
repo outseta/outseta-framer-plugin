@@ -10,18 +10,26 @@ import {
   postSignupConfigToExpression,
   postSignupExpressionToMode,
 } from "./script-post-signup";
+import {
+  type TokenStorageConfig,
+  tokenStorageConfigToExpression,
+  tokenStorageExpressionToConfig,
+  defaultTokenStorageConfig,
+} from "./script-token-storage";
 import { domainToExpression, expressionToDomain } from "./script-domain";
 
 export type CustomCodeConfig = {
   domain?: string;
   postLoginConfig: PostLoginConfig;
   postSignupConfig: PostSignupConfig;
+  tokenStorageConfig: TokenStorageConfig;
 };
 
 export const setCustomCode = async ({
   domain,
   postLoginConfig = { postLoginMode: "default" },
   postSignupConfig = { postSignupMode: "default" },
+  tokenStorageConfig = defaultTokenStorageConfig,
 }: CustomCodeConfig) => {
   if (!domain) {
     return await framer.setCustomCode({ html: null, location: "headEnd" });
@@ -30,10 +38,13 @@ export const setCustomCode = async ({
     const authCallbackExpression =
       authCallbackConfigToExpression(postLoginConfig);
     const postSignupExpression = postSignupConfigToExpression(postSignupConfig);
+    const tokenStorageExpression =
+      tokenStorageConfigToExpression(tokenStorageConfig);
     const script = createOutsetaScript({
       domainExpression,
       authCallbackExpression,
       postSignupExpression,
+      tokenStorageExpression,
     });
     return await framer.setCustomCode({ html: script, location: "headEnd" });
   }
@@ -44,6 +55,7 @@ export const subscribeToCustomCode = (
     domain?: string;
     postLoginConfig: PostLoginConfig;
     postSignupConfig: PostSignupConfig;
+    tokenStorageConfig: TokenStorageConfig;
     disabled: boolean;
   }) => void,
 ) => {
@@ -59,11 +71,15 @@ export const subscribeToCustomCode = (
     const postSignupConfig = postSignupExpressionToMode(
       outsetaScript.postSignupExpression,
     );
+    const tokenStorageConfig = tokenStorageExpressionToConfig(
+      outsetaScript.tokenStorageExpression,
+    );
 
     callback({
       domain,
       postLoginConfig,
       postSignupConfig,
+      tokenStorageConfig,
       disabled,
     });
   });

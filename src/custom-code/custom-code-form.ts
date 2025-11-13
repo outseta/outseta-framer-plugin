@@ -6,6 +6,10 @@ import {
   defaultPostSignupConfig,
   postSignupSchema,
 } from "./script-post-signup";
+import {
+  defaultTokenStorageConfig,
+  tokenStorageSchema,
+} from "./script-token-storage";
 
 export const customCodeSchema = z
   .object({
@@ -14,7 +18,8 @@ export const customCodeSchema = z
       .endsWith(".outseta.com", "An Outseta domain is required"),
   })
   .and(postLoginSchema)
-  .and(postSignupSchema);
+  .and(postSignupSchema)
+  .and(tokenStorageSchema);
 
 export type CustomCodeSchema = z.infer<typeof customCodeSchema>;
 
@@ -22,6 +27,7 @@ const defaultValues = {
   domain: "",
   ...defaultPostLoginConfig,
   ...defaultPostSignupConfig,
+  ...defaultTokenStorageConfig,
 };
 
 export const customCodeFormOptions = formOptions({

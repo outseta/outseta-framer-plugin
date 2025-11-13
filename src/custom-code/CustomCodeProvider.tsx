@@ -15,6 +15,10 @@ import {
   type PostSignupConfig,
   defaultPostSignupConfig,
 } from "./script-post-signup";
+import {
+  type TokenStorageConfig,
+  defaultTokenStorageConfig,
+} from "./script-token-storage";
 import { useQuery } from "@tanstack/react-query";
 import { getPlanData } from "../outseta";
 
@@ -23,6 +27,7 @@ type CustomCodeState = {
   domain: string;
   postLoginConfig: PostLoginConfig;
   postSignupConfig: PostSignupConfig;
+  tokenStorageConfig: TokenStorageConfig;
   disabled: boolean;
 };
 
@@ -33,6 +38,7 @@ const initialState: CustomCodeState = {
   domain: "",
   postLoginConfig: defaultPostLoginConfig,
   postSignupConfig: defaultPostSignupConfig,
+  tokenStorageConfig: defaultTokenStorageConfig,
   disabled: false,
 };
 
@@ -50,6 +56,8 @@ export const CustomCodeProvider: React.FC<{ children: ReactNode }> = ({
           customCode.postLoginConfig ?? initialState.postLoginConfig,
         postSignupConfig:
           customCode.postSignupConfig ?? initialState.postSignupConfig,
+        tokenStorageConfig:
+          customCode.tokenStorageConfig ?? initialState.tokenStorageConfig,
         disabled: customCode.disabled ?? initialState.disabled,
       });
     });
