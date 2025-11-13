@@ -19,28 +19,61 @@ export const TokenStorageFieldSection = withForm({
                   { label: "Cookie", value: "cookie" },
                 ]}
               />
-              <p>
-                Where to store the user's authentication token:
-                <br />
-                <br />
-                <strong>Local Storage:</strong> Token persists across tabs and
-                visits.
-                <br />
-                <strong>Session Storage:</strong> Token only valid in current
-                tab, cleared when tab closes.
-                <br />
-                <strong>Cookie:</strong> Token persists across tabs and visits,
-                available across all subdomains.
-                <br />
-                <br />
-                Learn more about{" "}
-                <ExternalLink href="https://docs.outseta.com/support/kb/articles/token-storage">
-                  token storage options
-                </ExternalLink>
-                .
-              </p>
             </>
           )}
+        />
+
+        <form.Subscribe
+          // Listen to changes in tokenStorage and render the appropriate description
+          selector={(state) => state.values.tokenStorage}
+          children={(tokenStorage) => {
+            return (
+              <>
+                {/* Local Storage mode */}
+                {tokenStorage === "local" ? (
+                  <p>
+                    Token persists across tabs and visits.
+                    <br />
+                    <br />
+                    Learn more about{" "}
+                    <ExternalLink href="https://docs.outseta.com/support/kb/articles/token-storage">
+                      token storage options
+                    </ExternalLink>
+                    .
+                  </p>
+                ) : null}
+
+                {/* Session Storage mode */}
+                {tokenStorage === "session" ? (
+                  <p>
+                    Token only valid in current tab, cleared when tab closes.
+                    <br />
+                    <br />
+                    Learn more about{" "}
+                    <ExternalLink href="https://docs.outseta.com/support/kb/articles/token-storage">
+                      token storage options
+                    </ExternalLink>
+                    .
+                  </p>
+                ) : null}
+
+                {/* Cookie mode */}
+                {tokenStorage === "cookie" ? (
+                  <p>
+                    Token persists across tabs and visits, available across all
+                    subdomains.
+                    <br />
+                    <br />
+                    Learn more about{" "}
+                    <ExternalLink href="https://docs.outseta.com/support/kb/articles/token-storage">
+                      token storage options
+                    </ExternalLink>
+                    .
+                  </p>
+                ) : null}
+              </>
+            );
+          }}
         />
       </fieldset>
     );

@@ -10,13 +10,13 @@ describe("parseOutsetaScript", () => {
           domain: 'test.outseta.com',
           load: "auth,profile,nocode,leadCapture,support,emailList",
           monitorDom: true,
+          tokenStorage: "local",
           auth: {
             // Override the Post Login URL configured in Outseta
             authenticationCallbackUrl: "https://example.com/callback",
             registrationConfirmationUrl: window.location.href,
             // Override the Post Signup URL configured in Outseta
-            postRegistrationUrl: 'https://example.com/welcome',
-            tokenStorage: "local"
+            postRegistrationUrl: 'https://example.com/welcome'
           },
           nocode: {
             clearQuerystring: true
@@ -443,9 +443,7 @@ describe("parseOutsetaScript", () => {
         <script>
           var o_options = {
             domain: 'test.outseta.com',
-            auth: {
-              tokenStorage: "local",
-            },
+            tokenStorage: "local",
           };
         </script>
       `;
@@ -459,9 +457,7 @@ describe("parseOutsetaScript", () => {
         <script>
           var o_options = {
             domain: 'test.outseta.com',
-            auth: {
-              tokenStorage: 'session',
-            },
+            tokenStorage: 'session',
           };
         </script>
       `;
@@ -475,9 +471,7 @@ describe("parseOutsetaScript", () => {
         <script>
           var o_options = {
             domain: 'test.outseta.com',
-            auth: {
-              tokenStorage: "cookie",
-            },
+            tokenStorage: "cookie",
           };
         </script>
       `;
@@ -505,9 +499,7 @@ describe("parseOutsetaScript", () => {
         <script>
           var o_options = {
             domain: 'myapp.outseta.com',
-            auth: {
-              tokenStorage:    "local"   ,
-            },
+            tokenStorage:    "local"   ,
           };
         </script>
       `;
@@ -683,10 +675,10 @@ describe("createOutsetaScript", () => {
             domain: 'test.outseta.com',
             load: 'auth,profile,nocode,leadCapture,support,emailList',
             monitorDom: 'true',
+            tokenStorage: "local",
             auth: {
               // Override the Signup Confirmation URL
               registrationConfirmationUrl: window.location.href,
-              tokenStorage: "local",
             },
             nocode: {
               // Nice to clean up the url so the access token is less visible
@@ -714,6 +706,7 @@ describe("createOutsetaScript", () => {
             domain: 'test.outseta.com',
             load: 'auth,profile,nocode,leadCapture,support,emailList',
             monitorDom: 'true',
+            tokenStorage: "session",
             auth: {
               // Override the Post Login URL configured in Outseta
               authenticationCallbackUrl: "https://example.com/callback",
@@ -721,7 +714,6 @@ describe("createOutsetaScript", () => {
               registrationConfirmationUrl: window.location.href,
               // Override the Post Signup URL configured in Outseta
               postRegistrationUrl: new URL("/welcome", window.location.origin).href,
-              tokenStorage: "session",
             },
             nocode: {
               // Nice to clean up the url so the access token is less visible

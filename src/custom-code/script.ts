@@ -49,6 +49,7 @@ export const createOutsetaScript = ({
             domain: ${domainExpression},
             load: 'auth,profile,nocode,leadCapture,support,emailList',
             monitorDom: 'true',
+            ${tokenStorageExpression ? `tokenStorage: ${tokenStorageExpression},` : ""}
             auth: {
               ${authCallbackExpression ? `// Override the Post Login URL configured in Outseta` : ""}
               ${authCallbackExpression ? `authenticationCallbackUrl: ${authCallbackExpression},` : ""}
@@ -56,7 +57,6 @@ export const createOutsetaScript = ({
               registrationConfirmationUrl: window.location.href,
               ${postSignupExpression ? `// Override the Post Signup URL configured in Outseta` : ""}
               ${postSignupExpression ? `postRegistrationUrl: ${postSignupExpression},` : ""}
-              ${tokenStorageExpression ? `tokenStorage: ${tokenStorageExpression},` : ""}
             },
             nocode: {
               // Nice to clean up the url so the access token is less visible
