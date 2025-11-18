@@ -87,10 +87,10 @@ function buildSignupConfirmationConfig(
 }
 
 export const Route = createFileRoute("/custom-code/")({
-  component: CustomCode,
+  component: CustomCodeIndex,
 });
 
-function CustomCode() {
+function CustomCodeIndex() {
   const navigate = useNavigate();
   const customCode = useCustomCode();
 
