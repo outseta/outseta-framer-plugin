@@ -1,19 +1,13 @@
 import { formOptions, revalidateLogic } from "@tanstack/react-form";
 import { z } from "zod";
 
-import {
-  defaultTokenStorageConfig,
-  tokenStorageSchema,
-} from "./script-token-storage";
-import { defaultPostLoginConfig, postLoginSchema } from "./script-post-login";
-import {
-  defaultPostSignupConfig,
-  postSignupSchema,
-} from "./script-post-signup";
+import { defaultTokenStorageConfig, tokenStorageSchema } from "../scripts/token-storage";
+import { defaultPostLoginConfig, postLoginSchema } from "../scripts/post-login";
+import { defaultPostSignupConfig, postSignupSchema } from "../scripts/post-signup";
 import {
   defaultSignupConfirmationConfig,
   signupConfirmationSchema,
-} from "./script-signup-confirmation";
+} from "../scripts/signup-confirmation";
 
 export const customCodeSchema = z
   .object({

@@ -1,4 +1,4 @@
-import { DOMAIN_REGEX } from "./script-regex";
+import { DOMAIN_REGEX } from "../script-regex";
 
 // Convert a JavaScript expression back to a domain string.
 export const expressionToDomain = (

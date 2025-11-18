@@ -1,5 +1,5 @@
-import { withForm } from "../forms";
-import { customCodeFormOptions } from "./custom-code-form";
+import { withForm } from "../../forms";
+import { customCodeFormOptions } from "../custom-code-form";
 
 export const TokenStorageFieldSection = withForm({
   ...customCodeFormOptions,
@@ -35,10 +35,7 @@ export const TokenStorageFieldSection = withForm({
 
                 {/* Session Storage mode */}
                 {tokenStorage === "session" ? (
-                  <p>
-                    Users are logged in only in the current tab, and are logged
-                    out when the tab is closed.
-                  </p>
+                  <p>Users are logged in only in the current tab.</p>
                 ) : null}
 
                 {/* Cookie mode */}

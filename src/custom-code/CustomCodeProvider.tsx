@@ -10,19 +10,13 @@ import { subscribeToCustomCode } from "./custom-code";
 import {
   type TokenStorageConfig,
   defaultTokenStorageConfig,
-} from "./script-token-storage";
-import {
-  type PostLoginConfig,
-  defaultPostLoginConfig,
-} from "./script-post-login";
+} from "../scripts/token-storage";
+import { type PostLoginConfig, defaultPostLoginConfig } from "../scripts/post-login";
 import {
   type SignupConfirmationConfig,
   defaultSignupConfirmationConfig,
-} from "./script-signup-confirmation";
-import {
-  type PostSignupConfig,
-  defaultPostSignupConfig,
-} from "./script-post-signup";
+} from "../scripts/signup-confirmation";
+import { type PostSignupConfig, defaultPostSignupConfig } from "../scripts/post-signup";
 
 import { useQuery } from "@tanstack/react-query";
 import { getPlanData } from "../outseta";

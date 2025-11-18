@@ -3,8 +3,12 @@ export * from "./custom-code";
 export * from "./CustomCodeProvider";
 export * from "./DisconnectedLinkListItem";
 export * from "./custom-code-form";
-export * from "./DomainFieldSection";
-export * from "./PostLoginFieldSection";
-export * from "./SignupConfirmationFieldSection";
-export * from "./PostSignupFieldSection";
-export * from "./TokenStorageFieldSection";
+export * from "./fields";
+// Re-export types from scripts for convenience
+export type {
+  PostLoginConfig,
+  PostSignupConfig,
+  SignupConfirmationConfig,
+  TokenStorageConfig,
+} from "../scripts";
+export { domainToExpression, expressionToDomain } from "../scripts/domain";

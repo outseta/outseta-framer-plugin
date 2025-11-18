@@ -1,6 +1,5 @@
-import { withForm } from "../forms";
-import { customCodeFormOptions } from "./custom-code-form";
-import { ExternalLink } from "../common";
+import { withForm } from "../../forms";
+import { customCodeFormOptions } from "../custom-code-form";
 
 export const PostLoginFieldSection = withForm({
   ...customCodeFormOptions,
@@ -28,25 +27,6 @@ export const PostLoginFieldSection = withForm({
           children={(postLoginMode) => {
             return (
               <>
-                {/* Default mode */}
-                {postLoginMode === "default" ? (
-                  <p>
-                    Redirect users to the URL configured in your{" "}
-                    {form.state.values.domain ? (
-                      <>
-                        <ExternalLink
-                          href={`https://${form.state.values.domain}/#/app/auth/sign-up-login`}
-                        >
-                          Outseta dashboard
-                        </ExternalLink>
-                      </>
-                    ) : (
-                      "Outseta dashboard"
-                    )}
-                    .
-                  </p>
-                ) : null}
-
                 {/* Current mode */}
                 {postLoginMode === "current" ? (
                   <p>

@@ -2,7 +2,7 @@ import {
   CURRENT_MODE_REGEX,
   CUSTOM_MODE_REGEX,
   PAGE_MODE_REGEX,
-} from "./script-regex";
+} from "../script-regex";
 import { z } from "zod";
 
 export const postLoginSchema = z.discriminatedUnion("postLoginMode", [

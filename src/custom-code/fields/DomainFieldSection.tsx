@@ -1,6 +1,6 @@
-import { ExternalLink } from "../common";
-import { withForm } from "../forms";
-import { customCodeFormOptions } from "./custom-code-form";
+import { ExternalLink } from "../../common";
+import { withForm } from "../../forms";
+import { customCodeFormOptions } from "../custom-code-form";
 
 export const DomainFieldSection = withForm({
   ...customCodeFormOptions,
