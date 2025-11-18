@@ -59,12 +59,12 @@ export const createOutsetaScript = ({
             monitorDom: 'true',
             ${tokenStorageExpression ? `tokenStorage: ${tokenStorageExpression},` : ""}
             auth: {
-              ${authCallbackExpression ? `// Override the Post Login URL configured in Outseta` : ""}
-              ${authCallbackExpression ? `authenticationCallbackUrl: ${authCallbackExpression},` : ""}
-              ${postSignupExpression ? `// Override the Post Signup URL configured in Outseta` : ""}
-              ${postSignupExpression ? `postRegistrationUrl: ${postSignupExpression},` : ""}
-              ${signupConfirmationExpression ? `// Override the Signup Confirmation URL configured in Outseta` : ""}
-              ${signupConfirmationExpression ? `registrationConfirmationUrl: ${signupConfirmationExpression},` : ""}
+              ${authCallbackExpression !== undefined ? `// Override the Post Login URL configured in Outseta` : `// As configured in Outseta`}
+              authenticationCallbackUrl: ${authCallbackExpression !== undefined ? `${authCallbackExpression},` : `undefined`}
+              ${postSignupExpression !== undefined ? `// Override the Post Signup URL configured in Outseta` : `// As configured in Outseta`}
+              postRegistrationUrl: ${postSignupExpression !== undefined ? `${postSignupExpression},` : `undefined`}
+              ${signupConfirmationExpression !== undefined ? `// Override the Signup Confirmation URL configured in Outseta` : `// As configured in Outseta`}
+              registrationConfirmationUrl: ${signupConfirmationExpression !== undefined ? `${signupConfirmationExpression},` : `undefined`}
             },
             nocode: {
               // Nice to clean up the url so the access token is less visible
@@ -74,7 +74,4 @@ export const createOutsetaScript = ({
         </script>
         <script src="https://cdn.outseta.com/outseta.min.js" data-options="o_options"></script>
       `;
-
-  // Remove empty lines
-  return script.replace(/\n\s*\n/g, "\n");
 };
