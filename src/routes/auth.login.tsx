@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMutation } from "@tanstack/react-query";
 import { Button } from "@triozer/framer-toolbox";
+import { revalidateLogic, useForm } from "@tanstack/react-form";
 
 import {
   upsertAuthEmbed,
@@ -41,25 +42,34 @@ export function AuthLoginPage() {
     },
   });
 
+  const form = useForm({
+    defaultValues: {},
+    validationLogic: revalidateLogic({ mode: "submit", modeAfterSubmission: "change" }),
+    onSubmit: async () => {
+      switch (embedMode) {
+        case "embed":
+          await embedMutation.mutateAsync();
+          break;
+        case "popup":
+          await popupMutation.mutateAsync();
+          break;
+      }
+    },
+  });
+
   return (
     <form
       onSubmit={(event) => {
         event.preventDefault();
-
-        switch (embedMode) {
-          case "embed":
-            embedMutation.mutate();
-            break;
-          case "popup":
-            popupMutation.mutate();
-            break;
-        }
+        form.handleSubmit();
       }}
     >
       <EmbedModeListControls disabled={!!singleOutsetaEmbed} />
 
       {embedMode === "embed" && !singleOutsetaEmbed && (
-        <Button variant="primary">Add Login Embed to page</Button>
+        <Button variant="primary" disabled={embedMutation.isPending}>
+          Add Login Embed to page
+        </Button>
       )}
 
       {embedMode === "popup" && (
