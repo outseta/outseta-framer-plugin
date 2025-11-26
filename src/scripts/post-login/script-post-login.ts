@@ -1,7 +1,9 @@
 import {
   CURRENT_MODE_REGEX,
+  CURRENT_MODE_TERNARY_REGEX,
   CUSTOM_MODE_REGEX,
   PAGE_MODE_REGEX,
+  PAGE_MODE_TERNARY_REGEX,
 } from "../script-regex";
 import { z } from "zod";
 
@@ -53,6 +55,22 @@ export const authCallbackExpressionToMode = (
   expression: string = "",
 ): PostLoginConfig => {
   expression = expression.trim();
+
+  /** Earlier plugin version ternary expressions (check before direct patterns) */
+  // Current Mode: "" ? new URL("", window.location.origin).href : window.location.href
+  const currentTernaryMatch = expression.match(CURRENT_MODE_TERNARY_REGEX);
+  if (currentTernaryMatch) {
+    return { postLoginMode: "current" };
+  }
+
+  // Page Mode: "/path" ? new URL("/path", window.location.origin).href : window.location.href
+  const pageTernaryMatch = expression.match(PAGE_MODE_TERNARY_REGEX);
+  if (pageTernaryMatch) {
+    // Both capture groups should match the same path, use the first one
+    return { postLoginMode: "page", postLoginPagePath: pageTernaryMatch[1] };
+  }
+
+  /** End of earlier plugin version ternary expressions */
 
   // Current Mode: window.location.href
   const currentMatch = expression.match(CURRENT_MODE_REGEX);
