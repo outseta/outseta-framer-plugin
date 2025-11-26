@@ -38,6 +38,46 @@ describe("parseOutsetaScript", () => {
       expect(tokenStorageExpression).toBe('"local"');
     });
 
+    it("should parse a complete earlier plugin version's script", () => {
+      const script = `
+        <script>
+          var o_options = {
+            domain: 'test.outseta.com',
+            load: 'auth,profile,nocode,leadCapture,support,emailList',
+            monitorDom: 'true',
+            auth: {
+              // Overrides the Post Login URL or uses the current page
+              authenticationCallbackUrl: "" ? new URL("", window.location.origin).href : window.location.href,
+              // Overrides the Signup Confirmation URL
+              registrationConfirmationUrl: window.location.href,
+              // Override the Post Signup URL or signup embed's post signup message
+              postRegistrationUrl: "/success" ? new URL("/success", window.location.origin).href : undefined,
+            },
+            nocode: {
+              // Nice to clean up the url so the access token is less visible
+              clearQuerystring: true
+            }
+          };
+        </script>
+        <script src="https://cdn.outseta.com/outseta.min.js" data-options="o_options"></script>
+      `;
+
+      const {
+        domainExpression,
+        authCallbackExpression,
+        postSignupExpression,
+        tokenStorageExpression,
+      } = parseOutsetaScript(script);
+      expect(domainExpression).toBe("'test.outseta.com'");
+      expect(authCallbackExpression).toBe(
+        `"" ? new URL("", window.location.origin).href : window.location.href`,
+      );
+      expect(postSignupExpression).toBe(
+        `"/success" ? new URL("/success", window.location.origin).href : undefined`,
+      );
+      expect(tokenStorageExpression).toBe(undefined);
+    });
+
     it("should handle empty script", () => {
       const {
         domainExpression,

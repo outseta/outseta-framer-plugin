@@ -1,6 +1,8 @@
 import {
   CUSTOM_MODE_REGEX,
+  DEFAULT_MODE_TERNARY_REGEX,
   PAGE_MODE_REGEX,
+  PAGE_MODE_TERNARY_UNDEFINED_REGEX,
   MESSAGE_MODE_REGEX,
 } from "../script-regex";
 import { z } from "zod";
@@ -52,6 +54,24 @@ export const postSignupConfigToExpression = (
 export const postSignupExpressionToMode = (
   expression: string = "",
 ): PostSignupConfig => {
+  expression = expression.trim();
+
+  /** Earlier plugin version ternary expressions (check before direct patterns) */
+  // Default Mode: "" ? new URL("", window.location.origin).href : undefined
+  const defaultTernaryMatch = expression.match(DEFAULT_MODE_TERNARY_REGEX);
+  if (defaultTernaryMatch) {
+    return { postSignupMode: "default" };
+  }
+
+  // Page Mode: "/path" ? new URL("/path", window.location.origin).href : undefined
+  const pageTernaryMatch = expression.match(PAGE_MODE_TERNARY_UNDEFINED_REGEX);
+  if (pageTernaryMatch) {
+    // Both capture groups should match the same path, use the first one
+    return { postSignupMode: "page", postSignupPagePath: pageTernaryMatch[1] };
+  }
+
+  /** End of earlier plugin version ternary expressions */
+
   // Message Mode: 'null'
   const messageMatch = expression.match(MESSAGE_MODE_REGEX);
   if (messageMatch) {

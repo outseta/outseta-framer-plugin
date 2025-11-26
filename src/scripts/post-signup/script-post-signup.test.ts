@@ -136,6 +136,13 @@ describe("postSignupExpressionToMode", () => {
       expect(result6).toEqual({ postSignupMode: "default" });
       expect(result7).toEqual({ postSignupMode: "default" });
     });
+
+    it("for earlier plugin version ternary expression", () => {
+      const result = postSignupExpressionToMode(
+        '"" ? new URL("", window.location.origin).href : undefined',
+      );
+      expect(result).toEqual({ postSignupMode: "default" });
+    });
   });
 
   describe("message mode", () => {
@@ -176,6 +183,16 @@ describe("postSignupExpressionToMode", () => {
     it("for new URL expression with less whitespace", () => {
       const result = postSignupExpressionToMode(
         'new URL("/thanks",window.location.origin).href',
+      );
+      expect(result).toEqual({
+        postSignupMode: "page",
+        postSignupPagePath: "/thanks",
+      });
+    });
+
+    it("for plugin version 1 expression", () => {
+      const result = postSignupExpressionToMode(
+        '"/thanks" ? new URL("/thanks", window.location.origin).href : undefined',
       );
       expect(result).toEqual({
         postSignupMode: "page",

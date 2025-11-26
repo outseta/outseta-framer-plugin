@@ -150,6 +150,13 @@ describe("authCallbackUrlExpressionToMode", () => {
       const result2 = authCallbackExpressionToMode("    window.location.href");
       expect(result2).toEqual({ postLoginMode: "current" });
     });
+
+    it("for earlier plugin version ternary expression", () => {
+      const result = authCallbackExpressionToMode(
+        '"" ? new URL("", window.location.origin).href : window.location.href',
+      );
+      expect(result).toEqual({ postLoginMode: "current" });
+    });
   });
 
   describe("page mode", () => {
@@ -176,6 +183,16 @@ describe("authCallbackUrlExpressionToMode", () => {
     it("for new URL expression with less whitespace", () => {
       const result = authCallbackExpressionToMode(
         'new URL("/dashboard",window.location.origin).href',
+      );
+      expect(result).toEqual({
+        postLoginMode: "page",
+        postLoginPagePath: "/dashboard",
+      });
+    });
+
+    it("for plugin version 1 expression", () => {
+      const result = authCallbackExpressionToMode(
+        '"/dashboard" ? new URL("/dashboard", window.location.origin).href : window.location.href',
       );
       expect(result).toEqual({
         postLoginMode: "page",
