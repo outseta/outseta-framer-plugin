@@ -2,7 +2,6 @@ import { createFileRoute, Outlet } from "@tanstack/react-router";
 import { LinkList, LinkListItem, PageHeader } from "../common";
 import { useConfiguration } from "../custom-code/CustomCodeProvider";
 import { Separator } from "@triozer/framer-toolbox";
-import { DisconnectedLinkListItem } from "../custom-code/DisconnectedLinkListItem";
 
 export const Route = createFileRoute("/custom-code")({
   component: CustomCode,
