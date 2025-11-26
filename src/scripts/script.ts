@@ -60,11 +60,11 @@ export const createOutsetaScript = ({
             tokenStorage: ${tokenStorageExpression !== undefined ? `${tokenStorageExpression},` : `undefined,`}
             auth: {
               ${authCallbackExpression !== undefined ? `// Override the Post Login URL configured in Outseta` : `// As configured in Outseta`}
-              authenticationCallbackUrl: ${authCallbackExpression !== undefined ? `${authCallbackExpression},` : `undefined`}
+              authenticationCallbackUrl: ${authCallbackExpression !== undefined ? `${authCallbackExpression},` : `undefined,`}
               ${postSignupExpression !== undefined ? `// Override the Post Signup URL configured in Outseta` : `// As configured in Outseta`}
-              postRegistrationUrl: ${postSignupExpression !== undefined ? `${postSignupExpression},` : `undefined`}
+              postRegistrationUrl: ${postSignupExpression !== undefined ? `${postSignupExpression},` : `undefined,`}
               ${signupConfirmationExpression !== undefined ? `// Override the Signup Confirmation URL configured in Outseta` : `// As configured in Outseta`}
-              registrationConfirmationUrl: ${signupConfirmationExpression !== undefined ? `${signupConfirmationExpression},` : `undefined`}
+              registrationConfirmationUrl: ${signupConfirmationExpression !== undefined ? `${signupConfirmationExpression}` : `undefined`}
             },
             nocode: {
               // Nice to clean up the url so the access token is less visible
