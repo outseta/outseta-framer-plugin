@@ -146,8 +146,8 @@ describe("parseOutsetaScript", () => {
       expect(domainExpression).toBe(undefined);
     });
 
-    it("should return undefined for empty string", () => {
-      const script = `
+    it("should return empty string for empty string", () => {
+      const script1 = `
         <script>
           var o_options = {
             domain: '',
@@ -155,8 +155,34 @@ describe("parseOutsetaScript", () => {
         </script>
       `;
 
+      const { domainExpression: domainExpression1 } =
+        parseOutsetaScript(script1);
+      expect(domainExpression1).toBe("''");
+
+      const script2 = `
+        <script>
+          var o_options = {
+            domain: "",
+          };
+        </script>
+      `;
+
+      const { domainExpression: domainExpression2 } =
+        parseOutsetaScript(script2);
+      expect(domainExpression2).toBe('""');
+    });
+
+    it("should return undefined expression for undefined", () => {
+      const script = `
+        <script>
+          var o_options = {
+            domain: undefined,
+          };
+        </script>
+      `;
+
       const { domainExpression } = parseOutsetaScript(script);
-      expect(domainExpression).toBe("''");
+      expect(domainExpression).toBe("undefined");
     });
   });
 
@@ -281,7 +307,7 @@ describe("parseOutsetaScript", () => {
       expect(authCallbackExpression).toBe(undefined);
     });
 
-    it("should return undefined for empty string", () => {
+    it("should return empty string for empty string", () => {
       const script = `
         <script>
           var o_options = {
@@ -296,6 +322,23 @@ describe("parseOutsetaScript", () => {
 
       const { authCallbackExpression } = parseOutsetaScript(script);
       expect(authCallbackExpression).toBe("''");
+    });
+
+    it("should return undefined expression for undefined", () => {
+      const script = `
+        <script>
+          var o_options = {
+            domain: 'myapp.outseta.com',
+            load: 'auth,profile',
+            auth: {
+              authenticationCallbackUrl: undefined,
+            },
+          };
+        </script>
+      `;
+
+      const { authCallbackExpression } = parseOutsetaScript(script);
+      expect(authCallbackExpression).toBe("undefined");
     });
   });
 
@@ -419,7 +462,7 @@ describe("parseOutsetaScript", () => {
       expect(postSignupExpression).toBe(undefined);
     });
 
-    it("should return undefined for empty string", () => {
+    it("should return empty string for empty string", () => {
       const script = `
         <script>
           var o_options = {
@@ -434,6 +477,23 @@ describe("parseOutsetaScript", () => {
 
       const { postSignupExpression } = parseOutsetaScript(script);
       expect(postSignupExpression).toBe("''");
+    });
+
+    it("should return undefined expression for undefined", () => {
+      const script = `
+        <script>
+          var o_options = {
+            domain: 'myapp.outseta.com',
+            load: 'auth,profile',
+            auth: {
+              postRegistrationUrl: undefined,
+            },
+          };
+        </script>
+      `;
+
+      const { postSignupExpression } = parseOutsetaScript(script);
+      expect(postSignupExpression).toBe("undefined");
     });
   });
 
@@ -506,6 +566,34 @@ describe("parseOutsetaScript", () => {
 
       const { tokenStorageExpression } = parseOutsetaScript(script);
       expect(tokenStorageExpression).toBe('"local"');
+    });
+
+    it("should return empty string for empty string", () => {
+      const script = `
+        <script>
+          var o_options = {
+            domain: 'myapp.outseta.com',
+            tokenStorage: '',
+          };
+        </script>
+      `;
+
+      const { tokenStorageExpression } = parseOutsetaScript(script);
+      expect(tokenStorageExpression).toBe("''");
+    });
+
+    it("should return undefined expression for undefined", () => {
+      const script = `
+        <script>
+          var o_options = {
+            domain: 'myapp.outseta.com',
+            tokenStorage: undefined,
+          };
+        </script>
+      `;
+
+      const { tokenStorageExpression } = parseOutsetaScript(script);
+      expect(tokenStorageExpression).toBe("undefined");
     });
   });
 });

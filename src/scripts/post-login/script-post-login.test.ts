@@ -24,13 +24,19 @@ describe("authCallbackModeToUrlExpression", () => {
 
   describe("page mode", () => {
     it("returns new URL expression with path", () => {
-      const config: PostLoginConfig = { postLoginMode: "page", postLoginPagePath: "/dashboard" };
+      const config: PostLoginConfig = {
+        postLoginMode: "page",
+        postLoginPagePath: "/dashboard",
+      };
       const result = authCallbackConfigToExpression(config);
       expect(result).toBe('new URL("/dashboard", window.location.origin).href');
     });
 
     it("returns new URL expression for empty path", () => {
-      const config: PostLoginConfig = { postLoginMode: "page", postLoginPagePath: "" };
+      const config: PostLoginConfig = {
+        postLoginMode: "page",
+        postLoginPagePath: "",
+      };
       const result = authCallbackConfigToExpression(config);
       expect(result).toBe('new URL("", window.location.origin).href');
     });
@@ -47,7 +53,10 @@ describe("authCallbackModeToUrlExpression", () => {
     });
 
     it("returns quoted empty string for empty url", () => {
-      const config: PostLoginConfig = { postLoginMode: "custom", postLoginCustomUrl: "" };
+      const config: PostLoginConfig = {
+        postLoginMode: "custom",
+        postLoginCustomUrl: "",
+      };
       const result = authCallbackConfigToExpression(config);
       expect(result).toBe('""');
     });
@@ -58,6 +67,11 @@ describe("authCallbackUrlExpressionToMode", () => {
   describe("default mode", () => {
     it("for undefined", () => {
       const result = authCallbackExpressionToMode(undefined);
+      expect(result).toEqual({ postLoginMode: "default" });
+    });
+
+    it("for undefined expression", () => {
+      const result = authCallbackExpressionToMode("undefined");
       expect(result).toEqual({ postLoginMode: "default" });
     });
     it("for empty expression", () => {
@@ -143,21 +157,30 @@ describe("authCallbackUrlExpressionToMode", () => {
       const result = authCallbackExpressionToMode(
         'new URL("/dashboard", window.location.origin).href',
       );
-      expect(result).toEqual({ postLoginMode: "page", postLoginPagePath: "/dashboard" });
+      expect(result).toEqual({
+        postLoginMode: "page",
+        postLoginPagePath: "/dashboard",
+      });
     });
 
     it("for new URL expression with additional whitespace", () => {
       const result = authCallbackExpressionToMode(
         'new URL( "/dashboard"    , window.location.origin ).href',
       );
-      expect(result).toEqual({ postLoginMode: "page", postLoginPagePath: "/dashboard" });
+      expect(result).toEqual({
+        postLoginMode: "page",
+        postLoginPagePath: "/dashboard",
+      });
     });
 
     it("for new URL expression with less whitespace", () => {
       const result = authCallbackExpressionToMode(
         'new URL("/dashboard",window.location.origin).href',
       );
-      expect(result).toEqual({ postLoginMode: "page", postLoginPagePath: "/dashboard" });
+      expect(result).toEqual({
+        postLoginMode: "page",
+        postLoginPagePath: "/dashboard",
+      });
     });
   });
 
@@ -174,7 +197,10 @@ describe("authCallbackUrlExpressionToMode", () => {
 
     it("for quoted string expression that is not a valid url", () => {
       const result = authCallbackExpressionToMode('"hello hello"');
-      expect(result).toEqual({ postLoginMode: "custom", postLoginCustomUrl: "hello hello" });
+      expect(result).toEqual({
+        postLoginMode: "custom",
+        postLoginCustomUrl: "hello hello",
+      });
     });
   });
 });
@@ -227,7 +253,8 @@ describe("authCallbackModeToUrlExpression and authCallbackUrlExpressionToMode ro
   it("should maintain consistency for custom mode with complex URL", () => {
     const original: PostLoginConfig = {
       postLoginMode: "custom",
-      postLoginCustomUrl: "https://myapp.com/auth/callback?state=xyz&redirect=/dashboard",
+      postLoginCustomUrl:
+        "https://myapp.com/auth/callback?state=xyz&redirect=/dashboard",
     };
     const expression = authCallbackConfigToExpression(original);
     const converted = authCallbackExpressionToMode(expression);
@@ -235,14 +262,20 @@ describe("authCallbackModeToUrlExpression and authCallbackUrlExpressionToMode ro
   });
 
   it("should fallback to default mode for page mode with empty path", () => {
-    const original: PostLoginConfig = { postLoginMode: "page", postLoginPagePath: "" };
+    const original: PostLoginConfig = {
+      postLoginMode: "page",
+      postLoginPagePath: "",
+    };
     const expression = authCallbackConfigToExpression(original);
     const converted = authCallbackExpressionToMode(expression);
     expect(converted).toEqual({ postLoginMode: "default" });
   });
 
   it("should fallback to default mode for custom mode with empty url", () => {
-    const original: PostLoginConfig = { postLoginMode: "custom", postLoginCustomUrl: "" };
+    const original: PostLoginConfig = {
+      postLoginMode: "custom",
+      postLoginCustomUrl: "",
+    };
     const expression = authCallbackConfigToExpression(original);
     const converted = authCallbackExpressionToMode(expression);
     expect(converted).toEqual({ postLoginMode: "default" });

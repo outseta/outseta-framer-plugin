@@ -69,6 +69,11 @@ describe("postSignupExpressionToMode", () => {
       const result = postSignupExpressionToMode(undefined);
       expect(result).toEqual({ postSignupMode: "default" });
     });
+
+    it("for undefined expression", () => {
+      const result = postSignupExpressionToMode("undefined");
+      expect(result).toEqual({ postSignupMode: "default" });
+    });
     it("for empty expression", () => {
       const result = postSignupExpressionToMode("");
       expect(result).toEqual({ postSignupMode: "default" });

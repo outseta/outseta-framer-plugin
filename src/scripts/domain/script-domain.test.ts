@@ -41,6 +41,10 @@ describe("expressionToDomain", () => {
     const expression5 = '"myapp    .outseta.com"';
     const domain5 = expressionToDomain(expression5);
     expect(domain5).toBe(undefined);
+
+    const expression6 = "undefined";
+    const domain6 = expressionToDomain(expression6);
+    expect(domain6).toBe(undefined);
   });
 });
 
@@ -80,5 +84,9 @@ describe("domainToExpression", () => {
     const domain4 = undefined;
     const expression4 = domainToExpression(domain4);
     expect(expression4).toBe(undefined);
+
+    const domain5 = "undefined";
+    const expression5 = domainToExpression(domain5);
+    expect(expression5).toBe(undefined);
   });
 });
