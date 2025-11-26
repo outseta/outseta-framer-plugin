@@ -5,7 +5,7 @@ import classes from "./CustomCodeSummary.module.css";
 
 import { setCustomCode } from "./custom-code";
 import { useCustomCode } from "./CustomCodeProvider";
-import { defaultTokenStorageConfig } from "./script-token-storage";
+import { defaultTokenStorageConfig } from "../scripts/token-storage";
 
 export function CustomCodeSummary() {
   const { domain, status } = useCustomCode();
@@ -16,6 +16,7 @@ export function CustomCodeSummary() {
         domain: "",
         tokenStorageConfig: defaultTokenStorageConfig,
         postLoginConfig: { postLoginMode: "default" },
+        signupConfirmationConfig: { signupConfirmationMode: "default" },
         postSignupConfig: { postSignupMode: "default" },
       }),
   });

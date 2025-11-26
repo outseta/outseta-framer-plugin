@@ -1,27 +1,27 @@
 import { framer } from "framer-plugin";
-import { createOutsetaScript, parseOutsetaScript } from "./script";
+import { createOutsetaScript, parseOutsetaScript } from "../scripts";
 import {
   PostLoginConfig,
   authCallbackConfigToExpression,
   authCallbackExpressionToMode,
-} from "./script-post-login";
+} from "../scripts/post-login";
 import {
   type PostSignupConfig,
   postSignupConfigToExpression,
   postSignupExpressionToMode,
-} from "./script-post-signup";
+} from "../scripts/post-signup";
 import {
   type SignupConfirmationConfig,
   signupConfirmationConfigToExpression,
   signupConfirmationExpressionToMode,
-} from "./script-signup-confirmation";
+} from "../scripts/signup-confirmation";
 import {
   type TokenStorageConfig,
   tokenStorageConfigToExpression,
   tokenStorageExpressionToConfig,
   defaultTokenStorageConfig,
-} from "./script-token-storage";
-import { domainToExpression, expressionToDomain } from "./script-domain";
+} from "../scripts/token-storage";
+import { domainToExpression, expressionToDomain } from "../scripts/domain";
 
 export type CustomCodeConfig = {
   domain?: string;
@@ -46,8 +46,9 @@ export const setCustomCode = async ({
       tokenStorageConfigToExpression(tokenStorageConfig);
     const authCallbackExpression =
       authCallbackConfigToExpression(postLoginConfig);
-    const signupConfirmationExpression =
-      signupConfirmationConfigToExpression(signupConfirmationConfig);
+    const signupConfirmationExpression = signupConfirmationConfigToExpression(
+      signupConfirmationConfig,
+    );
     const postSignupExpression = postSignupConfigToExpression(postSignupConfig);
 
     const script = createOutsetaScript({

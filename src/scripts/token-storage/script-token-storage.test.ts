@@ -79,6 +79,11 @@ describe("tokenStorageExpressionToConfig", () => {
     );
   });
 
+  it("should parse undefined expression as default mode", () => {
+    const result = tokenStorageExpressionToConfig("undefined");
+    expect(result).toEqual(defaultTokenStorageConfig);
+  });
+
   it("should default to local for invalid value", () => {
     const expression = '"invalid"';
     expect(tokenStorageExpressionToConfig(expression)).toEqual(

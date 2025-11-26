@@ -1,5 +1,5 @@
-import { withForm } from "../forms";
-import { customCodeFormOptions } from "./custom-code-form";
+import { withForm } from "../../forms";
+import { customCodeFormOptions } from "../custom-code-form";
 
 export const SignupConfirmationFieldSection = withForm({
   ...customCodeFormOptions,

@@ -2,7 +2,7 @@ import {
   CUSTOM_MODE_REGEX,
   PAGE_MODE_REGEX,
   MESSAGE_MODE_REGEX,
-} from "./script-regex";
+} from "../script-regex";
 import { z } from "zod";
 
 export const postSignupSchema = z.discriminatedUnion("postSignupMode", [

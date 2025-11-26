@@ -12,12 +12,12 @@ import {
   SignupConfirmationFieldSection,
   PostSignupFieldSection,
   customCodeFormOptions,
+  type TokenStorageConfig,
+  type PostLoginConfig,
+  type SignupConfirmationConfig,
+  type PostSignupConfig,
+  type CustomCodeSchema,
 } from "../custom-code";
-import { type TokenStorageConfig } from "../custom-code/script-token-storage";
-import { type PostLoginConfig } from "../custom-code/script-post-login";
-import { type SignupConfirmationConfig } from "../custom-code/script-signup-confirmation";
-import { type PostSignupConfig } from "../custom-code/script-post-signup";
-import { type CustomCodeSchema } from "../custom-code/custom-code-form";
 
 // Type-safe helper to construct TokenStorageConfig from form values
 function buildTokenStorageConfig(value: CustomCodeSchema): TokenStorageConfig {
@@ -87,10 +87,10 @@ function buildSignupConfirmationConfig(
 }
 
 export const Route = createFileRoute("/custom-code/")({
-  component: CustomCode,
+  component: CustomCodeIndex,
 });
 
-function CustomCode() {
+function CustomCodeIndex() {
   const navigate = useNavigate();
   const customCode = useCustomCode();
 

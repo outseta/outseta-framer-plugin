@@ -24,9 +24,7 @@ describe("signupConfirmationConfigToExpression", () => {
       signupConfirmationPagePath: "/dashboard",
     };
     const result = signupConfirmationConfigToExpression(config);
-    expect(result).toBe(
-      'new URL("/dashboard", window.location.origin).href',
-    );
+    expect(result).toBe('new URL("/dashboard", window.location.origin).href');
   });
 
   it("should return quoted URL for custom mode with absolute URL", () => {
@@ -59,6 +57,11 @@ describe("signupConfirmationExpressionToMode", () => {
 
     it("should parse undefined as default mode", () => {
       const result = signupConfirmationExpressionToMode(undefined);
+      expect(result).toEqual({ signupConfirmationMode: "default" });
+    });
+
+    it("should parse undefined expression as default mode", () => {
+      const result = signupConfirmationExpressionToMode("undefined");
       expect(result).toEqual({ signupConfirmationMode: "default" });
     });
 
@@ -96,8 +99,7 @@ describe("signupConfirmationExpressionToMode", () => {
 
   describe("page mode", () => {
     it("should parse new URL expression as page mode", () => {
-      const expression =
-        'new URL("/dashboard", window.location.origin).href';
+      const expression = 'new URL("/dashboard", window.location.origin).href';
       const result = signupConfirmationExpressionToMode(expression);
       expect(result).toEqual({
         signupConfirmationMode: "page",
@@ -106,8 +108,7 @@ describe("signupConfirmationExpressionToMode", () => {
     });
 
     it("should parse new URL expression with whitespace", () => {
-      const expression =
-        '  new URL("/welcome", window.location.origin).href  ';
+      const expression = '  new URL("/welcome", window.location.origin).href  ';
       const result = signupConfirmationExpressionToMode(expression);
       expect(result).toEqual({
         signupConfirmationMode: "page",
