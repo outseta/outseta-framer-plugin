@@ -57,7 +57,7 @@ export const createOutsetaScript = ({
             domain: ${domainExpression},
             load: 'auth,profile,nocode,leadCapture,support,emailList',
             monitorDom: 'true',
-            ${tokenStorageExpression ? `tokenStorage: ${tokenStorageExpression},` : ""}
+            tokenStorage: ${tokenStorageExpression !== undefined ? `${tokenStorageExpression},` : `undefined,`}
             auth: {
               ${authCallbackExpression !== undefined ? `// Override the Post Login URL configured in Outseta` : `// As configured in Outseta`}
               authenticationCallbackUrl: ${authCallbackExpression !== undefined ? `${authCallbackExpression},` : `undefined`}
@@ -74,4 +74,5 @@ export const createOutsetaScript = ({
         </script>
         <script src="https://cdn.outseta.com/outseta.min.js" data-options="o_options"></script>
       `;
+  return script;
 };

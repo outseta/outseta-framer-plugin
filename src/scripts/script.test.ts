@@ -526,11 +526,14 @@ describe("createOutsetaScript", () => {
             domain: 'test.outseta.com',
             load: 'auth,profile,nocode,leadCapture,support,emailList',
             monitorDom: 'true',
+            tokenStorage: undefined,
             auth: {
               // Override the Post Login URL configured in Outseta
               authenticationCallbackUrl: "https://example.com/callback",
               // Override the Post Signup URL configured in Outseta
               postRegistrationUrl: new URL("/welcome", window.location.origin).href,
+              // As configured in Outseta
+              registrationConfirmationUrl: undefined
             },
             nocode: {
               // Nice to clean up the url so the access token is less visible
@@ -556,7 +559,14 @@ describe("createOutsetaScript", () => {
             domain: 'myapp.outseta.com',
             load: 'auth,profile,nocode,leadCapture,support,emailList',
             monitorDom: 'true',
+            tokenStorage: undefined,
             auth: {
+              // As configured in Outseta
+              authenticationCallbackUrl: undefined
+              // As configured in Outseta
+              postRegistrationUrl: undefined
+              // As configured in Outseta
+              registrationConfirmationUrl: undefined
             },
             nocode: {
               // Nice to clean up the url so the access token is less visible
@@ -582,9 +592,14 @@ describe("createOutsetaScript", () => {
             domain: 'app.outseta.com',
             load: 'auth,profile,nocode,leadCapture,support,emailList',
             monitorDom: 'true',
+            tokenStorage: undefined,
             auth: {
               // Override the Post Login URL configured in Outseta
               authenticationCallbackUrl: "https://myapp.com/auth/callback",
+              // As configured in Outseta
+              postRegistrationUrl: undefined
+              // As configured in Outseta
+              registrationConfirmationUrl: undefined
             },
             nocode: {
               // Nice to clean up the url so the access token is less visible
@@ -611,9 +626,14 @@ describe("createOutsetaScript", () => {
             domain: 'app.outseta.com',
             load: 'auth,profile,nocode,leadCapture,support,emailList',
             monitorDom: 'true',
+            tokenStorage: undefined,
             auth: {
+              // As configured in Outseta
+              authenticationCallbackUrl: undefined
               // Override the Post Signup URL configured in Outseta
               postRegistrationUrl: new URL("/dashboard", window.location.origin).href,
+              // As configured in Outseta
+              registrationConfirmationUrl: undefined
             },
             nocode: {
               // Nice to clean up the url so the access token is less visible
@@ -639,7 +659,14 @@ describe("createOutsetaScript", () => {
             domain: 'test.outseta.com',
             load: 'auth,profile,nocode,leadCapture,support,emailList',
             monitorDom: 'true',
+            tokenStorage: undefined,
             auth: {
+              // As configured in Outseta
+              authenticationCallbackUrl: undefined
+              // As configured in Outseta
+              postRegistrationUrl: undefined
+              // As configured in Outseta
+              registrationConfirmationUrl: undefined
             },
             nocode: {
               // Nice to clean up the url so the access token is less visible
@@ -667,6 +694,12 @@ describe("createOutsetaScript", () => {
             monitorDom: 'true',
             tokenStorage: "local",
             auth: {
+              // As configured in Outseta
+              authenticationCallbackUrl: undefined
+              // As configured in Outseta
+              postRegistrationUrl: undefined
+              // As configured in Outseta
+              registrationConfirmationUrl: undefined
             },
             nocode: {
               // Nice to clean up the url so the access token is less visible
@@ -700,6 +733,8 @@ describe("createOutsetaScript", () => {
               authenticationCallbackUrl: "https://example.com/callback",
               // Override the Post Signup URL configured in Outseta
               postRegistrationUrl: new URL("/welcome", window.location.origin).href,
+              // As configured in Outseta
+              registrationConfirmationUrl: undefined
             },
             nocode: {
               // Nice to clean up the url so the access token is less visible
@@ -814,7 +849,14 @@ describe("signupConfirmationExpression parsing and generation", () => {
             domain: 'test.outseta.com',
             load: 'auth,profile,nocode,leadCapture,support,emailList',
             monitorDom: 'true',
+            tokenStorage: undefined,
             auth: {
+              // As configured in Outseta
+              authenticationCallbackUrl: undefined
+              // As configured in Outseta
+              postRegistrationUrl: undefined
+              // As configured in Outseta
+              registrationConfirmationUrl: undefined
             },
             nocode: {
               // Nice to clean up the url so the access token is less visible
@@ -840,7 +882,12 @@ describe("signupConfirmationExpression parsing and generation", () => {
             domain: 'test.outseta.com',
             load: 'auth,profile,nocode,leadCapture,support,emailList',
             monitorDom: 'true',
+            tokenStorage: undefined,
             auth: {
+              // As configured in Outseta
+              authenticationCallbackUrl: undefined
+              // As configured in Outseta
+              postRegistrationUrl: undefined
               // Override the Signup Confirmation URL configured in Outseta
               registrationConfirmationUrl: window.location.href,
             },
@@ -868,7 +915,12 @@ describe("signupConfirmationExpression parsing and generation", () => {
             domain: 'test.outseta.com',
             load: 'auth,profile,nocode,leadCapture,support,emailList',
             monitorDom: 'true',
+            tokenStorage: undefined,
             auth: {
+              // As configured in Outseta
+              authenticationCallbackUrl: undefined
+              // As configured in Outseta
+              postRegistrationUrl: undefined
               // Override the Signup Confirmation URL configured in Outseta
               registrationConfirmationUrl: "https://example.com/confirmed",
             },
@@ -897,7 +949,12 @@ describe("signupConfirmationExpression parsing and generation", () => {
             domain: 'test.outseta.com',
             load: 'auth,profile,nocode,leadCapture,support,emailList',
             monitorDom: 'true',
+            tokenStorage: undefined,
             auth: {
+              // As configured in Outseta
+              authenticationCallbackUrl: undefined
+              // As configured in Outseta
+              postRegistrationUrl: undefined
               // Override the Signup Confirmation URL configured in Outseta
               registrationConfirmationUrl: new URL("/welcome", window.location.origin).href,
             },
@@ -916,7 +973,8 @@ describe("signupConfirmationExpression parsing and generation", () => {
         domainExpression: "'test.outseta.com'",
         authCallbackExpression: '"https://example.com/callback"',
         signupConfirmationExpression: "window.location.href",
-        postSignupExpression: 'new URL("/dashboard", window.location.origin).href',
+        postSignupExpression:
+          'new URL("/dashboard", window.location.origin).href',
       };
 
       const result = createOutsetaScript(config);
@@ -927,6 +985,7 @@ describe("signupConfirmationExpression parsing and generation", () => {
             domain: 'test.outseta.com',
             load: 'auth,profile,nocode,leadCapture,support,emailList',
             monitorDom: 'true',
+            tokenStorage: undefined,
             auth: {
               // Override the Post Login URL configured in Outseta
               authenticationCallbackUrl: "https://example.com/callback",
