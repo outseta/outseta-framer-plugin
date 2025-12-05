@@ -77,7 +77,7 @@ export const CustomCodeProvider: React.FC<{ children: ReactNode }> = ({
 export const useCustomCode = (): CustomCodeState => {
   const context = useContext(CustomCodeContext);
   if (!context) {
-    throw new Error("useAppState must be used within an AppStateProvider");
+    throw new Error("useCustomCode must be used within a CustomCodeProvider");
   }
   return context;
 };

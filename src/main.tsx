@@ -36,7 +36,7 @@ const rollbarConfig = {
 const rollbar = new Rollbar(rollbarConfig);
 
 /**
- * TANTSACK ROUTER
+ * TANSTACK ROUTER
  */
 
 // Import the generated route tree
