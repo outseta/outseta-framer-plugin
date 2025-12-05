@@ -10,7 +10,8 @@
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest watch",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "pack": "npx framer-plugin-tools@latest pack"
   },
   "dependencies": {
     "@rollbar/react": "^1.0.0",
