@@ -20,6 +20,7 @@ describe("parseOutsetaScript", () => {
           },
           nocode: {
             clearQuerystring: true,
+            // Rewrite protected links to point to configured Access Denied URL
             rewriteProtectedLinks: true
           }
         };
@@ -57,6 +58,7 @@ describe("parseOutsetaScript", () => {
             nocode: {
               // Nice to clean up the url so the access token is less visible
               clearQuerystring: true,
+              // Rewrite protected links to point to configured Access Denied URL
               rewriteProtectedLinks: true
             }
           };
@@ -107,6 +109,7 @@ describe("parseOutsetaScript", () => {
           },
           nocode: {
             clearQuerystring: true,
+            // Rewrite protected links to point to configured Access Denied URL
             rewriteProtectedLinks: true
           }
         };
@@ -670,6 +673,7 @@ describe("createOutsetaScript", () => {
             nocode: {
               // Nice to clean up the url so the access token is less visible
               clearQuerystring: true,
+              // Rewrite protected links to point to configured Access Denied URL
               rewriteProtectedLinks: true
             }
           };
@@ -705,6 +709,7 @@ describe("createOutsetaScript", () => {
             nocode: {
               // Nice to clean up the url so the access token is less visible
               clearQuerystring: true,
+              // Rewrite protected links to point to configured Access Denied URL
               rewriteProtectedLinks: true
             }
           };
@@ -740,6 +745,7 @@ describe("createOutsetaScript", () => {
             nocode: {
               // Nice to clean up the url so the access token is less visible
               clearQuerystring: true,
+              // Rewrite protected links to point to configured Access Denied URL
               rewriteProtectedLinks: true
             }
           };
@@ -776,6 +782,7 @@ describe("createOutsetaScript", () => {
             nocode: {
               // Nice to clean up the url so the access token is less visible
               clearQuerystring: true,
+              // Rewrite protected links to point to configured Access Denied URL
               rewriteProtectedLinks: true
             }
           };
@@ -811,6 +818,7 @@ describe("createOutsetaScript", () => {
             nocode: {
               // Nice to clean up the url so the access token is less visible
               clearQuerystring: true,
+              // Rewrite protected links to point to configured Access Denied URL
               rewriteProtectedLinks: true
             }
           };
@@ -846,6 +854,7 @@ describe("createOutsetaScript", () => {
             nocode: {
               // Nice to clean up the url so the access token is less visible
               clearQuerystring: true,
+              // Rewrite protected links to point to configured Access Denied URL
               rewriteProtectedLinks: true
             }
           };
@@ -883,6 +892,7 @@ describe("createOutsetaScript", () => {
             nocode: {
               // Nice to clean up the url so the access token is less visible
               clearQuerystring: true,
+              // Rewrite protected links to point to configured Access Denied URL
               rewriteProtectedLinks: true
             }
           };
@@ -1007,6 +1017,7 @@ describe("signupConfirmationExpression parsing and generation", () => {
             nocode: {
               // Nice to clean up the url so the access token is less visible
               clearQuerystring: true,
+              // Rewrite protected links to point to configured Access Denied URL
               rewriteProtectedLinks: true
             }
           };
@@ -1042,6 +1053,7 @@ describe("signupConfirmationExpression parsing and generation", () => {
             nocode: {
               // Nice to clean up the url so the access token is less visible
               clearQuerystring: true,
+              // Rewrite protected links to point to configured Access Denied URL
               rewriteProtectedLinks: true
             }
           };
@@ -1077,6 +1089,7 @@ describe("signupConfirmationExpression parsing and generation", () => {
             nocode: {
               // Nice to clean up the url so the access token is less visible
               clearQuerystring: true,
+              // Rewrite protected links to point to configured Access Denied URL
               rewriteProtectedLinks: true
             }
           };
@@ -1113,6 +1126,7 @@ describe("signupConfirmationExpression parsing and generation", () => {
             nocode: {
               // Nice to clean up the url so the access token is less visible
               clearQuerystring: true,
+              // Rewrite protected links to point to configured Access Denied URL
               rewriteProtectedLinks: true
             }
           };
@@ -1151,6 +1165,7 @@ describe("signupConfirmationExpression parsing and generation", () => {
             nocode: {
               // Nice to clean up the url so the access token is less visible
               clearQuerystring: true,
+              // Rewrite protected links to point to configured Access Denied URL
               rewriteProtectedLinks: true
             }
           };
