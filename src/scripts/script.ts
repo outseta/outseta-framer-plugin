@@ -69,7 +69,9 @@ export const createOutsetaScript = ({
             },
             nocode: {
               // Nice to clean up the url so the access token is less visible
-              clearQuerystring: true
+              clearQuerystring: true,
+              // Rewrite protected links to point to configured Access Denied URL
+              rewriteProtectedLinks: true
             }
           };
         </script>
