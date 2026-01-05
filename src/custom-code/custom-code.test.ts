@@ -170,7 +170,8 @@ describe("subscribeToCustomCode", () => {
             postRegistrationUrl: 'https://example.com/welcome'
           },
           nocode: {
-            clearQuerystring: true
+            clearQuerystring: true,
+            rewriteProtectedLinks: true
           }
         };
       </script>
@@ -216,7 +217,8 @@ describe("subscribeToCustomCode", () => {
           },
           nocode: {
             // Nice to clean up the url so the access token is less visible
-            clearQuerystring: true
+            clearQuerystring: true,
+            rewriteProtectedLinks: true
           }
         };
       </script>

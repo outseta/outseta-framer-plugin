@@ -19,7 +19,8 @@ describe("parseOutsetaScript", () => {
             postRegistrationUrl: 'https://example.com/welcome'
           },
           nocode: {
-            clearQuerystring: true
+            clearQuerystring: true,
+            rewriteProtectedLinks: true
           }
         };
       </script>
@@ -55,7 +56,8 @@ describe("parseOutsetaScript", () => {
             },
             nocode: {
               // Nice to clean up the url so the access token is less visible
-              clearQuerystring: true
+              clearQuerystring: true,
+              rewriteProtectedLinks: true
             }
           };
         </script>
@@ -104,7 +106,8 @@ describe("parseOutsetaScript", () => {
             authenticationCallbackUrl: new        URL("/dashboard", window.location.origin).href
           },
           nocode: {
-            clearQuerystring: true
+            clearQuerystring: true,
+            rewriteProtectedLinks: true
           }
         };
       </script>
@@ -666,7 +669,8 @@ describe("createOutsetaScript", () => {
             },
             nocode: {
               // Nice to clean up the url so the access token is less visible
-              clearQuerystring: true
+              clearQuerystring: true,
+              rewriteProtectedLinks: true
             }
           };
         </script>
@@ -700,7 +704,8 @@ describe("createOutsetaScript", () => {
             },
             nocode: {
               // Nice to clean up the url so the access token is less visible
-              clearQuerystring: true
+              clearQuerystring: true,
+              rewriteProtectedLinks: true
             }
           };
         </script>
@@ -734,7 +739,8 @@ describe("createOutsetaScript", () => {
             },
             nocode: {
               // Nice to clean up the url so the access token is less visible
-              clearQuerystring: true
+              clearQuerystring: true,
+              rewriteProtectedLinks: true
             }
           };
         </script>
@@ -769,7 +775,8 @@ describe("createOutsetaScript", () => {
             },
             nocode: {
               // Nice to clean up the url so the access token is less visible
-              clearQuerystring: true
+              clearQuerystring: true,
+              rewriteProtectedLinks: true
             }
           };
         </script>
@@ -803,7 +810,8 @@ describe("createOutsetaScript", () => {
             },
             nocode: {
               // Nice to clean up the url so the access token is less visible
-              clearQuerystring: true
+              clearQuerystring: true,
+              rewriteProtectedLinks: true
             }
           };
         </script>
@@ -837,7 +845,8 @@ describe("createOutsetaScript", () => {
             },
             nocode: {
               // Nice to clean up the url so the access token is less visible
-              clearQuerystring: true
+              clearQuerystring: true,
+              rewriteProtectedLinks: true
             }
           };
         </script>
@@ -873,7 +882,8 @@ describe("createOutsetaScript", () => {
             },
             nocode: {
               // Nice to clean up the url so the access token is less visible
-              clearQuerystring: true
+              clearQuerystring: true,
+              rewriteProtectedLinks: true
             }
           };
         </script>
@@ -996,7 +1006,8 @@ describe("signupConfirmationExpression parsing and generation", () => {
             },
             nocode: {
               // Nice to clean up the url so the access token is less visible
-              clearQuerystring: true
+              clearQuerystring: true,
+              rewriteProtectedLinks: true
             }
           };
         </script>
@@ -1030,7 +1041,8 @@ describe("signupConfirmationExpression parsing and generation", () => {
             },
             nocode: {
               // Nice to clean up the url so the access token is less visible
-              clearQuerystring: true
+              clearQuerystring: true,
+              rewriteProtectedLinks: true
             }
           };
         </script>
@@ -1064,7 +1076,8 @@ describe("signupConfirmationExpression parsing and generation", () => {
             },
             nocode: {
               // Nice to clean up the url so the access token is less visible
-              clearQuerystring: true
+              clearQuerystring: true,
+              rewriteProtectedLinks: true
             }
           };
         </script>
@@ -1099,7 +1112,8 @@ describe("signupConfirmationExpression parsing and generation", () => {
             },
             nocode: {
               // Nice to clean up the url so the access token is less visible
-              clearQuerystring: true
+              clearQuerystring: true,
+              rewriteProtectedLinks: true
             }
           };
         </script>
@@ -1136,7 +1150,8 @@ describe("signupConfirmationExpression parsing and generation", () => {
             },
             nocode: {
               // Nice to clean up the url so the access token is less visible
-              clearQuerystring: true
+              clearQuerystring: true,
+              rewriteProtectedLinks: true
             }
           };
         </script>
