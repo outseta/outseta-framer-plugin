@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import {
   authCallbackConfigToExpression,
-  authCallbackExpressionToMode,
+  authCallbackExpressionToConfig,
   type PostLoginConfig,
 } from "./script-post-login";
 
@@ -66,67 +66,67 @@ describe("authCallbackModeToUrlExpression", () => {
 describe("authCallbackUrlExpressionToMode", () => {
   describe("default mode", () => {
     it("for undefined", () => {
-      const result = authCallbackExpressionToMode(undefined);
+      const result = authCallbackExpressionToConfig(undefined);
       expect(result).toEqual({ postLoginMode: "default" });
     });
 
     it("for undefined expression", () => {
-      const result = authCallbackExpressionToMode("undefined");
+      const result = authCallbackExpressionToConfig("undefined");
       expect(result).toEqual({ postLoginMode: "default" });
     });
     it("for empty expression", () => {
-      const result = authCallbackExpressionToMode("");
+      const result = authCallbackExpressionToConfig("");
       expect(result).toEqual({ postLoginMode: "default" });
     });
     it("for quoted empty string", () => {
-      const result = authCallbackExpressionToMode('""');
+      const result = authCallbackExpressionToConfig('""');
       expect(result).toEqual({ postLoginMode: "default" });
     });
 
     it("for quoted empty string with additional whitespace", () => {
-      const result1 = authCallbackExpressionToMode('"   "');
+      const result1 = authCallbackExpressionToConfig('"   "');
       expect(result1).toEqual({ postLoginMode: "default" });
-      const result2 = authCallbackExpressionToMode('    ""    ');
+      const result2 = authCallbackExpressionToConfig('    ""    ');
       expect(result2).toEqual({ postLoginMode: "default" });
     });
 
     it("for new URL expression with empty path", () => {
-      const result = authCallbackExpressionToMode(
+      const result = authCallbackExpressionToConfig(
         'new URL("", window.location.origin).href',
       );
       expect(result).toEqual({ postLoginMode: "default" });
     });
 
     it("for new URL expression with additional whitespace", () => {
-      const result1 = authCallbackExpressionToMode(
+      const result1 = authCallbackExpressionToConfig(
         'new URL("    ", window.location.origin).href    ',
       );
       expect(result1).toEqual({ postLoginMode: "default" });
-      const result2 = authCallbackExpressionToMode(
+      const result2 = authCallbackExpressionToConfig(
         '    new URL("", window.location.origin).href',
       );
       expect(result2).toEqual({ postLoginMode: "default" });
     });
 
     it("for invalid expressions", () => {
-      const result1 = authCallbackExpressionToMode(
+      const result1 = authCallbackExpressionToConfig(
         // window.location.href should be window.location.origin
         'new URL("/dashboard", window.location.href).href',
       );
-      const result2 = authCallbackExpressionToMode(
+      const result2 = authCallbackExpressionToConfig(
         '"https://example.com/callback',
       );
-      const result3 = authCallbackExpressionToMode("someOtherExpression()");
-      const result4 = authCallbackExpressionToMode(
+      const result3 = authCallbackExpressionToConfig("someOtherExpression()");
+      const result4 = authCallbackExpressionToConfig(
         'window.location.href + "/callback"',
       );
-      const result5 = authCallbackExpressionToMode(
+      const result5 = authCallbackExpressionToConfig(
         'new URL("/path\\"with\\"quotes", window.location.origin).href',
       );
-      const result6 = authCallbackExpressionToMode(
+      const result6 = authCallbackExpressionToConfig(
         '"https://example.com/path\\"with\\"quotes"',
       );
-      const result7 = authCallbackExpressionToMode("hello()");
+      const result7 = authCallbackExpressionToConfig("hello()");
 
       expect(result1).toEqual({ postLoginMode: "default" });
       expect(result2).toEqual({ postLoginMode: "default" });
@@ -140,19 +140,23 @@ describe("authCallbackUrlExpressionToMode", () => {
 
   describe("current mode", () => {
     it("for window.location.href", () => {
-      const result = authCallbackExpressionToMode("window.location.href");
+      const result = authCallbackExpressionToConfig("window.location.href");
       expect(result).toEqual({ postLoginMode: "current" });
     });
 
     it("for window.location.href with additional whitespace", () => {
-      const result1 = authCallbackExpressionToMode("window.location.href    ");
+      const result1 = authCallbackExpressionToConfig(
+        "window.location.href    ",
+      );
       expect(result1).toEqual({ postLoginMode: "current" });
-      const result2 = authCallbackExpressionToMode("    window.location.href");
+      const result2 = authCallbackExpressionToConfig(
+        "    window.location.href",
+      );
       expect(result2).toEqual({ postLoginMode: "current" });
     });
 
     it("for earlier plugin version ternary expression", () => {
-      const result = authCallbackExpressionToMode(
+      const result = authCallbackExpressionToConfig(
         '"" ? new URL("", window.location.origin).href : window.location.href',
       );
       expect(result).toEqual({ postLoginMode: "current" });
@@ -161,7 +165,7 @@ describe("authCallbackUrlExpressionToMode", () => {
 
   describe("page mode", () => {
     it("for new URL expression", () => {
-      const result = authCallbackExpressionToMode(
+      const result = authCallbackExpressionToConfig(
         'new URL("/dashboard", window.location.origin).href',
       );
       expect(result).toEqual({
@@ -171,7 +175,7 @@ describe("authCallbackUrlExpressionToMode", () => {
     });
 
     it("for new URL expression with additional whitespace", () => {
-      const result = authCallbackExpressionToMode(
+      const result = authCallbackExpressionToConfig(
         'new URL( "/dashboard"    , window.location.origin ).href',
       );
       expect(result).toEqual({
@@ -181,7 +185,7 @@ describe("authCallbackUrlExpressionToMode", () => {
     });
 
     it("for new URL expression with less whitespace", () => {
-      const result = authCallbackExpressionToMode(
+      const result = authCallbackExpressionToConfig(
         'new URL("/dashboard",window.location.origin).href',
       );
       expect(result).toEqual({
@@ -191,7 +195,7 @@ describe("authCallbackUrlExpressionToMode", () => {
     });
 
     it("for plugin version 1 expression", () => {
-      const result = authCallbackExpressionToMode(
+      const result = authCallbackExpressionToConfig(
         '"/dashboard" ? new URL("/dashboard", window.location.origin).href : window.location.href',
       );
       expect(result).toEqual({
@@ -203,7 +207,7 @@ describe("authCallbackUrlExpressionToMode", () => {
 
   describe("custom mode", () => {
     it("for quoted string url expression", () => {
-      const result = authCallbackExpressionToMode(
+      const result = authCallbackExpressionToConfig(
         '"https://example.com/callback"',
       );
       expect(result).toEqual({
@@ -213,7 +217,7 @@ describe("authCallbackUrlExpressionToMode", () => {
     });
 
     it("for quoted string expression that is not a valid url", () => {
-      const result = authCallbackExpressionToMode('"hello hello"');
+      const result = authCallbackExpressionToConfig('"hello hello"');
       expect(result).toEqual({
         postLoginMode: "custom",
         postLoginCustomUrl: "hello hello",
@@ -226,14 +230,14 @@ describe("authCallbackModeToUrlExpression and authCallbackUrlExpressionToMode ro
   it("should maintain consistency for default mode", () => {
     const original: PostLoginConfig = { postLoginMode: "default" };
     const expression = authCallbackConfigToExpression(original);
-    const converted = authCallbackExpressionToMode(expression);
+    const converted = authCallbackExpressionToConfig(expression);
     expect(converted).toEqual(original);
   });
 
   it("should maintain consistency for current mode", () => {
     const original: PostLoginConfig = { postLoginMode: "current" };
     const expression = authCallbackConfigToExpression(original);
-    const converted = authCallbackExpressionToMode(expression);
+    const converted = authCallbackExpressionToConfig(expression);
     expect(converted).toEqual(original);
   });
 
@@ -243,7 +247,7 @@ describe("authCallbackModeToUrlExpression and authCallbackUrlExpressionToMode ro
       postLoginPagePath: "/dashboard",
     };
     const expression = authCallbackConfigToExpression(original);
-    const converted = authCallbackExpressionToMode(expression);
+    const converted = authCallbackExpressionToConfig(expression);
     expect(converted).toEqual(original);
   });
 
@@ -253,7 +257,7 @@ describe("authCallbackModeToUrlExpression and authCallbackUrlExpressionToMode ro
       postLoginPagePath: "/auth/callback?redirect=/profile",
     };
     const expression = authCallbackConfigToExpression(original);
-    const converted = authCallbackExpressionToMode(expression);
+    const converted = authCallbackExpressionToConfig(expression);
     expect(converted).toEqual(original);
   });
 
@@ -263,7 +267,7 @@ describe("authCallbackModeToUrlExpression and authCallbackUrlExpressionToMode ro
       postLoginCustomUrl: "https://example.com/callback",
     };
     const expression = authCallbackConfigToExpression(original);
-    const converted = authCallbackExpressionToMode(expression);
+    const converted = authCallbackExpressionToConfig(expression);
     expect(converted).toEqual(original);
   });
 
@@ -274,7 +278,7 @@ describe("authCallbackModeToUrlExpression and authCallbackUrlExpressionToMode ro
         "https://myapp.com/auth/callback?state=xyz&redirect=/dashboard",
     };
     const expression = authCallbackConfigToExpression(original);
-    const converted = authCallbackExpressionToMode(expression);
+    const converted = authCallbackExpressionToConfig(expression);
     expect(converted).toEqual(original);
   });
 
@@ -284,7 +288,7 @@ describe("authCallbackModeToUrlExpression and authCallbackUrlExpressionToMode ro
       postLoginPagePath: "",
     };
     const expression = authCallbackConfigToExpression(original);
-    const converted = authCallbackExpressionToMode(expression);
+    const converted = authCallbackExpressionToConfig(expression);
     expect(converted).toEqual({ postLoginMode: "default" });
   });
 
@@ -294,7 +298,7 @@ describe("authCallbackModeToUrlExpression and authCallbackUrlExpressionToMode ro
       postLoginCustomUrl: "",
     };
     const expression = authCallbackConfigToExpression(original);
-    const converted = authCallbackExpressionToMode(expression);
+    const converted = authCallbackExpressionToConfig(expression);
     expect(converted).toEqual({ postLoginMode: "default" });
   });
 });

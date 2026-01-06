@@ -1,22 +1,10 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { setCustomCode, subscribeToCustomCode } from "./custom-code";
-import { createOutsetaScript } from "../scripts";
 import {
-  defaultPostLoginConfig,
-  type PostLoginConfig,
-} from "../scripts/post-login";
-import {
-  defaultPostSignupConfig,
-  type PostSignupConfig,
-} from "../scripts/post-signup";
-import {
-  defaultSignupConfirmationConfig,
-  type SignupConfirmationConfig,
-} from "../scripts/signup-confirmation";
-import {
-  defaultTokenStorageConfig,
-  type TokenStorageConfig,
-} from "../scripts/token-storage";
+  createOutsetaScript,
+  DEFAULT_SCRIPT_CONFIG,
+  ScriptConfig,
+} from "../scripts";
 
 // Mock framer-plugin
 const mockSetCustomCode = vi.fn();
@@ -36,13 +24,7 @@ describe("setCustomCode", () => {
   });
 
   it("should call framer.setCustomCode with null when domain is not provided", async () => {
-    await setCustomCode({
-      domain: undefined,
-      tokenStorageConfig: defaultTokenStorageConfig,
-      postLoginConfig: defaultPostLoginConfig,
-      signupConfirmationConfig: defaultSignupConfirmationConfig,
-      postSignupConfig: defaultPostSignupConfig,
-    });
+    await setCustomCode(DEFAULT_SCRIPT_CONFIG);
 
     expect(mockSetCustomCode).toHaveBeenCalledTimes(1);
     expect(mockSetCustomCode).toHaveBeenCalledWith({
@@ -53,13 +35,7 @@ describe("setCustomCode", () => {
 
   it("should generate script with domain and default configs", async () => {
     const domain = "test.outseta.com";
-    await setCustomCode({
-      domain,
-      tokenStorageConfig: defaultTokenStorageConfig,
-      postLoginConfig: defaultPostLoginConfig,
-      signupConfirmationConfig: defaultSignupConfirmationConfig,
-      postSignupConfig: defaultPostSignupConfig,
-    });
+    await setCustomCode({ ...DEFAULT_SCRIPT_CONFIG, domain });
 
     expect(mockSetCustomCode).toHaveBeenCalledTimes(1);
     const callArgs = mockSetCustomCode.mock.calls[0][0];
@@ -71,26 +47,14 @@ describe("setCustomCode", () => {
   });
 
   it("should generate complete script with all configs", async () => {
-    const domain = "myapp.outseta.com";
-    const tokenStorageConfig: TokenStorageConfig = { tokenStorage: "session" };
-    const postLoginConfig: PostLoginConfig = {
+    await setCustomCode({
+      domain: "myapp.outseta.com",
+      tokenStorageMode: "session",
       postLoginMode: "page",
       postLoginPagePath: "/dashboard",
-    };
-    const signupConfirmationConfig: SignupConfirmationConfig = {
       signupConfirmationMode: "current",
-    };
-    const postSignupConfig: PostSignupConfig = {
       postSignupMode: "custom",
       postSignupCustomUrl: "https://example.com/welcome",
-    };
-
-    await setCustomCode({
-      domain,
-      tokenStorageConfig,
-      postLoginConfig,
-      signupConfirmationConfig,
-      postSignupConfig,
     });
 
     expect(mockSetCustomCode).toHaveBeenCalledTimes(1);
@@ -115,13 +79,11 @@ describe("setCustomCode", () => {
     const domain = "app.outseta.com";
     await setCustomCode({
       domain,
-      tokenStorageConfig: { tokenStorage: "local" },
-      postLoginConfig: { postLoginMode: "current" },
-      signupConfirmationConfig: {
-        signupConfirmationMode: "page",
-        signupConfirmationPagePath: "/confirm",
-      },
-      postSignupConfig: { postSignupMode: "message" },
+      tokenStorageMode: "local",
+      postLoginMode: "current",
+      signupConfirmationMode: "page",
+      signupConfirmationPagePath: "/confirm",
+      postSignupMode: "message",
     });
 
     const callArgs = mockSetCustomCode.mock.calls[0][0];
@@ -182,19 +144,16 @@ describe("subscribeToCustomCode", () => {
 
     expect(callback).toHaveBeenCalledTimes(1);
     const callbackArgs = callback.mock.calls[0][0];
-    expect(callbackArgs.domain).toBe("test.outseta.com");
-    expect(callbackArgs.tokenStorageConfig).toEqual({ tokenStorage: "local" });
-    expect(callbackArgs.postLoginConfig).toEqual({
-      postLoginMode: "custom",
-      postLoginCustomUrl: "https://example.com/callback",
-    });
-    expect(callbackArgs.signupConfirmationConfig).toEqual({
-      signupConfirmationMode: "current",
-    });
-    expect(callbackArgs.postSignupConfig).toEqual({
-      postSignupMode: "custom",
-      postSignupCustomUrl: "https://example.com/welcome",
-    });
+    expect(callbackArgs.config.domain).toBe("test.outseta.com");
+    expect(callbackArgs.config.tokenStorageMode).toEqual("local");
+    expect(callbackArgs.config.postLoginMode).toEqual("custom");
+    expect(callbackArgs.config.postLoginCustomUrl).toEqual(
+      "https://example.com/callback",
+    );
+    expect(callbackArgs.config.postSignupMode).toEqual("custom");
+    expect(callbackArgs.config.postSignupCustomUrl).toEqual(
+      "https://example.com/welcome",
+    );
     expect(callbackArgs.disabled).toBe(false);
   });
 
@@ -231,22 +190,16 @@ describe("subscribeToCustomCode", () => {
 
     expect(callback).toHaveBeenCalledTimes(1);
     const callbackArgs = callback.mock.calls[0][0];
-    expect(callbackArgs.domain).toBe("test.outseta.com");
+    expect(callbackArgs.config.domain).toBe("test.outseta.com");
     // Old-style ternary for empty string should parse as current mode
-    expect(callbackArgs.postLoginConfig).toEqual({
-      postLoginMode: "current",
-    });
-    expect(callbackArgs.signupConfirmationConfig).toEqual({
-      signupConfirmationMode: "current",
-    });
+    expect(callbackArgs.config.postLoginMode).toEqual("current");
+    expect(callbackArgs.config.signupConfirmationMode).toEqual("current");
     // Old-style ternary with path should parse as page mode
-    expect(callbackArgs.postSignupConfig).toEqual({
-      postSignupMode: "page",
-      postSignupPagePath: "/success",
-    });
+    expect(callbackArgs.config.postSignupMode).toEqual("page");
+    expect(callbackArgs.config.postSignupPagePath).toEqual("/success");
   });
 
-  it("should handle empty/disabled state", () => {
+  it("should handle empty", () => {
     const callback = vi.fn();
     subscribeToCustomCode(callback);
 
@@ -255,22 +208,19 @@ describe("subscribeToCustomCode", () => {
 
     expect(callback).toHaveBeenCalledTimes(1);
     const callbackArgs1 = callback.mock.calls[0][0];
-    expect(callbackArgs1.domain).toBeUndefined();
-    expect(callbackArgs1.tokenStorageConfig).toEqual(defaultTokenStorageConfig);
-    expect(callbackArgs1.postLoginConfig).toEqual(defaultPostLoginConfig);
-    expect(callbackArgs1.signupConfirmationConfig).toEqual(
-      defaultSignupConfirmationConfig,
-    );
-    expect(callbackArgs1.postSignupConfig).toEqual(defaultPostSignupConfig);
+    expect(callbackArgs1.config).toEqual(DEFAULT_SCRIPT_CONFIG);
     expect(callbackArgs1.disabled).toBe(false);
+  });
 
-    // Test with disabled flag
-    callback.mockClear();
-    mockCallback({ headEnd: { html: "", disabled: true } });
+  it("should handle disabled state", () => {
+    const callback = vi.fn();
+    subscribeToCustomCode(callback);
+
+    mockCallback({ headEnd: { html: null, disabled: true } });
 
     expect(callback).toHaveBeenCalledTimes(1);
-    const callbackArgs2 = callback.mock.calls[0][0];
-    expect(callbackArgs2.disabled).toBe(true);
+    const callbackArgs = callback.mock.calls[0][0];
+    expect(callbackArgs.disabled).toBe(true);
   });
 
   it("should handle missing domain", () => {
@@ -290,33 +240,23 @@ describe("subscribeToCustomCode", () => {
 
     expect(callback).toHaveBeenCalledTimes(1);
     const callbackArgs = callback.mock.calls[0][0];
-    expect(callbackArgs.domain).toBeUndefined();
+    expect(callbackArgs.config).toEqual(DEFAULT_SCRIPT_CONFIG);
   });
 
   it("should handle roundtrip: set then subscribe", async () => {
-    const domain = "roundtrip.outseta.com";
-    const tokenStorageConfig: TokenStorageConfig = { tokenStorage: "cookie" };
-    const postLoginConfig: PostLoginConfig = {
+    const config: ScriptConfig = {
+      domain: "roundtrip.outseta.com",
+      tokenStorageMode: "cookie",
       postLoginMode: "page",
       postLoginPagePath: "/home",
-    };
-    const signupConfirmationConfig: SignupConfirmationConfig = {
       signupConfirmationMode: "page",
       signupConfirmationPagePath: "/verify",
-    };
-    const postSignupConfig: PostSignupConfig = {
       postSignupMode: "page",
       postSignupPagePath: "/thanks",
     };
 
     // Set the custom code
-    await setCustomCode({
-      domain,
-      tokenStorageConfig,
-      postLoginConfig,
-      signupConfirmationConfig,
-      postSignupConfig,
-    });
+    await setCustomCode(config);
 
     // Get the script that was set
     const setScript = mockSetCustomCode.mock.calls[0][0].html;
@@ -329,12 +269,6 @@ describe("subscribeToCustomCode", () => {
 
     expect(callback).toHaveBeenCalledTimes(1);
     const callbackArgs = callback.mock.calls[0][0];
-    expect(callbackArgs.domain).toBe(domain);
-    expect(callbackArgs.tokenStorageConfig).toEqual(tokenStorageConfig);
-    expect(callbackArgs.postLoginConfig).toEqual(postLoginConfig);
-    expect(callbackArgs.signupConfirmationConfig).toEqual(
-      signupConfirmationConfig,
-    );
-    expect(callbackArgs.postSignupConfig).toEqual(postSignupConfig);
+    expect(callbackArgs.config).toEqual(config);
   });
 });

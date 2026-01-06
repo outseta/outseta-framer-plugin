@@ -2,7 +2,7 @@ import { describe, it, expect } from "vitest";
 import {
   signupConfirmationConfigToExpression,
   signupConfirmationExpressionToMode,
-  defaultSignupConfirmationConfig,
+  DEFAULT_SIGNUP_CONFIRMATION_CONFIG,
 } from "./script-signup-confirmation";
 
 describe("signupConfirmationConfigToExpression", () => {
@@ -178,7 +178,7 @@ describe("signupConfirmationExpressionToMode", () => {
 
 describe("defaultSignupConfirmationConfig", () => {
   it("should have default mode as the default configuration", () => {
-    expect(defaultSignupConfirmationConfig).toEqual({
+    expect(DEFAULT_SIGNUP_CONFIRMATION_CONFIG).toEqual({
       signupConfirmationMode: "default",
     });
   });

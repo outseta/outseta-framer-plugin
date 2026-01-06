@@ -1,40 +1,21 @@
 import { formOptions, revalidateLogic } from "@tanstack/react-form";
 import { z } from "zod";
 
-import { defaultTokenStorageConfig, tokenStorageSchema } from "../scripts/token-storage";
-import { defaultPostLoginConfig, postLoginSchema } from "../scripts/post-login";
-import { defaultPostSignupConfig, postSignupSchema } from "../scripts/post-signup";
 import {
-  defaultSignupConfirmationConfig,
-  signupConfirmationSchema,
-} from "../scripts/signup-confirmation";
+  DEFAULT_SCRIPT_CONFIG,
+  scriptConfigSchema,
+  type ScriptConfig,
+} from "../scripts";
 
-export const customCodeSchema = z
-  .object({
-    domain: z
-      .hostname("An Outseta domain is required")
-      .endsWith(".outseta.com", "An Outseta domain is required"),
-  })
-  .and(tokenStorageSchema)
-  .and(postLoginSchema)
-  .and(postSignupSchema)
-  .and(signupConfirmationSchema);
+export { type ScriptConfig };
 
-export type CustomCodeSchema = z.infer<typeof customCodeSchema>;
-
-const defaultValues = {
-  domain: "",
-  ...defaultTokenStorageConfig,
-  ...defaultPostLoginConfig,
-  ...defaultPostSignupConfig,
-  ...defaultSignupConfirmationConfig,
-};
+export type CustomCodeSchema = z.infer<typeof scriptConfigSchema>;
 
 export const customCodeFormOptions = formOptions({
-  defaultValues,
+  defaultValues: DEFAULT_SCRIPT_CONFIG,
   validators: {
-    onSubmit: customCodeSchema,
-    onDynamic: customCodeSchema,
+    onSubmit: scriptConfigSchema,
+    onDynamic: scriptConfigSchema,
   },
   validationLogic: revalidateLogic({
     mode: "submit",

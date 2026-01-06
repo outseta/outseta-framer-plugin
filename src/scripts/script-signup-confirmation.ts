@@ -2,7 +2,7 @@ import {
   CURRENT_MODE_REGEX,
   CUSTOM_MODE_REGEX,
   PAGE_MODE_REGEX,
-} from "../script-regex";
+} from "./script-regex";
 import { z } from "zod";
 
 export const signupConfirmationSchema = z.discriminatedUnion(
@@ -29,13 +29,13 @@ export const signupConfirmationSchema = z.discriminatedUnion(
 
 export type SignupConfirmationConfig = z.infer<typeof signupConfirmationSchema>;
 
-export const defaultSignupConfirmationConfig: SignupConfirmationConfig = {
+export const DEFAULT_SIGNUP_CONFIRMATION_CONFIG: SignupConfirmationConfig = {
   signupConfirmationMode: "default",
 };
 
 // Convert config to a JavaScript expression suitable for the script generator.
 export const signupConfirmationConfigToExpression = (
-  config: SignupConfirmationConfig,
+  config: SignupConfirmationConfig = DEFAULT_SIGNUP_CONFIRMATION_CONFIG,
 ): string | undefined => {
   switch (config.signupConfirmationMode) {
     case "default":
