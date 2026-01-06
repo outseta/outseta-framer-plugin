@@ -1,10 +1,9 @@
-import { z } from "zod";
-
 import {
   expressionToDomainConfig,
   domainConfigToExpression,
   DEFAULT_DOMAIN_CONFIG,
   type DomainConfig,
+  domainSchema,
 } from "./script-domain";
 import {
   type TokenStorageConfig,
@@ -24,7 +23,7 @@ import {
   type SignupConfirmationConfig,
   DEFAULT_SIGNUP_CONFIRMATION_CONFIG,
   signupConfirmationConfigToExpression,
-  signupConfirmationExpressionToMode,
+  signupConfirmationExpressionToConfig,
   signupConfirmationSchema,
 } from "./script-signup-confirmation";
 import {
@@ -57,12 +56,7 @@ export const DEFAULT_SCRIPT_CONFIG: ScriptConfig = {
   ...DEFAULT_POST_SIGNUP_CONFIG,
 };
 
-export const scriptConfigSchema = z
-  .object({
-    domain: z
-      .hostname("An Outseta domain is required")
-      .endsWith(".outseta.com", "An Outseta domain is required"),
-  })
+export const scriptConfigSchema = domainSchema
   .and(tokenStorageSchema)
   .and(postLoginSchema)
   .and(postSignupSchema)
@@ -98,7 +92,7 @@ export function generateConfigFromRawHtml(rawHtml: string): ScriptConfig {
   const postLoginConfig = authCallbackExpressionToConfig(
     outsetaScript.authCallbackExpression,
   );
-  const signupConfirmationConfig = signupConfirmationExpressionToMode(
+  const signupConfirmationConfig = signupConfirmationExpressionToConfig(
     outsetaScript.signupConfirmationExpression,
   );
   const postSignupConfig = postSignupExpressionToConfig(

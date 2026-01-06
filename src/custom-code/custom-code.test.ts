@@ -150,6 +150,7 @@ describe("subscribeToCustomCode", () => {
     expect(callbackArgs.config.postLoginCustomUrl).toEqual(
       "https://example.com/callback",
     );
+    expect(callbackArgs.config.signupConfirmationMode).toEqual("current");
     expect(callbackArgs.config.postSignupMode).toEqual("custom");
     expect(callbackArgs.config.postSignupCustomUrl).toEqual(
       "https://example.com/welcome",

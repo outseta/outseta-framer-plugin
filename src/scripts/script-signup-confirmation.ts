@@ -52,7 +52,7 @@ export const signupConfirmationConfigToExpression = (
 };
 
 // Convert a parsed JavaScript expression back to a config object.
-export const signupConfirmationExpressionToMode = (
+export const signupConfirmationExpressionToConfig = (
   expression: string = "",
 ): SignupConfirmationConfig => {
   expression = expression.trim();
