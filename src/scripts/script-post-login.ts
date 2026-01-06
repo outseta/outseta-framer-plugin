@@ -4,7 +4,7 @@ import {
   CUSTOM_MODE_REGEX,
   PAGE_MODE_REGEX,
   PAGE_MODE_TERNARY_REGEX,
-} from "../script-regex";
+} from "./script-regex";
 import { z } from "zod";
 
 export const postLoginSchema = z.discriminatedUnion("postLoginMode", [
@@ -28,13 +28,13 @@ export const postLoginSchema = z.discriminatedUnion("postLoginMode", [
 
 export type PostLoginConfig = z.infer<typeof postLoginSchema>;
 
-export const defaultPostLoginConfig: PostLoginConfig = {
+export const DEFAULT_POST_LOGIN_CONFIG: PostLoginConfig = {
   postLoginMode: "default",
 };
 
 // Convert config to a JavaScript expression suitable for the script generator.
 export const authCallbackConfigToExpression = (
-  config: PostLoginConfig,
+  config: PostLoginConfig = DEFAULT_POST_LOGIN_CONFIG,
 ): string | undefined => {
   switch (config.postLoginMode) {
     case "default":
@@ -51,7 +51,7 @@ export const authCallbackConfigToExpression = (
 };
 
 // Convert a parsed JavaScript expression back to a config object.
-export const authCallbackExpressionToMode = (
+export const authCallbackExpressionToConfig = (
   expression: string = "",
 ): PostLoginConfig => {
   expression = expression.trim();
@@ -91,5 +91,5 @@ export const authCallbackExpressionToMode = (
   }
 
   // Fallback to default mode
-  return { postLoginMode: "default" };
+  return DEFAULT_POST_LOGIN_CONFIG;
 };

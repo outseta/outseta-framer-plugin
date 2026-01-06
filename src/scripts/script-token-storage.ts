@@ -1,20 +1,20 @@
 import { z } from "zod";
 
 export const tokenStorageSchema = z.object({
-  tokenStorage: z.enum(["session", "local", "cookie"]),
+  tokenStorageMode: z.enum(["session", "local", "cookie"]),
 });
 
 export type TokenStorageConfig = z.infer<typeof tokenStorageSchema>;
 
-export const defaultTokenStorageConfig: TokenStorageConfig = {
-  tokenStorage: "local",
+export const DEFAULT_TOKEN_STORAGE_CONFIG: TokenStorageConfig = {
+  tokenStorageMode: "local",
 };
 
 // Convert config to a JavaScript expression suitable for the script generator.
 export const tokenStorageConfigToExpression = (
-  config: TokenStorageConfig,
+  config: TokenStorageConfig = DEFAULT_TOKEN_STORAGE_CONFIG,
 ): string => {
-  return JSON.stringify(config.tokenStorage);
+  return JSON.stringify(config.tokenStorageMode);
 };
 
 // Convert a parsed JavaScript expression back to a config object.
@@ -32,9 +32,9 @@ export const tokenStorageExpressionToConfig = (
     cleanExpression === "local" ||
     cleanExpression === "cookie"
   ) {
-    return { tokenStorage: cleanExpression };
+    return { tokenStorageMode: cleanExpression };
   }
 
   // Fallback to default
-  return defaultTokenStorageConfig;
+  return DEFAULT_TOKEN_STORAGE_CONFIG;
 };

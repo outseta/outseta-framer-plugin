@@ -1,3 +1,39 @@
+import {
+  expressionToDomainConfig,
+  domainConfigToExpression,
+  DEFAULT_DOMAIN_CONFIG,
+  type DomainConfig,
+  domainSchema,
+} from "./script-domain";
+import {
+  type TokenStorageConfig,
+  DEFAULT_TOKEN_STORAGE_CONFIG,
+  tokenStorageConfigToExpression,
+  tokenStorageExpressionToConfig,
+  tokenStorageSchema,
+} from "./script-token-storage";
+import {
+  type PostLoginConfig,
+  DEFAULT_POST_LOGIN_CONFIG,
+  authCallbackConfigToExpression,
+  authCallbackExpressionToConfig,
+  postLoginSchema,
+} from "./script-post-login";
+import {
+  type SignupConfirmationConfig,
+  DEFAULT_SIGNUP_CONFIRMATION_CONFIG,
+  signupConfirmationConfigToExpression,
+  signupConfirmationExpressionToConfig,
+  signupConfirmationSchema,
+} from "./script-signup-confirmation";
+import {
+  type PostSignupConfig,
+  DEFAULT_POST_SIGNUP_CONFIG,
+  postSignupConfigToExpression,
+  postSignupExpressionToConfig,
+  postSignupSchema,
+} from "./script-post-signup";
+
 export type OutsetaScriptOptions = {
   domainExpression?: string;
   authCallbackExpression?: string;
@@ -6,7 +42,75 @@ export type OutsetaScriptOptions = {
   tokenStorageExpression?: string;
 };
 
-export const parseOutsetaScript = (code: string): OutsetaScriptOptions => {
+export type ScriptConfig = TokenStorageConfig &
+  PostLoginConfig &
+  SignupConfirmationConfig &
+  PostSignupConfig &
+  DomainConfig;
+
+export const DEFAULT_SCRIPT_CONFIG: ScriptConfig = {
+  ...DEFAULT_DOMAIN_CONFIG,
+  ...DEFAULT_TOKEN_STORAGE_CONFIG,
+  ...DEFAULT_POST_LOGIN_CONFIG,
+  ...DEFAULT_SIGNUP_CONFIRMATION_CONFIG,
+  ...DEFAULT_POST_SIGNUP_CONFIG,
+};
+
+export const scriptConfigSchema = domainSchema
+  .and(tokenStorageSchema)
+  .and(postLoginSchema)
+  .and(postSignupSchema)
+  .and(signupConfirmationSchema);
+
+// Generate script from config values
+export function generateScriptFromConfig(config: ScriptConfig): string {
+  if (!config.domain) return "";
+
+  const domainExpression = domainConfigToExpression(config);
+  const tokenStorageExpression = tokenStorageConfigToExpression(config);
+  const authCallbackExpression = authCallbackConfigToExpression(config);
+  const signupConfirmationExpression =
+    signupConfirmationConfigToExpression(config);
+  const postSignupExpression = postSignupConfigToExpression(config);
+
+  return createOutsetaScript({
+    domainExpression,
+    tokenStorageExpression,
+    authCallbackExpression,
+    signupConfirmationExpression,
+    postSignupExpression,
+  });
+}
+
+export function generateConfigFromRawHtml(rawHtml: string): ScriptConfig {
+  const outsetaScript = generateExpressionsFromRawHtml(rawHtml);
+
+  const domainConfig = expressionToDomainConfig(outsetaScript.domainExpression);
+  const tokenStorageConfig = tokenStorageExpressionToConfig(
+    outsetaScript.tokenStorageExpression,
+  );
+  const postLoginConfig = authCallbackExpressionToConfig(
+    outsetaScript.authCallbackExpression,
+  );
+  const signupConfirmationConfig = signupConfirmationExpressionToConfig(
+    outsetaScript.signupConfirmationExpression,
+  );
+  const postSignupConfig = postSignupExpressionToConfig(
+    outsetaScript.postSignupExpression,
+  );
+
+  return {
+    ...domainConfig,
+    ...tokenStorageConfig,
+    ...postLoginConfig,
+    ...signupConfirmationConfig,
+    ...postSignupConfig,
+  };
+}
+
+export const generateExpressionsFromRawHtml = (
+  code: string,
+): OutsetaScriptOptions => {
   // Captures the full expression after domain
   const domainRegex = /domain:\s*([\s\S]+?)(?=,\s*(\n|\})|\n|\}|$)/;
   // Capture the full expression after tokenStorage

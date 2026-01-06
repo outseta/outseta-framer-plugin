@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import {
   postSignupConfigToExpression,
-  postSignupExpressionToMode,
+  postSignupExpressionToConfig,
   type PostSignupConfig,
 } from "./script-post-signup";
 
@@ -63,70 +63,70 @@ describe("postSignupConfigToExpression", () => {
   });
 });
 
-describe("postSignupExpressionToMode", () => {
+describe("postSignupExpressionToConfig", () => {
   describe("default mode", () => {
     it("for undefined", () => {
-      const result = postSignupExpressionToMode(undefined);
+      const result = postSignupExpressionToConfig(undefined);
       expect(result).toEqual({ postSignupMode: "default" });
     });
 
     it("for undefined expression", () => {
-      const result = postSignupExpressionToMode("undefined");
+      const result = postSignupExpressionToConfig("undefined");
       expect(result).toEqual({ postSignupMode: "default" });
     });
     it("for empty expression", () => {
-      const result = postSignupExpressionToMode("");
+      const result = postSignupExpressionToConfig("");
       expect(result).toEqual({ postSignupMode: "default" });
     });
 
     it("for quoted empty string", () => {
-      const result = postSignupExpressionToMode('""');
+      const result = postSignupExpressionToConfig('""');
       expect(result).toEqual({ postSignupMode: "default" });
     });
 
     it("for quoted empty string with additional whitespace", () => {
-      const result1 = postSignupExpressionToMode('"   "');
+      const result1 = postSignupExpressionToConfig('"   "');
       expect(result1).toEqual({ postSignupMode: "default" });
-      const result2 = postSignupExpressionToMode('    ""    ');
+      const result2 = postSignupExpressionToConfig('    ""    ');
       expect(result2).toEqual({ postSignupMode: "default" });
     });
 
     it("for new URL expression with empty path", () => {
-      const result = postSignupExpressionToMode(
+      const result = postSignupExpressionToConfig(
         'new URL("", window.location.origin).href',
       );
       expect(result).toEqual({ postSignupMode: "default" });
     });
 
     it("for new URL expression with additional whitespace", () => {
-      const result1 = postSignupExpressionToMode(
+      const result1 = postSignupExpressionToConfig(
         'new URL("    ", window.location.origin).href    ',
       );
       expect(result1).toEqual({ postSignupMode: "default" });
-      const result2 = postSignupExpressionToMode(
+      const result2 = postSignupExpressionToConfig(
         '    new URL("", window.location.origin).href',
       );
       expect(result2).toEqual({ postSignupMode: "default" });
     });
 
     it("for invalid expressions", () => {
-      const result1 = postSignupExpressionToMode(
+      const result1 = postSignupExpressionToConfig(
         'new URL("/dashboard", window.location.href).href',
       );
-      const result2 = postSignupExpressionToMode(
+      const result2 = postSignupExpressionToConfig(
         '"https://example.com/callback',
       );
-      const result3 = postSignupExpressionToMode("someOtherExpression()");
-      const result4 = postSignupExpressionToMode(
+      const result3 = postSignupExpressionToConfig("someOtherExpression()");
+      const result4 = postSignupExpressionToConfig(
         'window.location.href + "/callback"',
       );
-      const result5 = postSignupExpressionToMode(
+      const result5 = postSignupExpressionToConfig(
         'new URL("/path\\"with\\"quotes", window.location.origin).href',
       );
-      const result6 = postSignupExpressionToMode(
+      const result6 = postSignupExpressionToConfig(
         '"https://example.com/path\\"with\\"quotes"',
       );
-      const result7 = postSignupExpressionToMode("hello()");
+      const result7 = postSignupExpressionToConfig("hello()");
 
       expect(result1).toEqual({ postSignupMode: "default" });
       expect(result2).toEqual({ postSignupMode: "default" });
@@ -138,7 +138,7 @@ describe("postSignupExpressionToMode", () => {
     });
 
     it("for earlier plugin version ternary expression", () => {
-      const result = postSignupExpressionToMode(
+      const result = postSignupExpressionToConfig(
         '"" ? new URL("", window.location.origin).href : undefined',
       );
       expect(result).toEqual({ postSignupMode: "default" });
@@ -147,21 +147,21 @@ describe("postSignupExpressionToMode", () => {
 
   describe("message mode", () => {
     it("for null literal", () => {
-      const result = postSignupExpressionToMode("null");
+      const result = postSignupExpressionToConfig("null");
       expect(result).toEqual({ postSignupMode: "message" });
     });
 
     it("for window.location.href with additional whitespace", () => {
-      const result1 = postSignupExpressionToMode("null    ");
+      const result1 = postSignupExpressionToConfig("null    ");
       expect(result1).toEqual({ postSignupMode: "message" });
-      const result2 = postSignupExpressionToMode("    null");
+      const result2 = postSignupExpressionToConfig("    null");
       expect(result2).toEqual({ postSignupMode: "message" });
     });
   });
 
   describe("page mode", () => {
     it("for new URL expression", () => {
-      const result = postSignupExpressionToMode(
+      const result = postSignupExpressionToConfig(
         'new URL("/thanks", window.location.origin).href',
       );
       expect(result).toEqual({
@@ -171,7 +171,7 @@ describe("postSignupExpressionToMode", () => {
     });
 
     it("for new URL expression with additional whitespace", () => {
-      const result = postSignupExpressionToMode(
+      const result = postSignupExpressionToConfig(
         'new URL( "/thanks"    , window.location.origin ).href',
       );
       expect(result).toEqual({
@@ -181,7 +181,7 @@ describe("postSignupExpressionToMode", () => {
     });
 
     it("for new URL expression with less whitespace", () => {
-      const result = postSignupExpressionToMode(
+      const result = postSignupExpressionToConfig(
         'new URL("/thanks",window.location.origin).href',
       );
       expect(result).toEqual({
@@ -191,7 +191,7 @@ describe("postSignupExpressionToMode", () => {
     });
 
     it("for plugin version 1 expression", () => {
-      const result = postSignupExpressionToMode(
+      const result = postSignupExpressionToConfig(
         '"/thanks" ? new URL("/thanks", window.location.origin).href : undefined',
       );
       expect(result).toEqual({
@@ -203,7 +203,7 @@ describe("postSignupExpressionToMode", () => {
 
   describe("custom mode", () => {
     it("for quoted string", () => {
-      expect(postSignupExpressionToMode('"https://x.y/z"')).toEqual({
+      expect(postSignupExpressionToConfig('"https://x.y/z"')).toEqual({
         postSignupMode: "custom",
         postSignupCustomUrl: "https://x.y/z",
       });

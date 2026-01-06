@@ -5,20 +5,13 @@ import classes from "./CustomCodeSummary.module.css";
 
 import { setCustomCode } from "./custom-code";
 import { useCustomCode } from "./CustomCodeProvider";
-import { defaultTokenStorageConfig } from "../scripts/token-storage";
+import { DEFAULT_SCRIPT_CONFIG } from "../scripts";
 
 export function CustomCodeSummary() {
-  const { domain, status } = useCustomCode();
+  const { config, status } = useCustomCode();
 
   const disconnectMutation = useMutation({
-    mutationFn: () =>
-      setCustomCode({
-        domain: "",
-        tokenStorageConfig: defaultTokenStorageConfig,
-        postLoginConfig: { postLoginMode: "default" },
-        signupConfirmationConfig: { signupConfirmationMode: "default" },
-        postSignupConfig: { postSignupMode: "default" },
-      }),
+    mutationFn: () => setCustomCode(DEFAULT_SCRIPT_CONFIG),
   });
 
   if (status === "disconnected") {
@@ -37,7 +30,7 @@ export function CustomCodeSummary() {
     return (
       <header className={classes.root}>
         <p>
-          <strong>{domain}</strong>
+          <strong>{config.domain}</strong>
           <span> · </span>
           <button
             type="button"

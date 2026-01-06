@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
-import { parseOutsetaScript, createOutsetaScript } from "./script";
+import { generateExpressionsFromRawHtml, createOutsetaScript } from "./script";
 
-describe("parseOutsetaScript", () => {
+describe("generateExpressionsFromRawHtml", () => {
   describe("complete script", () => {
     it("should parse a complete Outseta script with all properties", () => {
       const script = `
@@ -32,7 +32,7 @@ describe("parseOutsetaScript", () => {
         authCallbackExpression,
         postSignupExpression,
         tokenStorageExpression,
-      } = parseOutsetaScript(script);
+      } = generateExpressionsFromRawHtml(script);
 
       expect(domainExpression).toBe("'test.outseta.com'");
       expect(authCallbackExpression).toBe('"https://example.com/callback"');
@@ -71,7 +71,7 @@ describe("parseOutsetaScript", () => {
         authCallbackExpression,
         postSignupExpression,
         tokenStorageExpression,
-      } = parseOutsetaScript(script);
+      } = generateExpressionsFromRawHtml(script);
       expect(domainExpression).toBe("'test.outseta.com'");
       expect(authCallbackExpression).toBe(
         `"" ? new URL("", window.location.origin).href : window.location.href`,
@@ -88,7 +88,7 @@ describe("parseOutsetaScript", () => {
         authCallbackExpression,
         postSignupExpression,
         tokenStorageExpression,
-      } = parseOutsetaScript("");
+      } = generateExpressionsFromRawHtml("");
       expect(domainExpression).toBe(undefined);
       expect(authCallbackExpression).toBe(undefined);
       expect(postSignupExpression).toBe(undefined);
@@ -117,7 +117,7 @@ describe("parseOutsetaScript", () => {
     `;
 
       const { domainExpression, authCallbackExpression, postSignupExpression } =
-        parseOutsetaScript(script);
+        generateExpressionsFromRawHtml(script);
       expect(domainExpression).toBe("'   test.outseta.com'");
       expect(authCallbackExpression).toBe(
         'new        URL("/dashboard", window.location.origin).href',
@@ -137,7 +137,7 @@ describe("parseOutsetaScript", () => {
       `;
 
       const { domainExpression: domainExpression1 } =
-        parseOutsetaScript(script1);
+        generateExpressionsFromRawHtml(script1);
       expect(domainExpression1).toBe("'test.outseta.com'");
 
       const script2 = `
@@ -149,7 +149,7 @@ describe("parseOutsetaScript", () => {
       `;
 
       const { domainExpression: domainExpression2 } =
-        parseOutsetaScript(script2);
+        generateExpressionsFromRawHtml(script2);
       expect(domainExpression2).toBe('"myapp.outseta.com"');
     });
 
@@ -163,7 +163,7 @@ describe("parseOutsetaScript", () => {
       `;
 
       const { domainExpression: domainExpression1 } =
-        parseOutsetaScript(script1);
+        generateExpressionsFromRawHtml(script1);
       expect(domainExpression1).toBe("'   test.outseta.com'");
 
       const script2 = `
@@ -175,7 +175,7 @@ describe("parseOutsetaScript", () => {
       `;
 
       const { domainExpression: domainExpression2 } =
-        parseOutsetaScript(script2);
+        generateExpressionsFromRawHtml(script2);
       expect(domainExpression2).toBe("'test.outseta.com   '");
     });
 
@@ -188,7 +188,7 @@ describe("parseOutsetaScript", () => {
         </script>
       `;
 
-      const { domainExpression } = parseOutsetaScript(script);
+      const { domainExpression } = generateExpressionsFromRawHtml(script);
       expect(domainExpression).toBe(undefined);
     });
 
@@ -202,7 +202,7 @@ describe("parseOutsetaScript", () => {
       `;
 
       const { domainExpression: domainExpression1 } =
-        parseOutsetaScript(script1);
+        generateExpressionsFromRawHtml(script1);
       expect(domainExpression1).toBe("''");
 
       const script2 = `
@@ -214,7 +214,7 @@ describe("parseOutsetaScript", () => {
       `;
 
       const { domainExpression: domainExpression2 } =
-        parseOutsetaScript(script2);
+        generateExpressionsFromRawHtml(script2);
       expect(domainExpression2).toBe('""');
     });
 
@@ -227,7 +227,7 @@ describe("parseOutsetaScript", () => {
         </script>
       `;
 
-      const { domainExpression } = parseOutsetaScript(script);
+      const { domainExpression } = generateExpressionsFromRawHtml(script);
       expect(domainExpression).toBe("undefined");
     });
   });
@@ -247,7 +247,7 @@ describe("parseOutsetaScript", () => {
       `;
 
       const { authCallbackExpression: authCallbackExpression1 } =
-        parseOutsetaScript(script1);
+        generateExpressionsFromRawHtml(script1);
       expect(authCallbackExpression1).toBe('"https://example.com/callback"');
 
       const script2 = `
@@ -263,7 +263,7 @@ describe("parseOutsetaScript", () => {
       `;
 
       const { authCallbackExpression: authCallbackExpression2 } =
-        parseOutsetaScript(script2);
+        generateExpressionsFromRawHtml(script2);
       expect(authCallbackExpression2).toBe("window.location.href");
 
       const script3 = `
@@ -279,7 +279,7 @@ describe("parseOutsetaScript", () => {
       `;
 
       const { authCallbackExpression: authCallbackExpression3 } =
-        parseOutsetaScript(script3);
+        generateExpressionsFromRawHtml(script3);
       expect(authCallbackExpression3).toBe(
         'new URL("/dashboard", window.location.origin).href',
       );
@@ -299,7 +299,7 @@ describe("parseOutsetaScript", () => {
       `;
 
       const { authCallbackExpression: authCallbackExpression1 } =
-        parseOutsetaScript(script1);
+        generateExpressionsFromRawHtml(script1);
       expect(authCallbackExpression1).toBe("'    '");
 
       const script2 = `
@@ -315,7 +315,7 @@ describe("parseOutsetaScript", () => {
       `;
 
       const { authCallbackExpression: authCallbackExpression2 } =
-        parseOutsetaScript(script2);
+        generateExpressionsFromRawHtml(script2);
       expect(authCallbackExpression2).toBe(
         "'    https://example.com/callback'",
       );
@@ -333,7 +333,7 @@ describe("parseOutsetaScript", () => {
       `;
 
       const { authCallbackExpression: authCallbackExpression3 } =
-        parseOutsetaScript(script3);
+        generateExpressionsFromRawHtml(script3);
       expect(authCallbackExpression3).toBe(
         'new        URL("/dashboard", window.location.origin).href',
       );
@@ -349,7 +349,7 @@ describe("parseOutsetaScript", () => {
         </script>
       `;
 
-      const { authCallbackExpression } = parseOutsetaScript(script);
+      const { authCallbackExpression } = generateExpressionsFromRawHtml(script);
       expect(authCallbackExpression).toBe(undefined);
     });
 
@@ -366,7 +366,7 @@ describe("parseOutsetaScript", () => {
         </script>
       `;
 
-      const { authCallbackExpression } = parseOutsetaScript(script);
+      const { authCallbackExpression } = generateExpressionsFromRawHtml(script);
       expect(authCallbackExpression).toBe("''");
     });
 
@@ -383,7 +383,7 @@ describe("parseOutsetaScript", () => {
         </script>
       `;
 
-      const { authCallbackExpression } = parseOutsetaScript(script);
+      const { authCallbackExpression } = generateExpressionsFromRawHtml(script);
       expect(authCallbackExpression).toBe("undefined");
     });
   });
@@ -403,7 +403,7 @@ describe("parseOutsetaScript", () => {
       `;
 
       const { postSignupExpression: postSignupExpression1 } =
-        parseOutsetaScript(script1);
+        generateExpressionsFromRawHtml(script1);
       expect(postSignupExpression1).toBe('"https://example.com/welcome"');
 
       const script2 = `
@@ -419,7 +419,7 @@ describe("parseOutsetaScript", () => {
       `;
 
       const { postSignupExpression: postSignupExpression2 } =
-        parseOutsetaScript(script2);
+        generateExpressionsFromRawHtml(script2);
       expect(postSignupExpression2).toBe("null");
 
       const script3 = `
@@ -435,7 +435,7 @@ describe("parseOutsetaScript", () => {
       `;
 
       const { postSignupExpression: postSignupExpression3 } =
-        parseOutsetaScript(script3);
+        generateExpressionsFromRawHtml(script3);
       expect(postSignupExpression3).toBe(
         'new URL("/dashboard", window.location.origin).href',
       );
@@ -455,7 +455,7 @@ describe("parseOutsetaScript", () => {
       `;
 
       const { postSignupExpression: postSignupExpression1 } =
-        parseOutsetaScript(script1);
+        generateExpressionsFromRawHtml(script1);
       expect(postSignupExpression1).toBe("'    '");
 
       const script2 = `
@@ -471,7 +471,7 @@ describe("parseOutsetaScript", () => {
       `;
 
       const { postSignupExpression: postSignupExpression2 } =
-        parseOutsetaScript(script2);
+        generateExpressionsFromRawHtml(script2);
       expect(postSignupExpression2).toBe("'    https://example.com/welcome'");
 
       const script3 = `
@@ -487,7 +487,7 @@ describe("parseOutsetaScript", () => {
       `;
 
       const { postSignupExpression: postSignupExpression3 } =
-        parseOutsetaScript(script3);
+        generateExpressionsFromRawHtml(script3);
       expect(postSignupExpression3).toBe(
         'new        URL("/dashboard", window.location.origin).href',
       );
@@ -504,7 +504,7 @@ describe("parseOutsetaScript", () => {
         </script>
       `;
 
-      const { postSignupExpression } = parseOutsetaScript(script);
+      const { postSignupExpression } = generateExpressionsFromRawHtml(script);
       expect(postSignupExpression).toBe(undefined);
     });
 
@@ -521,7 +521,7 @@ describe("parseOutsetaScript", () => {
         </script>
       `;
 
-      const { postSignupExpression } = parseOutsetaScript(script);
+      const { postSignupExpression } = generateExpressionsFromRawHtml(script);
       expect(postSignupExpression).toBe("''");
     });
 
@@ -538,7 +538,7 @@ describe("parseOutsetaScript", () => {
         </script>
       `;
 
-      const { postSignupExpression } = parseOutsetaScript(script);
+      const { postSignupExpression } = generateExpressionsFromRawHtml(script);
       expect(postSignupExpression).toBe("undefined");
     });
   });
@@ -554,7 +554,7 @@ describe("parseOutsetaScript", () => {
         </script>
       `;
 
-      const { tokenStorageExpression } = parseOutsetaScript(script);
+      const { tokenStorageExpression } = generateExpressionsFromRawHtml(script);
       expect(tokenStorageExpression).toBe('"local"');
     });
 
@@ -568,7 +568,7 @@ describe("parseOutsetaScript", () => {
         </script>
       `;
 
-      const { tokenStorageExpression } = parseOutsetaScript(script);
+      const { tokenStorageExpression } = generateExpressionsFromRawHtml(script);
       expect(tokenStorageExpression).toBe("'session'");
     });
 
@@ -582,7 +582,7 @@ describe("parseOutsetaScript", () => {
         </script>
       `;
 
-      const { tokenStorageExpression } = parseOutsetaScript(script);
+      const { tokenStorageExpression } = generateExpressionsFromRawHtml(script);
       expect(tokenStorageExpression).toBe('"cookie"');
     });
 
@@ -596,7 +596,7 @@ describe("parseOutsetaScript", () => {
         </script>
       `;
 
-      const { tokenStorageExpression } = parseOutsetaScript(script);
+      const { tokenStorageExpression } = generateExpressionsFromRawHtml(script);
       expect(tokenStorageExpression).toBe(undefined);
     });
 
@@ -610,7 +610,7 @@ describe("parseOutsetaScript", () => {
         </script>
       `;
 
-      const { tokenStorageExpression } = parseOutsetaScript(script);
+      const { tokenStorageExpression } = generateExpressionsFromRawHtml(script);
       expect(tokenStorageExpression).toBe('"local"');
     });
 
@@ -624,7 +624,7 @@ describe("parseOutsetaScript", () => {
         </script>
       `;
 
-      const { tokenStorageExpression } = parseOutsetaScript(script);
+      const { tokenStorageExpression } = generateExpressionsFromRawHtml(script);
       expect(tokenStorageExpression).toBe("''");
     });
 
@@ -638,7 +638,7 @@ describe("parseOutsetaScript", () => {
         </script>
       `;
 
-      const { tokenStorageExpression } = parseOutsetaScript(script);
+      const { tokenStorageExpression } = generateExpressionsFromRawHtml(script);
       expect(tokenStorageExpression).toBe("undefined");
     });
   });
@@ -916,7 +916,8 @@ describe("signupConfirmationExpression parsing and generation", () => {
         </script>
       `;
 
-      const { signupConfirmationExpression } = parseOutsetaScript(script);
+      const { signupConfirmationExpression } =
+        generateExpressionsFromRawHtml(script);
       expect(signupConfirmationExpression).toBe("window.location.href");
     });
 
@@ -932,7 +933,8 @@ describe("signupConfirmationExpression parsing and generation", () => {
         </script>
       `;
 
-      const { signupConfirmationExpression } = parseOutsetaScript(script);
+      const { signupConfirmationExpression } =
+        generateExpressionsFromRawHtml(script);
       expect(signupConfirmationExpression).toBe(
         '"https://example.com/confirmed"',
       );
@@ -950,7 +952,8 @@ describe("signupConfirmationExpression parsing and generation", () => {
         </script>
       `;
 
-      const { signupConfirmationExpression } = parseOutsetaScript(script);
+      const { signupConfirmationExpression } =
+        generateExpressionsFromRawHtml(script);
       expect(signupConfirmationExpression).toBe(
         'new URL("/welcome", window.location.origin).href',
       );
@@ -968,7 +971,8 @@ describe("signupConfirmationExpression parsing and generation", () => {
         </script>
       `;
 
-      const { signupConfirmationExpression } = parseOutsetaScript(script);
+      const { signupConfirmationExpression } =
+        generateExpressionsFromRawHtml(script);
       expect(signupConfirmationExpression).toBe(undefined);
     });
 
@@ -984,7 +988,8 @@ describe("signupConfirmationExpression parsing and generation", () => {
         </script>
       `;
 
-      const { signupConfirmationExpression } = parseOutsetaScript(script);
+      const { signupConfirmationExpression } =
+        generateExpressionsFromRawHtml(script);
       expect(signupConfirmationExpression).toBe("window.location.href");
     });
   });

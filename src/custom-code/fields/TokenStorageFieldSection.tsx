@@ -7,7 +7,7 @@ export const TokenStorageFieldSection = withForm({
     return (
       <fieldset>
         <form.AppField
-          name="tokenStorage"
+          name="tokenStorageMode"
           children={(field) => (
             <>
               <field.SelectField
@@ -24,22 +24,22 @@ export const TokenStorageFieldSection = withForm({
 
         <form.Subscribe
           // Listen to changes in tokenStorage and render the appropriate description
-          selector={(state) => state.values.tokenStorage}
-          children={(tokenStorage) => {
+          selector={(state) => state.values.tokenStorageMode}
+          children={(tokenStorageMode) => {
             return (
               <>
                 {/* Local Storage mode */}
-                {tokenStorage === "local" ? (
+                {tokenStorageMode === "local" ? (
                   <p>Users are logged in across tabs and visits.</p>
                 ) : null}
 
                 {/* Session Storage mode */}
-                {tokenStorage === "session" ? (
+                {tokenStorageMode === "session" ? (
                   <p>Users are logged in only in the current tab.</p>
                 ) : null}
 
                 {/* Cookie mode */}
-                {tokenStorage === "cookie" ? (
+                {tokenStorageMode === "cookie" ? (
                   <p>
                     Users are logged in across tabs and visits, even across
                     different subdomains.
