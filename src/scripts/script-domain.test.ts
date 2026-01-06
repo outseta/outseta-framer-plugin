@@ -5,7 +5,7 @@ import {
   DEFAULT_DOMAIN_CONFIG,
 } from "./script-domain";
 
-describe("expressionToDomain", () => {
+describe("expressionToDomainConfig", () => {
   it("should convert valid expression to a domain string", () => {
     const expression1 = "'myapp.outseta.com'";
     const config1 = expressionToDomainConfig(expression1);
@@ -52,7 +52,7 @@ describe("expressionToDomain", () => {
   });
 });
 
-describe("domainToExpression", () => {
+describe("domainConfigToExpression", () => {
   it("should convert a valid domain string to a string expression", () => {
     const expression1 = domainConfigToExpression({
       domain: "myapp.outseta.com",
