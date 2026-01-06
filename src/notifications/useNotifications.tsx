@@ -1,4 +1,6 @@
-import { useConfiguration } from "../custom-code";
+import { useMutation } from "@tanstack/react-query";
+import { Button } from "@triozer/framer-toolbox";
+import { useConfiguration, useCustomCode, setCustomCode } from "../custom-code";
 import { Link } from "@tanstack/react-router";
 
 export enum NotificationLevel {
@@ -14,6 +16,11 @@ export type Notification = {
 
 export const useNotifications = () => {
   const { domain, isInvalid, disabled } = useConfiguration();
+  const { needsUpdate, config } = useCustomCode();
+
+  const updateMutation = useMutation({
+    mutationFn: setCustomCode,
+  });
 
   const notifications = [];
 
@@ -43,6 +50,28 @@ export const useNotifications = () => {
             }
           </em>
           .
+        </>
+      ),
+    });
+  }
+
+  if (needsUpdate) {
+    notifications.push({
+      level: NotificationLevel.WARNING,
+      message: (
+        <>
+          The Outseta script in your Framer site is outdated and doesn't match
+          the current plugin version.{" "}
+          <Button
+            variant="primary"
+            onClick={(e) => {
+              e.preventDefault();
+              updateMutation.mutate(config);
+            }}
+            disabled={updateMutation.isPending}
+          >
+            {updateMutation.isPending ? "Updating..." : "Update Script"}
+          </Button>
         </>
       ),
     });
