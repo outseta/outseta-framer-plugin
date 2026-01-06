@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { generateExpressionsFromRawHtml, createOutsetaScript } from "./script";
 
-describe("parseOutsetaScript", () => {
+describe("generateExpressionsFromRawHtml", () => {
   describe("complete script", () => {
     it("should parse a complete Outseta script with all properties", () => {
       const script = `
