@@ -3,6 +3,8 @@ import { Button } from "@triozer/framer-toolbox";
 import { useConfiguration, useCustomCode, setCustomCode } from "../custom-code";
 import { Link } from "@tanstack/react-router";
 
+import classes from "./Notification.module.css";
+
 export enum NotificationLevel {
   INFO = 1,
   WARNING,
@@ -28,11 +30,11 @@ export const useNotifications = () => {
     notifications.push({
       level: NotificationLevel.ERROR,
       message: (
-        <>
+        <p>
           The Outseta domain configured does not exist, either create an account
           for <strong>{domain}</strong> or{" "}
           <Link to="/custom-code">edit the configured Outseta domain</Link>.
-        </>
+        </p>
       ),
     });
   }
@@ -41,7 +43,7 @@ export const useNotifications = () => {
     notifications.push({
       level: NotificationLevel.WARNING,
       message: (
-        <>
+        <p>
           Please reenable the custom plugin code for Outseta to work properly.
           Go to{" "}
           <em>
@@ -50,7 +52,7 @@ export const useNotifications = () => {
             }
           </em>
           .
-        </>
+        </p>
       ),
     });
   }
@@ -60,10 +62,13 @@ export const useNotifications = () => {
       level: NotificationLevel.WARNING,
       message: (
         <>
-          The Outseta script in your Framer site is outdated and doesn't match
-          the current plugin version.{" "}
+          <p>
+            The Outseta script in your Framer site is outdated and doesn't match
+            the current plugin version.{" "}
+          </p>
           <Button
             variant="primary"
+            className={classes.buttonWrapper}
             onClick={(e) => {
               e.preventDefault();
               updateMutation.mutate(config);

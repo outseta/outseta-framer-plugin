@@ -16,3 +16,7 @@
 .item[data-level="ERROR"] {
   border-color: #eb6767;
 }
+
+.item p + * {
+  margin-top: 8px;
+}
