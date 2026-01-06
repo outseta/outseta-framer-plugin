@@ -63,7 +63,7 @@ describe("postSignupConfigToExpression", () => {
   });
 });
 
-describe("postSignupExpressionToMode", () => {
+describe("postSignupExpressionToConfig", () => {
   describe("default mode", () => {
     it("for undefined", () => {
       const result = postSignupExpressionToConfig(undefined);

@@ -5,7 +5,7 @@ import {
   type PostLoginConfig,
 } from "./script-post-login";
 
-describe("authCallbackModeToUrlExpression", () => {
+describe("authCallbackConfigToExpression", () => {
   describe("default mode", () => {
     it("returns undefined", () => {
       const config: PostLoginConfig = { postLoginMode: "default" };
@@ -63,7 +63,7 @@ describe("authCallbackModeToUrlExpression", () => {
   });
 });
 
-describe("authCallbackUrlExpressionToMode", () => {
+describe("authCallbackExpressionToConfig", () => {
   describe("default mode", () => {
     it("for undefined", () => {
       const result = authCallbackExpressionToConfig(undefined);
@@ -226,7 +226,7 @@ describe("authCallbackUrlExpressionToMode", () => {
   });
 });
 
-describe("authCallbackModeToUrlExpression and authCallbackUrlExpressionToMode roundtrip", () => {
+describe("authCallbackConfigToExpression and authCallbackExpressionToConfig roundtrip", () => {
   it("should maintain consistency for default mode", () => {
     const original: PostLoginConfig = { postLoginMode: "default" };
     const expression = authCallbackConfigToExpression(original);
