@@ -16,7 +16,6 @@ type CustomCodeState = {
   config: ScriptConfig;
   disabled: boolean;
   needsUpdate: boolean;
-  rawHtml: string | null;
 };
 
 const CustomCodeContext = createContext<CustomCodeState | undefined>(undefined);
@@ -26,7 +25,6 @@ const initialState: CustomCodeState = {
   config: DEFAULT_SCRIPT_CONFIG,
   disabled: false,
   needsUpdate: false,
-  rawHtml: null,
 };
 
 export const CustomCodeProvider: React.FC<{ children: ReactNode }> = ({
@@ -41,7 +39,6 @@ export const CustomCodeProvider: React.FC<{ children: ReactNode }> = ({
         config: customCode.config ?? initialState.config,
         disabled: customCode.disabled ?? initialState.disabled,
         needsUpdate: customCode.needsUpdate ?? initialState.needsUpdate,
-        rawHtml: customCode.rawHtml ?? initialState.rawHtml,
       });
     });
   }, []);

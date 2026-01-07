@@ -211,11 +211,8 @@ export function scriptsMatch(rawHtml: string, config: ScriptConfig): boolean {
   }
 
   try {
-    // Parse the raw HTML to get the config
-    const parsedConfig = generateConfigFromRawHtml(rawHtml);
-
-    // Generate script from the parsed config
-    const regeneratedScript = generateScriptFromConfig(parsedConfig);
+    // Generate script from the provided config (using current generation logic)
+    const regeneratedScript = generateScriptFromConfig(config);
 
     // Normalize both scripts for comparison
     const normalizedRaw = normalizeScript(rawHtml);
@@ -223,7 +220,7 @@ export function scriptsMatch(rawHtml: string, config: ScriptConfig): boolean {
 
     return normalizedRaw === normalizedRegenerated;
   } catch {
-    // If parsing fails, they don't match
+    // If generation or normalization fails, they don't match
     return false;
   }
 }

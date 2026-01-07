@@ -19,7 +19,6 @@ export const subscribeToCustomCode = (
   callback: (props: {
     config: ScriptConfig;
     disabled: boolean;
-    rawHtml: string;
     needsUpdate: boolean;
   }) => void,
 ) => {
@@ -32,7 +31,6 @@ export const subscribeToCustomCode = (
     callback({
       config,
       disabled,
-      rawHtml,
       needsUpdate,
     });
   });
