@@ -202,11 +202,19 @@ function normalizeScript(script: string): string {
 /**
  * Compares raw HTML script with what would be generated from the current config.
  * Returns true if they match (after normalization), false otherwise.
- * Returns false if rawHtml is empty or if there's no domain configured.
+ * Returns true if both rawHtml and config.domain are empty (both unconfigured).
  */
 export function scriptsMatch(rawHtml: string, config: ScriptConfig): boolean {
-  // If no raw HTML or no domain, they don't match
-  if (!rawHtml || !rawHtml.trim() || !config.domain) {
+  const isEmptyHtml = !rawHtml || !rawHtml.trim();
+  const isEmptyDomain = !config.domain || !config.domain.trim();
+
+  // If both are empty, they match (both unconfigured)
+  if (isEmptyHtml && isEmptyDomain) {
+    return true;
+  }
+
+  // If one is empty but the other isn't, they don't match
+  if (isEmptyHtml || isEmptyDomain) {
     return false;
   }
 
