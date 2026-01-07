@@ -68,7 +68,6 @@ export const useNotifications = () => {
           </p>
           <Button
             variant="primary"
-            className={classes.buttonWrapper}
             onClick={(e) => {
               e.preventDefault();
               updateMutation.mutate(config);
