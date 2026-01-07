@@ -161,7 +161,6 @@ export const createOutsetaScript = ({
             domain: ${domainExpression},
             load: 'auth,profile,nocode,leadCapture,support,emailList',
             monitorDom: 'true',
-            stopImmediatePropagation: true,
             tokenStorage: ${tokenStorageExpression !== undefined ? `${tokenStorageExpression},` : `undefined,`}
             auth: {
               ${authCallbackExpression !== undefined ? `// Override the Post Login URL configured in Outseta` : `// As configured in Outseta`}
