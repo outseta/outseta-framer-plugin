@@ -1,5 +1,9 @@
-import { useConfiguration } from "../custom-code";
+import { useMutation } from "@tanstack/react-query";
+import { Button } from "@triozer/framer-toolbox";
+import { useConfiguration, useCustomCode, setCustomCode } from "../custom-code";
 import { Link } from "@tanstack/react-router";
+
+import classes from "./Notification.module.css";
 
 export enum NotificationLevel {
   INFO = 1,
@@ -14,6 +18,11 @@ export type Notification = {
 
 export const useNotifications = () => {
   const { domain, isInvalid, disabled } = useConfiguration();
+  const { needsUpdate, config } = useCustomCode();
+
+  const updateMutation = useMutation({
+    mutationFn: setCustomCode,
+  });
 
   const notifications = [];
 
@@ -21,11 +30,11 @@ export const useNotifications = () => {
     notifications.push({
       level: NotificationLevel.ERROR,
       message: (
-        <>
+        <p>
           The Outseta domain configured does not exist, either create an account
           for <strong>{domain}</strong> or{" "}
           <Link to="/custom-code">edit the configured Outseta domain</Link>.
-        </>
+        </p>
       ),
     });
   }
@@ -34,7 +43,7 @@ export const useNotifications = () => {
     notifications.push({
       level: NotificationLevel.WARNING,
       message: (
-        <>
+        <p>
           Please reenable the custom plugin code for Outseta to work properly.
           Go to{" "}
           <em>
@@ -43,6 +52,30 @@ export const useNotifications = () => {
             }
           </em>
           .
+        </p>
+      ),
+    });
+  }
+
+  if (needsUpdate) {
+    notifications.push({
+      level: NotificationLevel.WARNING,
+      message: (
+        <>
+          <p>
+            The Outseta script in your Framer site is outdated and doesn't match
+            the current plugin version.
+          </p>
+          <Button
+            variant="primary"
+            onClick={(e) => {
+              e.preventDefault();
+              updateMutation.mutate(config);
+            }}
+            disabled={updateMutation.isPending}
+          >
+            {updateMutation.isPending ? "Updating..." : "Update Script"}
+          </Button>
         </>
       ),
     });

@@ -1,5 +1,11 @@
 import { describe, it, expect } from "vitest";
-import { generateExpressionsFromRawHtml, createOutsetaScript } from "./script";
+import {
+  generateExpressionsFromRawHtml,
+  createOutsetaScript,
+  scriptsMatch,
+  DEFAULT_SCRIPT_CONFIG,
+  generateScriptFromConfig,
+} from "./script";
 
 describe("generateExpressionsFromRawHtml", () => {
   describe("complete script", () => {
@@ -1178,5 +1184,76 @@ describe("signupConfirmationExpression parsing and generation", () => {
         <script src="https://cdn.outseta.com/outseta.min.js" data-options="o_options"></script>
       `);
     });
+  });
+});
+
+describe("scriptsMatch", () => {
+  it("should return true when both rawHtml and config.domain are empty", () => {
+    const result = scriptsMatch("", DEFAULT_SCRIPT_CONFIG);
+    expect(result).toBe(true);
+  });
+
+  it("should return true when rawHtml is whitespace and config.domain is empty", () => {
+    const result = scriptsMatch("   \n\t  ", DEFAULT_SCRIPT_CONFIG);
+    expect(result).toBe(true);
+  });
+
+  it("should return false when rawHtml is empty but config.domain is set", () => {
+    const config = {
+      ...DEFAULT_SCRIPT_CONFIG,
+      domain: "test.outseta.com",
+    };
+    const result = scriptsMatch("", config);
+    expect(result).toBe(false);
+  });
+
+  it("should return false when rawHtml is set but config.domain is empty", () => {
+    const script = `
+      <script>
+        var o_options = {
+          domain: 'test.outseta.com',
+        };
+      </script>
+    `;
+    const result = scriptsMatch(script, DEFAULT_SCRIPT_CONFIG);
+    expect(result).toBe(false);
+  });
+
+  it("should return true when scripts match exactly", () => {
+    const config = {
+      ...DEFAULT_SCRIPT_CONFIG,
+      domain: "test.outseta.com",
+    };
+    const script = generateScriptFromConfig(config);
+    const result = scriptsMatch(script, config);
+    expect(result).toBe(true);
+  });
+
+  it("should return true when scripts match after normalization", () => {
+    const config = {
+      ...DEFAULT_SCRIPT_CONFIG,
+      domain: "test.outseta.com",
+    };
+    const script = generateScriptFromConfig(config);
+    // Add extra whitespace that should be normalized
+    const scriptWithWhitespace = `   ${script}   \n\n`;
+    const result = scriptsMatch(scriptWithWhitespace, config);
+    expect(result).toBe(true);
+  });
+
+  it("should return false when scripts do not match", () => {
+    const config = {
+      ...DEFAULT_SCRIPT_CONFIG,
+      domain: "test.outseta.com",
+    };
+    const differentScript = `
+      <script>
+        var o_options = {
+          domain: 'different.outseta.com',
+        };
+      </script>
+    `;
+    const result = scriptsMatch(differentScript, config);
+    expect(result).toBe(false);
   });
 });

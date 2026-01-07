@@ -20,7 +20,7 @@ export const Route = createFileRoute("/custom-code/")({
 
 function CustomCodeIndex() {
   const navigate = useNavigate();
-  const { config } = useCustomCode();
+  const { config, needsUpdate } = useCustomCode();
 
   const mutation = useMutation({
     mutationFn: setCustomCode,
@@ -56,6 +56,7 @@ function CustomCodeIndex() {
       <form.AppForm>
         <form.SubmitButton
           label={config.domain ? "Update Outseta Script" : "Add Outseta Script"}
+          forceEnabled={needsUpdate}
         />
       </form.AppForm>
     </form>

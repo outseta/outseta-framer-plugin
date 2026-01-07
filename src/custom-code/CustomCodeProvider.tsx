@@ -15,6 +15,7 @@ type CustomCodeState = {
   status: "loading" | "connected" | "disconnected";
   config: ScriptConfig;
   disabled: boolean;
+  needsUpdate: boolean;
 };
 
 const CustomCodeContext = createContext<CustomCodeState | undefined>(undefined);
@@ -23,6 +24,7 @@ const initialState: CustomCodeState = {
   status: "loading",
   config: DEFAULT_SCRIPT_CONFIG,
   disabled: false,
+  needsUpdate: false,
 };
 
 export const CustomCodeProvider: React.FC<{ children: ReactNode }> = ({
@@ -36,6 +38,7 @@ export const CustomCodeProvider: React.FC<{ children: ReactNode }> = ({
         status: customCode.config.domain ? "connected" : "disconnected",
         config: customCode.config ?? initialState.config,
         disabled: customCode.disabled ?? initialState.disabled,
+        needsUpdate: customCode.needsUpdate ?? initialState.needsUpdate,
       });
     });
   }, []);

@@ -183,3 +183,52 @@ export const createOutsetaScript = ({
       `;
   return script;
 };
+
+/**
+ * Normalizes whitespace in a script string for comparison
+ * - Trims leading/trailing whitespace
+ * - Normalizes line breaks to \n
+ * - Collapses multiple consecutive whitespace characters to single spaces
+ */
+function normalizeScript(script: string): string {
+  return script
+    .trim()
+    .replace(/\r\n/g, "\n")
+    .replace(/\r/g, "\n")
+    .replace(/[ \t]+/g, " ")
+    .replace(/\n\s*\n/g, "\n");
+}
+
+/**
+ * Compares raw HTML script with what would be generated from the current config.
+ * Returns true if they match (after normalization), false otherwise.
+ * Returns true if both rawHtml and config.domain are empty (both unconfigured).
+ */
+export function scriptsMatch(rawHtml: string, config: ScriptConfig): boolean {
+  const isEmptyHtml = !rawHtml || !rawHtml.trim();
+  const isEmptyDomain = !config.domain || !config.domain.trim();
+
+  // If both are empty, they match (both unconfigured)
+  if (isEmptyHtml && isEmptyDomain) {
+    return true;
+  }
+
+  // If one is empty but the other isn't, they don't match
+  if (isEmptyHtml || isEmptyDomain) {
+    return false;
+  }
+
+  try {
+    // Generate script from the provided config (using current generation logic)
+    const regeneratedScript = generateScriptFromConfig(config);
+
+    // Normalize both scripts for comparison
+    const normalizedRaw = normalizeScript(rawHtml);
+    const normalizedRegenerated = normalizeScript(regeneratedScript);
+
+    return normalizedRaw === normalizedRegenerated;
+  } catch {
+    // If generation or normalization fails, they don't match
+    return false;
+  }
+}
