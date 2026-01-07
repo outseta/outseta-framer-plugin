@@ -64,7 +64,7 @@ export const useNotifications = () => {
         <>
           <p>
             The Outseta script in your Framer site is outdated and doesn't match
-            the current plugin version.{" "}
+            the current plugin version.
           </p>
           <Button
             variant="primary"
