@@ -666,7 +666,6 @@ describe("createOutsetaScript", () => {
             domain: 'test.outseta.com',
             load: 'auth,profile,nocode,leadCapture,support,emailList',
             monitorDom: 'true',
-            stopImmediatePropagation: true,
             tokenStorage: undefined,
             auth: {
               // Override the Post Login URL configured in Outseta
@@ -702,7 +701,6 @@ describe("createOutsetaScript", () => {
             domain: 'myapp.outseta.com',
             load: 'auth,profile,nocode,leadCapture,support,emailList',
             monitorDom: 'true',
-            stopImmediatePropagation: true,
             tokenStorage: undefined,
             auth: {
               // As configured in Outseta
@@ -738,7 +736,6 @@ describe("createOutsetaScript", () => {
             domain: 'app.outseta.com',
             load: 'auth,profile,nocode,leadCapture,support,emailList',
             monitorDom: 'true',
-            stopImmediatePropagation: true,
             tokenStorage: undefined,
             auth: {
               // Override the Post Login URL configured in Outseta
@@ -775,7 +772,6 @@ describe("createOutsetaScript", () => {
             domain: 'app.outseta.com',
             load: 'auth,profile,nocode,leadCapture,support,emailList',
             monitorDom: 'true',
-            stopImmediatePropagation: true,
             tokenStorage: undefined,
             auth: {
               // As configured in Outseta
@@ -811,7 +807,6 @@ describe("createOutsetaScript", () => {
             domain: 'test.outseta.com',
             load: 'auth,profile,nocode,leadCapture,support,emailList',
             monitorDom: 'true',
-            stopImmediatePropagation: true,
             tokenStorage: undefined,
             auth: {
               // As configured in Outseta
@@ -847,7 +842,6 @@ describe("createOutsetaScript", () => {
             domain: 'test.outseta.com',
             load: 'auth,profile,nocode,leadCapture,support,emailList',
             monitorDom: 'true',
-            stopImmediatePropagation: true,
             tokenStorage: "local",
             auth: {
               // As configured in Outseta
@@ -885,7 +879,6 @@ describe("createOutsetaScript", () => {
             domain: 'test.outseta.com',
             load: 'auth,profile,nocode,leadCapture,support,emailList',
             monitorDom: 'true',
-            stopImmediatePropagation: true,
             tokenStorage: "session",
             auth: {
               // Override the Post Login URL configured in Outseta
@@ -1015,7 +1008,6 @@ describe("signupConfirmationExpression parsing and generation", () => {
             domain: 'test.outseta.com',
             load: 'auth,profile,nocode,leadCapture,support,emailList',
             monitorDom: 'true',
-            stopImmediatePropagation: true,
             tokenStorage: undefined,
             auth: {
               // As configured in Outseta
@@ -1051,7 +1043,6 @@ describe("signupConfirmationExpression parsing and generation", () => {
             domain: 'test.outseta.com',
             load: 'auth,profile,nocode,leadCapture,support,emailList',
             monitorDom: 'true',
-            stopImmediatePropagation: true,
             tokenStorage: undefined,
             auth: {
               // As configured in Outseta
@@ -1087,7 +1078,6 @@ describe("signupConfirmationExpression parsing and generation", () => {
             domain: 'test.outseta.com',
             load: 'auth,profile,nocode,leadCapture,support,emailList',
             monitorDom: 'true',
-            stopImmediatePropagation: true,
             tokenStorage: undefined,
             auth: {
               // As configured in Outseta
@@ -1124,7 +1114,6 @@ describe("signupConfirmationExpression parsing and generation", () => {
             domain: 'test.outseta.com',
             load: 'auth,profile,nocode,leadCapture,support,emailList',
             monitorDom: 'true',
-            stopImmediatePropagation: true,
             tokenStorage: undefined,
             auth: {
               // As configured in Outseta
@@ -1163,7 +1152,6 @@ describe("signupConfirmationExpression parsing and generation", () => {
             domain: 'test.outseta.com',
             load: 'auth,profile,nocode,leadCapture,support,emailList',
             monitorDom: 'true',
-            stopImmediatePropagation: true,
             tokenStorage: undefined,
             auth: {
               // Override the Post Login URL configured in Outseta
