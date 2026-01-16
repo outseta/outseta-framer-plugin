@@ -1,22 +1,34 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { revalidateLogic, useForm } from "@tanstack/react-form";
 
 import { CopyButton, PageListControls } from "../common";
-import { useState } from "react";
 
 export const Route = createFileRoute("/auth/logout")({
   component: AuthLogoutPage,
 });
 
 export function AuthLogoutPage() {
-  const [postLogoutPath, setPostLogoutPath] = useState<string>("/");
+  const form = useForm({
+    defaultValues: {
+      postLogoutPath: "/",
+    },
+    validationLogic: revalidateLogic({ mode: "submit", modeAfterSubmission: "change" }),
+  });
+
+  const postLogoutPath = form.useStore((s) => s.values.postLogoutPath) as string;
 
   return (
     <form>
-      <PageListControls
-        title="Post Logout Path"
-        value={postLogoutPath}
-        onChange={(value) => setPostLogoutPath(value)}
-      />
+      <form.Field name="postLogoutPath">
+        {(field) => (
+          <PageListControls
+            title="Post Logout Path"
+            value={field.state.value as string}
+            onChange={(value) => field.handleChange(value)}
+            onBlur={field.handleBlur}
+          />
+        )}
+      </form.Field>
 
       <CopyButton
         label="Copy popup url to clipboard"
