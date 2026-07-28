@@ -1,4 +1,4 @@
-export default function FieldError({ errors }: { errors: any[] }) {
+export default function FieldError({ errors }: { errors: unknown[] }) {
   if (errors.length === 0) return null;
   const error = errors[0];
   return (

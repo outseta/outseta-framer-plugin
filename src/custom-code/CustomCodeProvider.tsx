@@ -69,6 +69,7 @@ export const useConfiguration = () => {
     queryFn: () => getPlanData(domain),
     enabled: !!domain,
     retry: 1,
+    throwOnError: false,
   });
 
   const isInvalid = !query.data && query.errorUpdatedAt > 0;

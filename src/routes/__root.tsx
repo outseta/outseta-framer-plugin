@@ -1,5 +1,4 @@
 import { createRootRoute, Outlet, useNavigate } from "@tanstack/react-router";
-import { TanStackRouterDevtools } from "@tanstack/router-devtools";
 
 import { useEmbedMode, useSingleOutsetaEmbedSelection } from "../app-state";
 import { Widget, WidgetMode } from "../outseta";
@@ -45,7 +44,6 @@ function Root() {
   return (
     <div className={classes.root}>
       <Outlet />
-      {import.meta.env.DEV && <TanStackRouterDevtools />}
     </div>
   );
 }

@@ -431,8 +431,8 @@ const EmailListEmbed = ({ emailListUid }: { emailListUid: string }) => {
 };
 
 const Placeholder = ({
-  title,
-  subtitle,
+  title: _title,
+  subtitle: _subtitle,
   illustraton,
 }: {
   title: string;

@@ -1,3 +1,4 @@
+import { env } from "node:process";
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import mkcert from "vite-plugin-mkcert";
@@ -9,10 +10,11 @@ export default defineConfig({
   plugins: [
     tanstackRouterPlugin(),
     react(),
-    ...(process.env.NO_MKCERT === "true" ? [] : [mkcert()]),
+    ...(env.NO_MKCERT === "true" ? [] : [mkcert()]),
     framer(),
   ],
   build: {
     target: "ES2022",
+    modulePreload: { polyfill: false },
   },
 });

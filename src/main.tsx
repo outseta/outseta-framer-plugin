@@ -4,8 +4,6 @@ import "@triozer/framer-toolbox/index.css";
 import * as React from "react";
 import { useEffect } from "react";
 import { createRoot } from "react-dom/client";
-import { TanStackDevtools } from "@tanstack/react-devtools";
-import { FormDevtoolsPlugin } from "@tanstack/react-form-devtools";
 import Rollbar from "rollbar";
 import {
   Provider as RollbarProvider,
@@ -85,6 +83,14 @@ const queryClient = new QueryClient({
       rollbar?.error(error);
     },
   }),
+  defaultOptions: {
+    queries: {
+      throwOnError: true,
+    },
+    mutations: {
+      throwOnError: true,
+    },
+  },
 });
 
 const root = document.getElementById("root");
@@ -120,10 +126,5 @@ createRoot(root).render(
     ) : (
       app
     )}
-
-    <TanStackDevtools
-      config={{ hideUntilHover: true }}
-      plugins={[FormDevtoolsPlugin()]}
-    />
   </React.StrictMode>,
 );
