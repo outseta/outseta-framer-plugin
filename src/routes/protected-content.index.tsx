@@ -5,7 +5,7 @@ import { useConfiguration } from "../custom-code";
 import { getContentGroupData } from "../outseta";
 
 import classes from "./protected-content.module.css";
-import { usePageQuery } from "../pages";
+import { matchesContentGroupPath, usePageQuery } from "../pages";
 import { Alert } from "../common/Alert";
 import { ExternalLink } from "../common";
 
@@ -28,16 +28,9 @@ export function ProtectedContent() {
     pageQuery.data
       ?.map((page) => {
         const matchedItems = contentGroups.filter((item) => {
-          return item.ContentGroupItems.some(({ MatchMode, Pattern }) => {
-            switch (MatchMode) {
-              case 1:
-                return page.path === `/${Pattern}`;
-              case 2:
-                return page.path?.startsWith(`/${Pattern}`);
-              default:
-                return false;
-            }
-          });
+          return item.ContentGroupItems.some(({ MatchMode, Pattern }) =>
+            matchesContentGroupPath(page.path, Pattern, MatchMode),
+          );
         });
 
         return {
@@ -88,14 +81,18 @@ export function ProtectedContent() {
                 </h2>
                 <div>
                   {matchedItems.map((item) => {
+                    const usesProducts = item.AllowedProducts !== undefined;
+                    const allowedProductsOrPlans =
+                      item.AllowedProducts ?? item.AllowedPlans ?? [];
+
                     return (
                       <div key={item.Uid}>
-                        {item.AllowedPlans.length > 0 && (
+                        {allowedProductsOrPlans.length > 0 && (
                           <p>
-                            Allowed plan
-                            {item.AllowedPlans.length > 1 && <>s</>}
+                            Allowed {usesProducts ? "product" : "plan"}
+                            {allowedProductsOrPlans.length > 1 && <>s</>}
                             {": "}
-                            {item.AllowedPlans.map(
+                            {allowedProductsOrPlans.map(
                               ({ Uid, Name }, index, array) => (
                                 <span key={Uid}>
                                   <strong key={Uid}>{Name}</strong>
@@ -124,9 +121,12 @@ export function ProtectedContent() {
                           </p>
                         )}
 
-                        {item.AllowedPlans.length === 0 &&
+                        {allowedProductsOrPlans.length === 0 &&
                           item.AllowedAddOns.length === 0 && (
-                            <p>No allowed plans or add ons</p>
+                            <p>
+                              No allowed {usesProducts ? "products" : "plans"} or
+                              add ons
+                            </p>
                           )}
                       </div>
                     );

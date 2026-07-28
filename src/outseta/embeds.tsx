@@ -26,7 +26,15 @@ const upsertEmbed = async (
 };
 
 export const upsertAuthEmbed = async (
-  { widgetMode, preselect, familyUid, planUid, discountCode }: AuthEmbedConfig,
+  {
+    widgetMode,
+    preselect,
+    familyUid,
+    planUid,
+    productFamilyUid,
+    priceId,
+    discountCode,
+  }: AuthEmbedConfig,
   componentInstance: CanvasNode | null,
 ) => {
   const controls: Partial<OutsetaEmbedProps> = {
@@ -35,6 +43,8 @@ export const upsertAuthEmbed = async (
     registerPreselect: preselect,
     registerFamilyUid: familyUid,
     registerPlanUid: planUid,
+    registerProductFamilyUid: productFamilyUid,
+    registerPriceId: priceId,
     registerDiscountCode: discountCode,
   };
 

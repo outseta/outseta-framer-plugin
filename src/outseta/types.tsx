@@ -76,6 +76,8 @@ export type OutsetaEmbedProps = {
   registerPreselect: RegisterPreselectOption;
   registerFamilyUid: string;
   registerPlanUid: string;
+  registerProductFamilyUid: string;
+  registerPriceId: string;
   registerDiscountCode: string;
   // Profile
   profileDefaultTab: ProfileTabOption;
@@ -91,6 +93,8 @@ export const defaultProps: OutsetaEmbedProps = {
   registerPreselect: "none",
   registerFamilyUid: "",
   registerPlanUid: "",
+  registerProductFamilyUid: "",
+  registerPriceId: "",
   registerDiscountCode: "",
   profileDefaultTab: "profile",
   emailListUid: "",
@@ -102,6 +106,8 @@ export type AuthEmbedConfig = {
   preselect?: RegisterPreselectOption;
   familyUid?: string;
   planUid?: string;
+  productFamilyUid?: string;
+  priceId?: string;
   discountCode?: string;
 };
 
@@ -130,9 +136,31 @@ export type PlanFamily = {
   Plans: PlanFamilyPlan[];
 };
 
+export type StripePrice = {
+  Uid: string;
+  StripeId: string;
+  IsActive: boolean;
+  ShowInSignUpForm?: boolean;
+};
+
+export type StripeProduct = {
+  Uid: string;
+  Name: string;
+  DefaultPriceId?: string | null;
+  StripePrices?: StripePrice[];
+};
+
+export type StripeProductFamily = {
+  Uid: string;
+  Name: string;
+  StripeProducts: StripeProduct[];
+};
+
 export type PlansResponse = {
   DiscountsExist: boolean;
   PlanFamilies: PlanFamily[];
+  StripeProducts?: StripeProduct[];
+  StripeProductFamilies?: StripeProductFamily[];
 };
 
 export type BasicItem = {
@@ -154,7 +182,8 @@ export type ContentGroup = {
   Uid: string;
   Name: string;
   ContentGroupItems: ContentGroupItem[];
-  AllowedPlans: BasicItem[];
+  AllowedProducts?: BasicItem[];
+  AllowedPlans?: BasicItem[];
   AllowedAddOns: BasicItem[];
 };
 

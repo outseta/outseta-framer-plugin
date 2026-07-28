@@ -6,7 +6,12 @@ import tanstackRouterPlugin from "@tanstack/router-plugin/vite";
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [tanstackRouterPlugin(), react(), mkcert(), framer()],
+  plugins: [
+    tanstackRouterPlugin(),
+    react(),
+    ...(process.env.NO_MKCERT === "true" ? [] : [mkcert()]),
+    framer(),
+  ],
   build: {
     target: "ES2022",
   },

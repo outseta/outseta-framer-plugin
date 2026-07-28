@@ -25,15 +25,15 @@ import { CustomCodeProvider } from "./custom-code";
  * ROLLBAR
  */
 
-// Initialize Config
-const rollbarConfig = {
-  accessToken: import.meta.env.VITE_ROLLBAR_ACCESS_TOKEN,
-  environment: import.meta.env.MODE,
-  captureUncaught: true,
-  captureUnhandledRejections: true,
-};
-
-const rollbar = new Rollbar(rollbarConfig);
+const rollbarAccessToken = import.meta.env.VITE_ROLLBAR_ACCESS_TOKEN;
+const rollbar = rollbarAccessToken
+  ? new Rollbar({
+      accessToken: rollbarAccessToken,
+      environment: import.meta.env.MODE,
+      captureUncaught: true,
+      captureUnhandledRejections: true,
+    })
+  : null;
 
 /**
  * TANSTACK ROUTER
@@ -54,7 +54,7 @@ const RouterErrorComponent = ({
   useEffect(() => {
     if (error) {
       console.error("Tanstack Router", error);
-      rollbar.error(error);
+      rollbar?.error(error);
     }
   }, [error]);
   return <ErrorDisplay error={error} resetError={reset} />;
@@ -82,7 +82,7 @@ const queryClient = new QueryClient({
   queryCache: new QueryCache({
     onError: (error) => {
       console.error("Tanstack Query", error);
-      rollbar.error(error);
+      rollbar?.error(error);
     },
   }),
 });
@@ -99,22 +99,27 @@ framer.showUI({
   width: 400,
 });
 
+const app = (
+  <QueryClientProvider client={queryClient}>
+    <AppStateProvider>
+      <CustomCodeProvider>
+        <RouterProvider router={router} />
+      </CustomCodeProvider>
+    </AppStateProvider>
+  </QueryClientProvider>
+);
+
 createRoot(root).render(
   <React.StrictMode>
-    {/* Last resort error handling */}
-    <RollbarProvider instance={rollbar}>
-      <RollbarErrorBoundary fallbackUI={ErrorDisplay}>
-        {/* Error handling configured in query cache */}
-        <QueryClientProvider client={queryClient}>
-          <AppStateProvider>
-            <CustomCodeProvider>
-              {/* Error handling configured in router options */}
-              <RouterProvider router={router} />
-            </CustomCodeProvider>
-          </AppStateProvider>
-        </QueryClientProvider>
-      </RollbarErrorBoundary>
-    </RollbarProvider>
+    {rollbar ? (
+      <RollbarProvider instance={rollbar}>
+        <RollbarErrorBoundary fallbackUI={ErrorDisplay}>
+          {app}
+        </RollbarErrorBoundary>
+      </RollbarProvider>
+    ) : (
+      app
+    )}
 
     <TanStackDevtools
       config={{ hideUntilHover: true }}

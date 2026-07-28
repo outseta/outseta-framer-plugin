@@ -78,6 +78,8 @@ export type OutsetaEmbedProps = {
   registerPreselect: RegisterPreselectOption;
   registerFamilyUid: string;
   registerPlanUid: string;
+  registerProductFamilyUid: string;
+  registerPriceId: string;
   registerDiscountCode: string;
   // Profile
   profileDefaultTab: ProfileTabOption;
@@ -93,6 +95,8 @@ export const defaultProps: OutsetaEmbedProps = {
   registerPreselect: "none",
   registerFamilyUid: "",
   registerPlanUid: "",
+  registerProductFamilyUid: "",
+  registerPriceId: "",
   registerDiscountCode: "",
   profileDefaultTab: "profile",
   emailListUid: "",
@@ -180,6 +184,32 @@ addPropertyControls(OutsetaEmbed, {
       !["login|register", "register"].includes(props.widgetMode) ||
       !["plan"].includes(props.registerPreselect),
   },
+  registerProductFamilyUid: {
+    title: "Product Family Uid",
+    type: ControlType.String,
+    defaultValue: "",
+    hidden: (props: {
+      widget: Widget;
+      widgetMode: WidgetMode;
+      registerPreselect: RegisterPreselectOption;
+    }) =>
+      !["auth"].includes(props.widget) ||
+      !["login|register", "register"].includes(props.widgetMode) ||
+      !["family"].includes(props.registerPreselect),
+  },
+  registerPriceId: {
+    title: "Price Id",
+    type: ControlType.String,
+    defaultValue: "",
+    hidden: (props: {
+      widget: Widget;
+      widgetMode: WidgetMode;
+      registerPreselect: RegisterPreselectOption;
+    }) =>
+      !["auth"].includes(props.widget) ||
+      !["login|register", "register"].includes(props.widgetMode) ||
+      !["plan"].includes(props.registerPreselect),
+  },
   registerDiscountCode: {
     title: "Discount Code",
     type: ControlType.String,
@@ -231,33 +261,55 @@ const AuthEmbed = ({
   registerPreselect,
   registerPlanUid,
   registerFamilyUid,
+  registerProductFamilyUid,
+  registerPriceId,
   registerDiscountCode,
 }: {
   widgetMode: string;
   registerPreselect: RegisterPreselectOption;
   registerPlanUid: string;
   registerFamilyUid: string;
+  registerProductFamilyUid: string;
+  registerPriceId: string;
   registerDiscountCode: string;
 }) => {
-  const preselectProps: { planUid?: string; planFamilyUid?: string } = {};
+  const preselectProps: Record<string, string> = {};
   let subtitle = null;
 
   if (registerPreselect === "plan") {
-    preselectProps["data-plan-uid"] = registerPlanUid;
-    subtitle = (
-      <>
-        With plan <code>{registerPlanUid}</code>
-      </>
-    );
+    if (registerPriceId) {
+      preselectProps["data-price-id"] = registerPriceId;
+      subtitle = (
+        <>
+          With price <code>{registerPriceId}</code>
+        </>
+      );
+    } else {
+      preselectProps["data-plan-uid"] = registerPlanUid;
+      subtitle = (
+        <>
+          With plan <code>{registerPlanUid}</code>
+        </>
+      );
+    }
   }
 
   if (registerPreselect === "family") {
-    preselectProps["data-plan-family-uid"] = registerFamilyUid;
-    subtitle = (
-      <>
-        With plan family <code>{registerFamilyUid}</code>
-      </>
-    );
+    if (registerProductFamilyUid) {
+      preselectProps["data-product-family-uid"] = registerProductFamilyUid;
+      subtitle = (
+        <>
+          With product family <code>{registerProductFamilyUid}</code>
+        </>
+      );
+    } else {
+      preselectProps["data-plan-family-uid"] = registerFamilyUid;
+      subtitle = (
+        <>
+          With plan family <code>{registerFamilyUid}</code>
+        </>
+      );
+    }
   }
 
   if (registerDiscountCode) {

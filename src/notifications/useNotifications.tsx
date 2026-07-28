@@ -3,8 +3,6 @@ import { Button } from "@triozer/framer-toolbox";
 import { useConfiguration, useCustomCode, setCustomCode } from "../custom-code";
 import { Link } from "@tanstack/react-router";
 
-import classes from "./Notification.module.css";
-
 export enum NotificationLevel {
   INFO = 1,
   WARNING,

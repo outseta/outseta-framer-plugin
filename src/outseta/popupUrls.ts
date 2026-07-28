@@ -13,17 +13,32 @@ function popupUrl({ path, domain }: { path: string; domain: string }) {
 }
 
 export function registerAuthPopupUrl(
-  { preselect, planUid, familyUid, discountCode }: AuthEmbedConfig,
+  {
+    preselect,
+    planUid,
+    familyUid,
+    priceId,
+    productFamilyUid,
+    discountCode,
+  }: AuthEmbedConfig,
   domain: string,
 ) {
   let path = `/auth?widgetMode=register`;
 
-  if (preselect === "plan" && planUid) {
-    path += `&planUid=${planUid}`;
+  if (preselect === "plan") {
+    if (priceId) {
+      path += `&priceId=${priceId}`;
+    } else if (planUid) {
+      path += `&planUid=${planUid}`;
+    }
   }
 
-  if (preselect === "family" && familyUid) {
-    path += `&planFamilyUid=${familyUid}`;
+  if (preselect === "family") {
+    if (productFamilyUid) {
+      path += `&productFamilyUid=${productFamilyUid}`;
+    } else if (familyUid) {
+      path += `&planFamilyUid=${familyUid}`;
+    }
   }
 
   if (discountCode) {

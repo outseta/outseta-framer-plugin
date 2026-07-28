@@ -16,6 +16,14 @@ export const getPlanData = async (domain: string): Promise<PlansResponse> => {
     "PlanFamilies.Name",
     "PlanFamilies.Plans.Uid",
     "PlanFamilies.Plans.Name",
+    "StripeProducts.*",
+    "StripeProducts.StripePrices.*",
+    "StripeProducts.StripeProductCrossSells.IsUserSelectable",
+    "StripeProducts.StripeProductCrossSells.CrossSellProduct.*",
+    "StripeProducts.StripeProductCrossSells.CrossSellProduct.StripePrices.*",
+    "StripeProductFamilies.*",
+    "StripeProductFamilies.StripeProducts.*",
+    "StripeProductFamilies.StripeProducts.StripePrices.*",
   ].join(",");
 
   const response: AxiosResponse<PlansResponse> = await axios.get(

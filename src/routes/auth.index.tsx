@@ -51,6 +51,12 @@ function AuthRegisterPage() {
   const [planUid, setPlanUid] = useState<string>(
     embedControls?.registerPlanUid as string,
   );
+  const [productFamilyUid, setProductFamilyUid] = useState<string>(
+    embedControls?.registerProductFamilyUid as string,
+  );
+  const [priceId, setPriceId] = useState<string>(
+    embedControls?.registerPriceId as string,
+  );
   const [applyDiscountCode, setApplyDiscount] = useState<boolean>(
     !!(embedControls?.registerDiscountCode as string),
   );
@@ -59,8 +65,21 @@ function AuthRegisterPage() {
   );
 
   const planFamilies = query.data?.PlanFamilies;
-  const defaultFamilyUid = query.data?.PlanFamilies?.[0]?.Uid;
-  const defaultPlanUid = query.data?.PlanFamilies?.[0]?.Plans[0]?.Uid;
+  const stripeProducts = query.data?.StripeProducts;
+  const stripeProductFamilies = query.data?.StripeProductFamilies;
+  const usesStripeProducts = stripeProducts !== undefined;
+  const stripeProductItems =
+    stripeProducts?.flatMap((product) => {
+      const priceId =
+        product.DefaultPriceId ||
+        product.StripePrices?.find((price) => price.IsActive)?.StripeId;
+
+      return priceId ? [{ value: priceId, label: product.Name }] : [];
+    }) ?? [];
+  const defaultFamilyUid = planFamilies?.[0]?.Uid;
+  const defaultPlanUid = planFamilies?.[0]?.Plans[0]?.Uid;
+  const defaultProductFamilyUid = stripeProductFamilies?.[0]?.Uid;
+  const defaultPriceId = stripeProductItems[0]?.value;
   const allPlans = planFamilies?.flatMap((family) => family.Plans);
   const discountCodeExists = query.data?.DiscountsExist;
 
@@ -69,8 +88,12 @@ function AuthRegisterPage() {
   const config: AuthEmbedConfig = {
     widgetMode: "register",
     preselect,
-    familyUid: familyUid || defaultFamilyUid,
-    planUid: planUid || defaultPlanUid,
+    familyUid: usesStripeProducts ? undefined : familyUid || defaultFamilyUid,
+    planUid: usesStripeProducts ? undefined : planUid || defaultPlanUid,
+    productFamilyUid: usesStripeProducts
+      ? productFamilyUid || defaultProductFamilyUid
+      : undefined,
+    priceId: usesStripeProducts ? priceId || defaultPriceId : undefined,
     discountCode,
   };
 
@@ -79,11 +102,15 @@ function AuthRegisterPage() {
       embedControls?.registerPreselect as RegisterPreselectOption;
     const familyUid = embedControls?.registerFamilyUid as string;
     const planUid = embedControls?.registerPlanUid as string;
+    const productFamilyUid = embedControls?.registerProductFamilyUid as string;
+    const priceId = embedControls?.registerPriceId as string;
     const code = embedControls?.registerDiscountCode as string;
 
     setPreselect(preselect || "none");
     setFamilyUid(familyUid);
     setPlanUid(planUid);
+    setProductFamilyUid(productFamilyUid);
+    setPriceId(priceId);
     setDiscountCode(code);
     if (code && !applyDiscountCode) {
       setApplyDiscount(true);
@@ -92,6 +119,8 @@ function AuthRegisterPage() {
     embedControls?.registerPreselect,
     embedControls?.registerFamilyUid,
     embedControls?.registerPlanUid,
+    embedControls?.registerProductFamilyUid,
+    embedControls?.registerPriceId,
     embedControls?.registerDiscountCode,
   ]);
 
@@ -99,44 +128,53 @@ function AuthRegisterPage() {
     mutationFn: () => upsertAuthEmbed(config, singleOutsetaEmbed),
   });
 
-  const planFamilyItems =
-    planFamilies?.map((family) => ({
-      value: family.Uid,
-      label: family.Name,
-    })) || [];
+  const familyItems =
+    (usesStripeProducts ? stripeProductFamilies : planFamilies)?.map(
+      (family) => ({
+        value: family.Uid,
+        label: family.Name,
+      }),
+    ) || [];
+  const selectedFamilyUid = usesStripeProducts ? productFamilyUid : familyUid;
+  const selectedDefaultFamilyUid = usesStripeProducts
+    ? defaultProductFamilyUid
+    : defaultFamilyUid;
 
-  if (familyUid !== undefined && query.isSuccess) {
-    // After the query has succeeded
-    if (!planFamilyItems.find((item) => item.value === familyUid)) {
-      // Check if the uid is valid and if not add an invalid item to the top of the list
-      planFamilyItems.unshift({
-        value: familyUid,
-        label: `Invalid  - ${familyUid ? familyUid : "empty"}`,
+  if (selectedFamilyUid !== undefined && query.isSuccess) {
+    if (!familyItems.find((item) => item.value === selectedFamilyUid)) {
+      familyItems.unshift({
+        value: selectedFamilyUid,
+        label: `Invalid  - ${selectedFamilyUid || "empty"}`,
       });
     }
   }
 
-  const planItems =
-    planFamilies
-      ?.find((family) => {
-        if (familyUid) {
-          return family.Uid === familyUid;
-        } else {
-          return family.Uid === defaultFamilyUid;
-        }
-      })
-      ?.Plans.map((plan) => ({
-        value: plan.Uid,
-        label: plan.Name,
-      })) || [];
+  const productOrPlanItems = usesStripeProducts
+    ? stripeProductItems
+    : (planFamilies
+        ?.find((family) =>
+          familyUid
+            ? family.Uid === familyUid
+            : family.Uid === defaultFamilyUid,
+        )
+        ?.Plans.map((plan) => ({
+          value: plan.Uid,
+          label: plan.Name,
+        })) ?? []);
+  const selectedProductOrPlanId = usesStripeProducts ? priceId : planUid;
+  const selectedDefaultProductOrPlanId = usesStripeProducts
+    ? defaultPriceId
+    : defaultPlanUid;
 
-  if (planUid !== undefined && query.isSuccess) {
-    // After the query has succeeded
-    if (!planItems.find((item) => item.value === planUid)) {
-      // Check if the uid is valid and if not add an invalid item to the top of the list
-      planItems.unshift({
-        value: planUid,
-        label: `Invalid  - ${planUid ? planUid : "empty"}`,
+  if (selectedProductOrPlanId !== undefined && query.isSuccess) {
+    if (
+      !productOrPlanItems.find(
+        (item) => item.value === selectedProductOrPlanId,
+      )
+    ) {
+      productOrPlanItems.unshift({
+        value: selectedProductOrPlanId,
+        label: `Invalid  - ${selectedProductOrPlanId || "empty"}`,
       });
     }
   }
@@ -163,30 +201,48 @@ function AuthRegisterPage() {
         title="Preselect"
         items={RegisterPreselectOptions.map((option) => ({
           value: option,
-          label: RegisterPreselectOptionLabels[option],
+          label:
+            usesStripeProducts && option !== "none"
+              ? option === "family"
+                ? "Product Family"
+                : "Single Product"
+              : RegisterPreselectOptionLabels[option],
         }))}
         value={preselect}
         onChange={(value) => setPreselect(value)}
       />
 
-      {/* Display plan family selection when preselect is set to "family" or "plan" */}
-      {preselect !== "none" && (
+      {(preselect === "family" ||
+        (!usesStripeProducts && preselect === "plan")) && (
         <ListControls
-          title="Family"
-          items={planFamilyItems}
-          value={familyUid === undefined ? defaultFamilyUid : familyUid}
-          onChange={(value) => setFamilyUid(value)}
+          title={usesStripeProducts ? "Product Family" : "Plan Family"}
+          items={familyItems}
+          value={
+            selectedFamilyUid === undefined
+              ? selectedDefaultFamilyUid
+              : selectedFamilyUid
+          }
+          onChange={(value) =>
+            usesStripeProducts
+              ? setProductFamilyUid(value)
+              : setFamilyUid(value)
+          }
           disabled={query.isPending}
         />
       )}
 
-      {/* Display plan selection when preselect is set to "plan" */}
       {preselect === "plan" && (
         <ListControls
-          title="Plan"
-          items={planItems}
-          value={planUid === undefined ? defaultPlanUid : planUid}
-          onChange={(value) => setPlanUid(value)}
+          title={usesStripeProducts ? "Product" : "Plan"}
+          items={productOrPlanItems}
+          value={
+            selectedProductOrPlanId === undefined
+              ? selectedDefaultProductOrPlanId
+              : selectedProductOrPlanId
+          }
+          onChange={(value) =>
+            usesStripeProducts ? setPriceId(value) : setPlanUid(value)
+          }
           disabled={query.isPending}
         />
       )}
@@ -236,11 +292,12 @@ function AuthRegisterPage() {
       )}
 
       <section>
-        {allPlans?.length === 0 && (
+        {(usesStripeProducts ? stripeProductItems.length : allPlans?.length) ===
+          0 && (
           <Alert level="warning">
             Add at least one{" "}
             <ExternalLink href={`https://${domain}/#/app/billing/plans/`}>
-              plan in Outseta
+              {usesStripeProducts ? "product" : "plan"} in Outseta
             </ExternalLink>{" "}
             to enable signup.
           </Alert>
