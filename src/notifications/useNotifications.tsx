@@ -2,6 +2,8 @@ import { useMutation } from "@tanstack/react-query";
 import { Button } from "@triozer/framer-toolbox";
 import { useConfiguration, useCustomCode, setCustomCode } from "../custom-code";
 import { Link } from "@tanstack/react-router";
+import { useIsAllowedTo } from "framer-plugin";
+import { notifyMutationError } from "../framer/permissions";
 
 export enum NotificationLevel {
   INFO = 1,
@@ -17,9 +19,12 @@ export type Notification = {
 export const useNotifications = () => {
   const { domain, isInvalid, disabled } = useConfiguration();
   const { needsUpdate, config } = useCustomCode();
+  const canSetCustomCode = useIsAllowedTo("setCustomCode");
 
   const updateMutation = useMutation({
     mutationFn: setCustomCode,
+    onError: notifyMutationError("update the Outseta script"),
+    throwOnError: false,
   });
 
   const notifications = [];
@@ -70,10 +75,13 @@ export const useNotifications = () => {
               e.preventDefault();
               updateMutation.mutate(config);
             }}
-            disabled={updateMutation.isPending}
+            disabled={!canSetCustomCode || updateMutation.isPending}
           >
             {updateMutation.isPending ? "Updating..." : "Update Script"}
           </Button>
+          {!canSetCustomCode && (
+            <p>You don&apos;t have permission to change custom code.</p>
+          )}
         </>
       ),
     });

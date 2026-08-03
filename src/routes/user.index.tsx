@@ -5,6 +5,7 @@ import { useMutation } from "@tanstack/react-query";
 
 import {
   upsertProfileEmbed,
+  useCanUpsertEmbed,
   ProfileTabOptions,
   ProfileTabOptionLabels,
   ProfileTabOption,
@@ -14,9 +15,13 @@ import {
 import {
   useEmbedMode,
   useSingleOutsetaEmbedSelection,
-  useSingleSupportsLinkSelection,
 } from "../app-state";
-import { CopyButton, EmbedModeListControls } from "../common";
+import {
+  EmbedModeListControls,
+  PermissionNotice,
+  PopupLinkFormSection,
+} from "../common";
+import { notifyMutationError } from "../framer/permissions";
 import { useConfiguration } from "../custom-code";
 
 export const Route = createFileRoute("/user/")({
@@ -26,8 +31,8 @@ export const Route = createFileRoute("/user/")({
 function User() {
   const { embedMode } = useEmbedMode();
   const { domain } = useConfiguration();
-  const singleSupportsLink = useSingleSupportsLinkSelection();
   const singleOutsetaEmbed = useSingleOutsetaEmbedSelection();
+  const canUpsertEmbed = useCanUpsertEmbed(singleOutsetaEmbed);
 
   const [tab, setTab] = useState<ProfileTabOption>("profile");
 
@@ -40,22 +45,14 @@ function User() {
 
   const embedMutation = useMutation({
     mutationFn: () => upsertProfileEmbed(config, singleOutsetaEmbed),
-  });
-
-  const popupMutation = useMutation({
-    mutationFn: () => {
-      if (!singleSupportsLink) return Promise.resolve(null);
-      return singleSupportsLink.setAttributes({
-        link: profilePopupUrl(config, domain),
-        linkOpenInNewTab: false,
-      });
-    },
+    onError: notifyMutationError("save the profile embed"),
+    throwOnError: false,
   });
 
   return (
     <form
       onChange={() => {
-        if (!singleOutsetaEmbed) return;
+        if (!singleOutsetaEmbed || !canUpsertEmbed) return;
         embedMutation.mutate();
       }}
       onSubmit={(event) => {
@@ -64,9 +61,6 @@ function User() {
         switch (embedMode) {
           case "embed":
             embedMutation.mutate();
-            break;
-          case "popup":
-            popupMutation.mutate();
             break;
         }
       }}
@@ -81,27 +75,21 @@ function User() {
         }))}
         value={tab}
         onChange={(value) => setTab(value)}
+        disabled={!!singleOutsetaEmbed && !canUpsertEmbed}
       />
 
       {embedMode === "embed" && !singleOutsetaEmbed && (
-        <Button variant="primary">Add Profile Embed to page</Button>
+        <Button variant="primary" disabled={!canUpsertEmbed}>
+          Add Profile Embed to page
+        </Button>
       )}
 
-      {embedMode === "popup" && singleSupportsLink && (
-        <Button variant="primary">Set Profile Popup Link</Button>
+      {embedMode === "embed" && !canUpsertEmbed && (
+        <PermissionNotice action="add or update component embeds" />
       )}
 
-      {embedMode === "popup" && !singleSupportsLink && (
-        <>
-          <CopyButton
-            label={`Copy Popup Url to clipboard`}
-            text={profilePopupUrl(config, domain)}
-          />
-          <p>
-            Paste the copied url as the <strong>Link To</strong> value
-            <br /> and set <strong>New Tab</strong> to <em>No</em>.
-          </p>
-        </>
+      {embedMode === "popup" && (
+        <PopupLinkFormSection popupUrl={profilePopupUrl(config, domain)} />
       )}
     </form>
   );

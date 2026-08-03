@@ -1,4 +1,5 @@
-import { CanvasNode, framer } from "framer-plugin";
+import { CanvasNode, framer, useIsAllowedTo } from "framer-plugin";
+import { requireFramerPermission } from "../framer/permissions";
 import {
   OutsetaEmbedProps,
   AuthEmbedConfig,
@@ -14,8 +15,10 @@ const upsertEmbed = async (
   componentInstance?: CanvasNode | null,
 ) => {
   if (componentInstance) {
-    componentInstance.setAttributes({ controls: controls });
+    requireFramerPermission("Node.setAttributes", "update component embeds");
+    await componentInstance.setAttributes({ controls: controls });
   } else {
+    requireFramerPermission("addComponentInstance", "add component embeds");
     await framer.addComponentInstance({
       url: OUTSETA_EMBED_URL,
       attributes: {
@@ -23,6 +26,15 @@ const upsertEmbed = async (
       },
     });
   }
+};
+
+export const useCanUpsertEmbed = (
+  componentInstance?: CanvasNode | null,
+) => {
+  const canAddComponent = useIsAllowedTo("addComponentInstance");
+  const canSetAttributes = useIsAllowedTo("Node.setAttributes");
+
+  return componentInstance ? canSetAttributes : canAddComponent;
 };
 
 export const upsertAuthEmbed = async (
@@ -60,7 +72,7 @@ export const upsertProfileEmbed = async (
     profileDefaultTab: tab,
   };
 
-  upsertEmbed(controls, componentInstance);
+  return upsertEmbed(controls, componentInstance);
 };
 
 export const upsertEmailListEmbed = async (

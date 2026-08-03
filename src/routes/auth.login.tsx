@@ -4,14 +4,19 @@ import { Button } from "@triozer/framer-toolbox";
 
 import {
   upsertAuthEmbed,
+  useCanUpsertEmbed,
   loginAuthPopupUrl,
   AuthEmbedConfig,
 } from "../outseta";
-import { EmbedModeListControls, PopupLinkFormSection } from "../common";
+import {
+  EmbedModeListControls,
+  PermissionNotice,
+  PopupLinkFormSection,
+} from "../common";
+import { notifyMutationError } from "../framer/permissions";
 import {
   useEmbedMode,
   useSingleOutsetaEmbedSelection,
-  useSingleSupportsLinkSelection,
 } from "../app-state";
 import { useConfiguration } from "../custom-code";
 
@@ -22,23 +27,15 @@ export const Route = createFileRoute("/auth/login")({
 export function AuthLoginPage() {
   const { embedMode } = useEmbedMode();
   const { domain } = useConfiguration();
-  const singleSupportsLink = useSingleSupportsLinkSelection();
   const singleOutsetaEmbed = useSingleOutsetaEmbedSelection();
+  const canUpsertEmbed = useCanUpsertEmbed(singleOutsetaEmbed);
 
   const config: AuthEmbedConfig = { widgetMode: "login" };
 
   const embedMutation = useMutation({
     mutationFn: () => upsertAuthEmbed(config, singleOutsetaEmbed),
-  });
-
-  const popupMutation = useMutation({
-    mutationFn: () => {
-      if (!singleSupportsLink) return Promise.resolve(null);
-      return singleSupportsLink.setAttributes({
-        link: loginAuthPopupUrl(domain),
-        linkOpenInNewTab: false,
-      });
-    },
+    onError: notifyMutationError("save the login embed"),
+    throwOnError: false,
   });
 
   return (
@@ -50,16 +47,19 @@ export function AuthLoginPage() {
           case "embed":
             embedMutation.mutate();
             break;
-          case "popup":
-            popupMutation.mutate();
-            break;
         }
       }}
     >
       <EmbedModeListControls disabled={!!singleOutsetaEmbed} />
 
       {embedMode === "embed" && !singleOutsetaEmbed && (
-        <Button variant="primary">Add Login Embed to page</Button>
+        <Button variant="primary" disabled={!canUpsertEmbed}>
+          Add Login Embed to page
+        </Button>
+      )}
+
+      {embedMode === "embed" && !canUpsertEmbed && (
+        <PermissionNotice action="add or update component embeds" />
       )}
 
       {embedMode === "popup" && (

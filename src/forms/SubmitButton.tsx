@@ -4,9 +4,11 @@ import { useFormContext } from "./form-context";
 export default function SubmitButton({
   label,
   forceEnabled,
+  disabled,
 }: {
   label: string;
   forceEnabled?: boolean;
+  disabled?: boolean;
 }) {
   const form = useFormContext();
   return (
@@ -15,7 +17,7 @@ export default function SubmitButton({
         <Button
           variant="primary"
           type="submit"
-          disabled={(!isDirty && !forceEnabled) || isSubmitting}
+          disabled={disabled || (!isDirty && !forceEnabled) || isSubmitting}
         >
           {label}
         </Button>

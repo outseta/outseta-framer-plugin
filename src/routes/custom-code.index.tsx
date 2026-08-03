@@ -1,7 +1,10 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useMutation } from "@tanstack/react-query";
+import { useIsAllowedTo } from "framer-plugin";
 
 import { useAppForm } from "../forms";
+import { PermissionNotice } from "../common";
+import { notifyMutationError } from "../framer/permissions";
 
 import {
   setCustomCode,
@@ -21,10 +24,13 @@ export const Route = createFileRoute("/custom-code/")({
 function CustomCodeIndex() {
   const navigate = useNavigate();
   const { config, needsUpdate } = useCustomCode();
+  const canSetCustomCode = useIsAllowedTo("setCustomCode");
 
   const mutation = useMutation({
     mutationFn: setCustomCode,
     onSuccess: () => navigate({ to: "/", from: Route.fullPath }),
+    onError: notifyMutationError("save the Outseta script"),
+    throwOnError: false,
   });
 
   const form = useAppForm({
@@ -57,8 +63,11 @@ function CustomCodeIndex() {
         <form.SubmitButton
           label={config.domain ? "Update Outseta Script" : "Add Outseta Script"}
           forceEnabled={needsUpdate}
+          disabled={!canSetCustomCode}
         />
       </form.AppForm>
+
+      {!canSetCustomCode && <PermissionNotice action="change custom code" />}
     </form>
   );
 }

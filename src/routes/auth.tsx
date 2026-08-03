@@ -9,7 +9,9 @@ import { SegmentedControls, Separator } from "@triozer/framer-toolbox";
 import { LinkList, LinkListItem, PageHeader } from "../common";
 import { useConfiguration, DisconnectedLinkListItem } from "../custom-code";
 import { useSingleOutsetaEmbedSelection } from "../app-state";
-import { upsertAuthEmbed } from "../outseta";
+import { upsertAuthEmbed, useCanUpsertEmbed } from "../outseta";
+import { useMutation } from "@tanstack/react-query";
+import { notifyMutationError } from "../framer/permissions";
 import { GlobalErrorNotificationSection } from "../notifications";
 
 export const Route = createFileRoute("/auth")({
@@ -24,6 +26,14 @@ function AuthPage() {
   const navigate = useNavigate();
   const { domain } = useConfiguration();
   const singleOutsetaEmbed = useSingleOutsetaEmbedSelection();
+  const canUpdateEmbed = useCanUpsertEmbed(singleOutsetaEmbed);
+
+  const updateEmbedMutation = useMutation({
+    mutationFn: (widgetMode: "register" | "login") =>
+      upsertAuthEmbed({ widgetMode }, singleOutsetaEmbed),
+    onError: notifyMutationError("change the authentication embed"),
+    throwOnError: false,
+  });
 
   return (
     <>
@@ -37,11 +47,12 @@ function AuthPage() {
             { value: "/auth/logout", label: "Logout" },
           ]}
           value={pathname}
-          onChange={async (value) => {
+          disabled={!!singleOutsetaEmbed && !canUpdateEmbed}
+          onChange={(value) => {
             if (singleOutsetaEmbed && value === "/auth") {
-              upsertAuthEmbed({ widgetMode: "register" }, singleOutsetaEmbed);
+              updateEmbedMutation.mutate("register");
             } else if (singleOutsetaEmbed && value === "/auth/login") {
-              upsertAuthEmbed({ widgetMode: "login" }, singleOutsetaEmbed);
+              updateEmbedMutation.mutate("login");
             } else {
               navigate({ to: value });
             }

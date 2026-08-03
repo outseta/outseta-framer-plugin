@@ -9,9 +9,11 @@ import {
 // Mock framer-plugin
 const mockSetCustomCode = vi.fn();
 const mockSubscribeToCustomCode = vi.fn();
+const mockIsAllowedTo = vi.fn((_method: unknown) => true);
 
 vi.mock("framer-plugin", () => ({
   framer: {
+    isAllowedTo: (method: unknown) => mockIsAllowedTo(method),
     setCustomCode: (...args: unknown[]) => mockSetCustomCode(...args),
     subscribeToCustomCode: (...args: unknown[]) =>
       mockSubscribeToCustomCode(...args),
@@ -21,6 +23,16 @@ vi.mock("framer-plugin", () => ({
 describe("setCustomCode", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mockIsAllowedTo.mockReturnValue(true);
+  });
+
+  it("should reject without permission", async () => {
+    mockIsAllowedTo.mockReturnValue(false);
+
+    await expect(setCustomCode(DEFAULT_SCRIPT_CONFIG)).rejects.toThrow(
+      "You don't have permission to change custom code",
+    );
+    expect(mockSetCustomCode).not.toHaveBeenCalled();
   });
 
   it("should call framer.setCustomCode with null when domain is not provided", async () => {

@@ -5,6 +5,7 @@ export { CopyButton } from "./CopyButton";
 export { ErrorDisplay } from "./ErrorDisplay";
 export { PageListControls } from "./PageListControls";
 export { PopupLinkFormSection } from "./PopupLinkFormSection";
+export { PermissionNotice } from "./PermissionNotice";
 export { LinkList, LinkListItem } from "./LinkList";
 export { ExternalLink } from "./ExternalLink";
 

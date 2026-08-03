@@ -1,4 +1,5 @@
 import { framer } from "framer-plugin";
+import { requireFramerPermission } from "../framer/permissions";
 import {
   generateScriptFromConfig,
   generateConfigFromRawHtml,
@@ -7,6 +8,8 @@ import {
 } from "../scripts";
 
 export const setCustomCode = async (config: ScriptConfig) => {
+  requireFramerPermission("setCustomCode", "change custom code");
+
   if (!config.domain) {
     return await framer.setCustomCode({ html: null, location: "headEnd" });
   } else {

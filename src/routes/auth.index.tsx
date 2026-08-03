@@ -16,15 +16,18 @@ import {
   registerAuthPopupUrl,
   AuthEmbedConfig,
   upsertAuthEmbed,
+  useCanUpsertEmbed,
 } from "../outseta";
 import {
   EmbedModeListControls,
   PopupLinkFormSection,
   ExternalLink,
+  PermissionNotice,
 } from "../common";
 import { useEmbedMode, useSingleOutsetaEmbedSelection } from "../app-state";
 import { useConfiguration } from "../custom-code";
 import { Alert } from "../common/Alert";
+import { notifyMutationError } from "../framer/permissions";
 
 export const Route = createFileRoute("/auth/")({
   component: AuthRegisterPage,
@@ -40,6 +43,7 @@ function AuthRegisterPage() {
   });
 
   const singleOutsetaEmbed = useSingleOutsetaEmbedSelection();
+  const canUpsertEmbed = useCanUpsertEmbed(singleOutsetaEmbed);
   const embedControls = singleOutsetaEmbed?.controls;
 
   const [preselect, setPreselect] = useState<RegisterPreselectOption>(
@@ -67,7 +71,8 @@ function AuthRegisterPage() {
   const planFamilies = query.data?.PlanFamilies;
   const stripeProducts = query.data?.StripeProducts;
   const stripeProductFamilies = query.data?.StripeProductFamilies;
-  const usesStripeProducts = stripeProducts !== undefined;
+  const usesStripeProducts =
+    !!stripeProducts?.length && !!stripeProductFamilies?.length;
   const stripeProductItems =
     stripeProducts?.flatMap((product) => {
       const priceId =
@@ -126,6 +131,18 @@ function AuthRegisterPage() {
 
   const embedMutation = useMutation({
     mutationFn: () => upsertAuthEmbed(config, singleOutsetaEmbed),
+    onError: notifyMutationError("save the signup embed"),
+    throwOnError: false,
+  });
+
+  const clearDiscountMutation = useMutation({
+    mutationFn: () =>
+      upsertAuthEmbed(
+        { widgetMode: "register", discountCode: "" },
+        singleOutsetaEmbed,
+      ),
+    onError: notifyMutationError("clear the signup embed discount code"),
+    throwOnError: false,
   });
 
   const familyItems =
@@ -182,7 +199,7 @@ function AuthRegisterPage() {
   return (
     <form
       onChange={() => {
-        if (!singleOutsetaEmbed) return;
+        if (!singleOutsetaEmbed || !canUpsertEmbed) return;
         embedMutation.mutate();
       }}
       onSubmit={(event) => {
@@ -210,6 +227,7 @@ function AuthRegisterPage() {
         }))}
         value={preselect}
         onChange={(value) => setPreselect(value)}
+        disabled={!!singleOutsetaEmbed && !canUpsertEmbed}
       />
 
       {(preselect === "family" ||
@@ -227,7 +245,9 @@ function AuthRegisterPage() {
               ? setProductFamilyUid(value)
               : setFamilyUid(value)
           }
-          disabled={query.isPending}
+          disabled={
+            query.isPending || (!!singleOutsetaEmbed && !canUpsertEmbed)
+          }
         />
       )}
 
@@ -243,7 +263,9 @@ function AuthRegisterPage() {
           onChange={(value) =>
             usesStripeProducts ? setPriceId(value) : setPlanUid(value)
           }
-          disabled={query.isPending}
+          disabled={
+            query.isPending || (!!singleOutsetaEmbed && !canUpsertEmbed)
+          }
         />
       )}
 
@@ -255,13 +277,11 @@ function AuthRegisterPage() {
           if (!value && singleOutsetaEmbed) {
             setDiscountCode("");
             // HACK: This is a workaround to update the discount
-            // code in the embed when disables the discount code
-            upsertAuthEmbed(
-              { widgetMode: "register", discountCode: "" },
-              singleOutsetaEmbed,
-            );
+            // code in the embed when disabling the discount code
+            clearDiscountMutation.mutate();
           }
         }}
+        disabled={!!singleOutsetaEmbed && !canUpsertEmbed}
       />
 
       {applyDiscountCode && (
@@ -270,6 +290,7 @@ function AuthRegisterPage() {
             title="Discount code"
             value={discountCode}
             onChange={(value) => setDiscountCode(value)}
+            disabled={!!singleOutsetaEmbed && !canUpsertEmbed}
           />
           {!discountCodeExists && (
             <p>
@@ -284,7 +305,13 @@ function AuthRegisterPage() {
       )}
 
       {embedMode === "embed" && !singleOutsetaEmbed && (
-        <Button variant="primary">Add Signup Embed to page</Button>
+        <Button variant="primary" disabled={!canUpsertEmbed}>
+          Add Signup Embed to page
+        </Button>
+      )}
+
+      {embedMode === "embed" && !canUpsertEmbed && (
+        <PermissionNotice action="add or update component embeds" />
       )}
 
       {embedMode === "popup" && (

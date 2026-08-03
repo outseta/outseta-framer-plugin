@@ -6,6 +6,7 @@ import { Button, ListControls } from "@triozer/framer-toolbox";
 import { useConfiguration } from "../custom-code";
 import {
   upsertLeadCaptureEmbed,
+  useCanUpsertEmbed,
   getLeadCaptureData,
   LeadCaptureEmbedConfig,
   leadCapturePopupUrl,
@@ -16,7 +17,9 @@ import {
   Alert,
   PopupLinkFormSection,
   ExternalLink,
+  PermissionNotice,
 } from "../common";
+import { notifyMutationError } from "../framer/permissions";
 
 export const Route = createFileRoute("/lead-capture/")({
   component: LeadCaptureIndex,
@@ -27,6 +30,7 @@ export function LeadCaptureIndex() {
   const { domain, isInvalid } = useConfiguration();
 
   const singleOutsetaEmbed = useSingleOutsetaEmbedSelection();
+  const canUpsertEmbed = useCanUpsertEmbed(singleOutsetaEmbed);
 
   const query = useQuery({
     queryKey: ["outseta", "lead-capture", "all", domain],
@@ -48,6 +52,8 @@ export function LeadCaptureIndex() {
 
   const embedMutation = useMutation({
     mutationFn: () => upsertLeadCaptureEmbed(config, singleOutsetaEmbed),
+    onError: notifyMutationError("save the lead capture embed"),
+    throwOnError: false,
   });
 
   const items =
@@ -70,7 +76,7 @@ export function LeadCaptureIndex() {
   return (
     <form
       onChange={() => {
-        if (!singleOutsetaEmbed) return;
+        if (!singleOutsetaEmbed || !canUpsertEmbed) return;
         embedMutation.mutate();
       }}
       onSubmit={(event) => {
@@ -90,11 +96,19 @@ export function LeadCaptureIndex() {
         items={items}
         value={uid === undefined ? defaultUid : uid}
         onChange={(value) => setUid(value)}
-        disabled={items.length === 0}
+        disabled={
+          items.length === 0 || (!!singleOutsetaEmbed && !canUpsertEmbed)
+        }
       />
 
       {embedMode === "embed" && !singleOutsetaEmbed && (
-        <Button>Add Lead Capture Embed to page</Button>
+        <Button disabled={!canUpsertEmbed}>
+          Add Lead Capture Embed to page
+        </Button>
+      )}
+
+      {embedMode === "embed" && !canUpsertEmbed && (
+        <PermissionNotice action="add or update component embeds" />
       )}
 
       <PopupLinkFormSection popupUrl={leadCapturePopupUrl(config, domain)} />

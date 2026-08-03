@@ -6,6 +6,7 @@ import { Button, ListControls } from "@triozer/framer-toolbox";
 import { useConfiguration } from "../custom-code";
 import {
   upsertEmailListEmbed,
+  useCanUpsertEmbed,
   EmailListEmbedConfig,
   emailListPopupUrl,
   getEmailListData,
@@ -16,7 +17,9 @@ import {
   Alert,
   PopupLinkFormSection,
   ExternalLink,
+  PermissionNotice,
 } from "../common";
+import { notifyMutationError } from "../framer/permissions";
 import { useEmbedMode, useSingleOutsetaEmbedSelection } from "../app-state";
 
 export const Route = createFileRoute("/email-list/")({
@@ -27,6 +30,7 @@ export function EmailListIndex() {
   const { embedMode } = useEmbedMode();
   const { domain, isInvalid } = useConfiguration();
   const singleOutsetaEmbed = useSingleOutsetaEmbedSelection();
+  const canUpsertEmbed = useCanUpsertEmbed(singleOutsetaEmbed);
 
   const query = useQuery({
     queryKey: ["outseta", "email-list", "all", domain],
@@ -48,6 +52,8 @@ export function EmailListIndex() {
 
   const embedMutation = useMutation({
     mutationFn: () => upsertEmailListEmbed(config, singleOutsetaEmbed),
+    onError: notifyMutationError("save the email list embed"),
+    throwOnError: false,
   });
 
   const items =
@@ -70,7 +76,7 @@ export function EmailListIndex() {
   return (
     <form
       onChange={() => {
-        if (!singleOutsetaEmbed) return;
+        if (!singleOutsetaEmbed || !canUpsertEmbed) return;
         embedMutation.mutate();
       }}
       onSubmit={(event) => {
@@ -90,11 +96,19 @@ export function EmailListIndex() {
         items={items}
         value={uid === undefined ? defaultUid : uid}
         onChange={(value) => setUid(value)}
-        disabled={items.length === 0}
+        disabled={
+          items.length === 0 || (!!singleOutsetaEmbed && !canUpsertEmbed)
+        }
       />
 
       {embedMode === "embed" && !singleOutsetaEmbed && (
-        <Button variant="primary">Add Email List Embed to page</Button>
+        <Button variant="primary" disabled={!canUpsertEmbed}>
+          Add Email List Embed to page
+        </Button>
+      )}
+
+      {embedMode === "embed" && !canUpsertEmbed && (
+        <PermissionNotice action="add or update component embeds" />
       )}
 
       <PopupLinkFormSection popupUrl={emailListPopupUrl(config, domain)} />
